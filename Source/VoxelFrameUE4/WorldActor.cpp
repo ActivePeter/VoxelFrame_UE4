@@ -9,6 +9,8 @@ AWorldActor::AWorldActor()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	context.meshManager->customMesh = CreateDefaultSubobject<UProceduralMeshComponent>("customMesh");
+	context.meshManager->customMesh->bUseAsyncCooking = false;
+	//context.meshManager->customMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	//context.chunkManager = std::make_shared<VF::ChunkManager>();
 }
@@ -17,7 +19,7 @@ AWorldActor::AWorldActor()
 void AWorldActor::BeginPlay()
 {
 	Super::BeginPlay();
-	generateCubeTest();
+	//generateCubeTest();
 	//customMesh.bU
 }
 
@@ -25,6 +27,7 @@ void AWorldActor::BeginPlay()
 void AWorldActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	context.chunkManager->cookOneChunk();
 }
 
 void AWorldActor::generateCubeTest()

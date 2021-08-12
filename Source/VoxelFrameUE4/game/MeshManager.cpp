@@ -16,6 +16,7 @@ namespace VF
 			id = nextSectionId;
 			nextSectionId++;
 		}
+		assert(customMesh);
 		customMesh->CreateMeshSection(id, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), true);
 
 		return id;
@@ -23,6 +24,7 @@ namespace VF
 
 	void MeshManager::updateMesh_withId(int id, const TArray<FVector>& vertices, const TArray<int32>& triangles)
 	{
+		assert(customMesh);
 		customMesh->CreateMeshSection(id, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), true);
 	}
 }

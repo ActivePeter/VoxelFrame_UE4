@@ -29,7 +29,8 @@ namespace VF
 
 		Type::Vec3I oldPlayerChunkPos;
 
-
+		std::list<std::shared_ptr<Chunk>> chunks2Cook;
+		FCriticalSection chunkCookMutex;
 		//判断区块是否在可视范围内0
 		bool isChunkInRange(int x, int y, int z,
 			int centerX = 0, int centerY = 0, int centerZ = 0)
@@ -55,6 +56,8 @@ namespace VF
 		void constructMeshForChunk(Chunk& chunk);
 
 		void checkPlayerChunkPosChange(const Type::Vec3F& curPlayerPos);
+
+		void cookOneChunk();
 
 		//通过Key获取chunk，若不存在则创建chunk
 		std::shared_ptr<Chunk> getChunkOfKey(const ChunkKey& ck);

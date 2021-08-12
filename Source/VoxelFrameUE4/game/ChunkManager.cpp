@@ -166,14 +166,8 @@ namespace VF
 		//bottom face
 		VF::addOneTriangle2IndexArr(chunk.triangles, 2, 0, 4);
 		VF::addOneTriangle2IndexArr(chunk.triangles, 4, 7, 2);*/
-		if (chunk.meshId < 0)
-		{
-			chunk.meshId = context->meshManager->createMesh_andGetId(chunk.vertices, chunk.triangles);
-		}
-		else
-		{
-			context->meshManager->updateMesh_withId(chunk.meshId, chunk.vertices, chunk.triangles);
-		}
+
+
 	}
 	void ChunkManager::checkPlayerChunkPosChange(const Type::Vec3F& curPlayerPos)
 	{
@@ -205,8 +199,17 @@ namespace VF
 					)
 				);
 				chunks2Draw[i] = chunk2Draw;
+				//chunkPtr = chunk2Draw.get(;
+				AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask,
+					[this, chunk2Draw]()
+					{
+						constructMeshForChunk(*chunk2Draw);
 
-				constructMeshForChunk(*chunk2Draw);
+						chunkCookMutex.Lock();
+						chunks2Cook.emplace_back(chunk2Draw);
+						chunkCookMutex.Unlock();
+					}
+				);
 				//App::getInstance().graphPtr->meshes2draw.emplace(chunks2Draw[i].get());
 
 				//threadPool2BuildChunkMeshes->enqueue(
@@ -221,6 +224,40 @@ namespace VF
 
 		}
 		oldPlayerChunkPos = curPlayerChunkPos;
+	}
+
+	void ChunkManager::cookOneChunk()
+	{
+		static bool cooking=false;
+		if(!cooking){
+			cooking = true;
+			AsyncTask(ENamedThreads::GameThread,
+				[this]()
+				{
+					if (chunkCookMutex.TryLock())
+					{
+						if (chunks2Cook.size() > 0)
+						{
+							auto back = chunks2Cook.back();
+							chunks2Cook.pop_back();
+							if (back->meshId < 0)
+							{
+								back->meshId = context->meshManager->createMesh_andGetId(back->vertices, back->triangles);
+							}
+							else
+							{
+								context->meshManager->updateMesh_withId(back->meshId, back->vertices, back->triangles);
+							}
+						}
+
+						chunkCookMutex.Unlock();
+					}
+
+					cooking = false;
+				}
+			);
+			
+		}
 	}
 	std::shared_ptr<Chunk> ChunkManager::getChunkOfKey(const ChunkKey& ck)
 	{

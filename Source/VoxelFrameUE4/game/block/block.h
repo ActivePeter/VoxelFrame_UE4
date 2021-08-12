@@ -121,7 +121,7 @@ namespace VF
 			/**
 			 * 添加block信息（在注册block时调用
 			*/
-			void addBlock(const BlockTypeInfo& Info)
+			void addBlock(const BlockTypeInfo &Info)
 			{
 				typeInfos.push_back(Info);
 			}
@@ -129,7 +129,7 @@ namespace VF
 			/**
 			 * 添加一个emptyblock（在注册block时调用
 			*/
-			void addEmptyBlock(const BlockTypeInfo& Info)
+			void addEmptyBlock(const BlockTypeInfo &Info)
 			{
 				typeInfos.push_back(Info);
 				//设置为空方块属性
@@ -138,7 +138,7 @@ namespace VF
 			/**
 			 * 根据blockId获取Info
 			*/
-			BlockTypeInfo& getInfo(int blockId)
+			BlockTypeInfo &getInfo(int blockId)
 			{
 				return typeInfos[blockId];
 			}
@@ -146,16 +146,17 @@ namespace VF
 		};
 
 		// /**************************************
-			//  * 往区块网格添加一个方块面的函数
-			//  * 包含了三角形的顺序信息（indices
-			//  * 顶点信息（vertices
-			//  * 材质信息（uv
-			//  *
-			//  * 网格是区块网格，所以要加上方块的坐标作为顶点的偏移
-			//  * ***************************************/
-		void pushOneFace2Chunk(const Type::Vec3F& chunkMeshPos, int blockx, int blocky, int blockz, _Block::BlockTypeInfo& info, _Block::FaceDirection dir,
-			Type::Array<Type::Vec3F>& vertexPoses,
-			Type::Array<int32>& indices);
+		//  * 往区块网格添加一个方块面的函数
+		//  * 包含了三角形的顺序信息（indices
+		//  * 顶点信息（vertices
+		//  * 材质信息（uv
+		//  *
+		//  * 网格是区块网格，所以要加上方块的坐标作为顶点的偏移
+		//  * ***************************************/
+		void pushOneFace2Chunk(const Type::Vec3F &chunkMeshPos, int blockx, int blocky, int blockz, _Block::BlockTypeInfo &info, _Block::FaceDirection dir,
+							   Type::Array<Type::Vec3F> &vertexPoses,
+							   Type::Array<int32> &indices);
 		//void pushOneFace2Mesh(int blockx, int blocky, int blockz, Info& Info, _Block::FaceDirection dir, _Graph::Mesh& mesh);
+
 	}
 }
