@@ -1,3 +1,39 @@
 # VoxelFrame_UE4
-Planning to implement my VoxelFrame project on ue4, which is a minecraft like game.
-https://github.com/ActivePeter/VoxelFrame
+## Introduction（介绍
+
+- I likes playing minecraft very much and it's always been my dream to write a mc.
+
+  我非常喜欢玩minecraft，写一个mc是我长久以来一直想做到的事
+
+![image-20210609143052106](https://hanbaoaaa.xyz/tuchuang/images/2021/06/09/image-20210609143052106.png)
+
+## Organization（组织
+
+- [VoxelFrame (github.com)](https://github.com/VoxelFrame)   
+
+  To store related projects.
+
+  用于存储相关项目
+
+## Language（语言
+
+- c++(client), rust(server) ~~golang~~ 
+
+## Related Projects（相关项目
+
+- #### paecs（entity component system)
+
+  [https://github.com/ActivePeter/paecs](https://github.com/ActivePeter/paecs)
+
+  I'm also trying to implement a ecs lib and use it in my mc
+
+  我也在尝试实现一个ecs库并用在我的mc里
+
+- #### raw opengl version
+
+  [https://github.com/ActivePeter/VoxelFrame](https://github.com/ActivePeter/VoxelFrame)
+
+- #### unity version
+
+  [VoxelFrame/VoxelFrame_Abandoned (github.com)](https://github.com/VoxelFrame/VoxelFrame_Abandoned)
+
