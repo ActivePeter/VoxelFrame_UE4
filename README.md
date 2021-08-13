@@ -37,3 +37,15 @@
 
   [VoxelFrame/VoxelFrame_Abandoned (github.com)](https://github.com/VoxelFrame/VoxelFrame_Abandoned)
 
+## Progress（進度
+
+- 2021/8/13
+
+  - 区块构建的卡顿修复，原因是在一个mesh component下create会复制之前的数据，
+
+  - 无限加载
+
+    ![](./image/20210813_155207.gif)
+
+    
+
