@@ -12,11 +12,18 @@ namespace VF
 		GameContext* context;
 
 		UProceduralMeshComponent* customMesh;
-		std::unordered_set<int> recycledSectionIds;
-		int nextSectionId = 1;
 
-		int createMesh_andGetId(const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
-		void updateMesh_withId(int id, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+		/*销毁后可再利用的网格插件*/
+		std::list<int> recycledSectionIds;
+
+		/*网格组件池*/
+		std::vector<UProceduralMeshComponent*> meshCompPool;
+
+		int nextSectionId = 0;
+
+		int createMeshAndGetId(const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+		void updateMeshWithId(int id, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+		void delMeshWithId(int id);
 
 		void init(GameContext* context1)
 		{

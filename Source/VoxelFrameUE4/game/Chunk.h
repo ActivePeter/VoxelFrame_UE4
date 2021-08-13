@@ -70,7 +70,10 @@ namespace VF
 		 * 需要构造
 		 */
 		bool needConstruct = true;
-
+		void unbindMesh()
+		{
+			meshId = -1;
+		}
 		inline void getChunkWorldPos(Type::Vec3F& return_pos)
 		{
 			return_pos.X = chunkData.chunkKey.x() * (VF_ChunkWidth);

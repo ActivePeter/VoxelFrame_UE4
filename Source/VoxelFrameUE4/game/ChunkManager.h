@@ -29,8 +29,8 @@ namespace VF
 
 		Type::Vec3I oldPlayerChunkPos;
 
-		std::list<std::shared_ptr<Chunk>> chunks2Cook;
-		FCriticalSection chunkCookMutex;
+		
+		
 		//判断区块是否在可视范围内0
 		bool isChunkInRange(int x, int y, int z,
 			int centerX = 0, int centerY = 0, int centerZ = 0)
@@ -48,6 +48,9 @@ namespace VF
 		}
 
 	public:
+		FCriticalSection chunkCookMutex;
+		std::list<std::shared_ptr<Chunk>> chunks2Cook;
+
 		ChunkManager();
 		void init(GameContext* context1)
 		{

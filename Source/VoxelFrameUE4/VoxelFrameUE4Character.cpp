@@ -121,7 +121,7 @@ void AVoxelFrameUE4Character::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (world)
 	{
-		world->context.chunkManager->checkPlayerChunkPosChange(
+		world->context->chunkManager->checkPlayerChunkPosChange(
 			FVector(GetActorLocation().X, GetActorLocation().Z, GetActorLocation().Y)/VF_WorldScale);
 	}
 	else

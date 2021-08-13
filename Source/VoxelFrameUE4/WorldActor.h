@@ -32,7 +32,7 @@ public:
 	// Sets default values for this actor's properties
 	AWorldActor();
 
-	VF::GameContext context;
+	std::shared_ptr<VF::GameContext> context;
 protected:
 	/* The vertices of the mesh */
 	TArray<FVector> vertices;

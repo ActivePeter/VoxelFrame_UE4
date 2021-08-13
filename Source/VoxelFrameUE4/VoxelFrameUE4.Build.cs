@@ -8,6 +8,12 @@ public class VoxelFrameUE4 : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "ProceduralMeshComponent" });
+        PublicDependencyModuleNames.AddRange(
+            new string[] 
+            {
+                "Core", "CoreUObject", "Engine", "InputCore",
+                "HeadMountedDisplay", "ProceduralMeshComponent" 
+            }
+        );
     }
 }

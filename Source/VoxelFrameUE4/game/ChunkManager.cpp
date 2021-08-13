@@ -59,13 +59,13 @@ namespace VF
 		}
 	}
 
-	template <typename IndexArrType>
+	/*template <typename IndexArrType>
 	static void addOneTriangle2IndexArr(IndexArrType& arr, int index1, int index2, int index3)
 	{
 		arr.Add(index1);
 		arr.Add(index2);
 		arr.Add(index3);
-	}
+	}*/
 
 	void ChunkManager::constructMeshForChunk(Chunk& chunk)
 	{
@@ -182,6 +182,10 @@ namespace VF
 					if (!isChunkInRange(chunks2Draw[i]->chunkData.chunkKey, curPlayerChunkPos.X, curPlayerChunkPos.Y, curPlayerChunkPos.Z)) {
 						/*App::getInstance().graphPtr->meshes2draw.erase(chunks2Draw[i].get());
 						chunksDestroyQuene.push_back(chunks2Draw[i]);*/
+						auto key = chunks2Draw[i]->chunkData.chunkKey;
+						//UE_LOG(LogTemp, Warning, TEXT("mesh del %d %d %d"), key.x(), key.y(), key.z());
+						context->meshManager->delMeshWithId(chunks2Draw[i]->meshId);
+						chunks2Draw[i]->unbindMesh();
 					}
 					else {
 						/*printf("%-2d %-2d %-2d,", player.chunkX - chunks2Draw[i]->key.x, player.chunkY - chunks2Draw[i]->key.y, player.chunkZ - chunks2Draw[i]->key.z);*/
@@ -228,35 +232,28 @@ namespace VF
 
 	void ChunkManager::cookOneChunk()
 	{
-		static bool cooking=false;
-		if(!cooking){
-			cooking = true;
-			AsyncTask(ENamedThreads::GameThread,
-				[this]()
+		/*AsyncTask(ENamedThreads::GameThread,
+			[this]()
+			{*/
+		if (chunkCookMutex.TryLock())
+		{
+			while (chunks2Cook.size() > 0)
+			{
+				auto back = chunks2Cook.back();
+				chunks2Cook.pop_back();
+				if (back->meshId < 0)
 				{
-					if (chunkCookMutex.TryLock())
-					{
-						if (chunks2Cook.size() > 0)
-						{
-							auto back = chunks2Cook.back();
-							chunks2Cook.pop_back();
-							if (back->meshId < 0)
-							{
-								back->meshId = context->meshManager->createMesh_andGetId(back->vertices, back->triangles);
-							}
-							else
-							{
-								context->meshManager->updateMesh_withId(back->meshId, back->vertices, back->triangles);
-							}
-						}
-
-						chunkCookMutex.Unlock();
-					}
-
-					cooking = false;
+					//context->meshManager->customMesh = context->worldActor->CreateDefaultSubobject<UProceduralMeshComponent>("customMesh");
+					back->meshId = context->meshManager->createMeshAndGetId(back->vertices, back->triangles);
 				}
-			);
-			
+				else
+				{
+
+					//context->meshManager->updateMesh_withId(back->meshId, back->vertices, back->triangles);
+				}
+			}
+
+			chunkCookMutex.Unlock();
 		}
 	}
 	std::shared_ptr<Chunk> ChunkManager::getChunkOfKey(const ChunkKey& ck)

@@ -1,6 +1,6 @@
 #pragma once
-#define VF_ChunkLoadRadius (2)
-#define VF_ChunkWidth (16)
+#define VF_ChunkLoadRadius (4)
+#define VF_ChunkWidth (32)
 #define VF_ChunkSize (VF_ChunkWidth * VF_ChunkWidth * VF_ChunkWidth)
 #define VF_WorldScale (100)
 #include "memory"
