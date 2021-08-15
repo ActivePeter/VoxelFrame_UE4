@@ -9,7 +9,7 @@ AWorldActor::AWorldActor()
 	context = std::make_shared<VF::GameContext>();
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	context->meshManager->customMesh = CreateDefaultSubobject<UProceduralMeshComponent>("customMesh");
+	context->meshManager->customMesh = CreateDefaultSubobject<VF::UProceduralMeshComponentWithBind>("customMesh");
 	//context->meshManager->customMesh->bUseAsyncCooking = false;
 	//context->meshManager->customMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -21,6 +21,7 @@ AWorldActor::AWorldActor()
 void AWorldActor::BeginPlay()
 {
 	Super::BeginPlay();
+	context->worldActorCallWhenBeginPlay();
 	//generateCubeTest();
 	//customMesh.bU
 }
@@ -83,7 +84,7 @@ void AWorldActor::generateCubeTest()
 	VertexColors.Add(FLinearColor(0.f, 1.f, 1.f));*/
 
 	//context.meshManager->customMesh->CreateMeshSection(0, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), true);
-	context->meshManager->createMeshAndGetId(vertices, triangles);
+	context->meshManager->createMeshAndGetId(this, FName("test"), vertices, triangles);
 	// customMesh->section
 	//customMesh->CreateMeshSection_LinearColor(0, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), VertexColors, TArray<FProcMeshTangent>(), true);
 }

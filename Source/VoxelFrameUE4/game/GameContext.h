@@ -1,4 +1,6 @@
 #pragma once
+
+
 #include "VF_Base.h"
 class AWorldActor;
 namespace VF
@@ -9,17 +11,27 @@ namespace VF
 	namespace _Block
 	{
 		class BlockManager;
+		class BlockPreviewManager;
 	}
 
 	class GameContext
 	{
+		
 	public:
+		static GameContext* getContext();
 		std::shared_ptr<ChunkManager> chunkManager;
 		std::shared_ptr<MeshManager> meshManager;
 		std::shared_ptr<_Block::BlockManager> blockManager;
+		std::shared_ptr<_Block::BlockPreviewManager> blockPreviewManager;
 		AWorldActor* worldActor;
+
+		/*
+		 *WorldActor 调用的函数，用来检查是否一切就绪
+		 ***/
+		void worldActorCallWhenBeginPlay();
+
 		GameContext();
-		//~GameContext();
+		~GameContext();
 	};
 }
 
@@ -27,3 +39,4 @@ namespace VF
 #include "ChunkManager.h"
 #include "block/block.h"
 #include "VoxelFrameUE4/WorldActor.h"
+#include "block/BlockPreviewManager.h"

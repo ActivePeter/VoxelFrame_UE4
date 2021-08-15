@@ -2,7 +2,11 @@
 #include "../WorldActor.h"
 namespace VF
 {
-	int MeshManager::createMeshAndGetId(const TArray<FVector>& vertices, const TArray<int32>& triangles)
+	UProceduralMeshComponentWithBind* MeshManager::getMeshById(int id)
+	{
+		return meshCompPool[id];
+	}
+	int MeshManager::createMeshAndGetId(void* bindedTo, const FName& tag, const TArray<FVector>& vertices, const TArray<int32>& triangles)
 	{
 		int id = 0;
 		if (recycledSectionIds.size() > 0)
@@ -16,7 +20,10 @@ namespace VF
 		{
 			id = nextSectionId;
 
-			auto newMesh = NewObject<UProceduralMeshComponent>(context->worldActor);
+			auto newMesh = NewObject<UProceduralMeshComponentWithBind>(context->worldActor);
+			//newMesh->meshId = id;
+
+
 			newMesh->RegisterComponent();
 			newMesh->bUseAsyncCooking = true;
 
@@ -25,17 +32,23 @@ namespace VF
 		}
 		assert(customMesh);
 		assert(context->worldActor);
-		auto mesh=meshCompPool[id];
-		
+		auto mesh = meshCompPool[id];
+		assert(mesh);
+		//设置绑定到的对象指针
+		mesh->bindedTo = bindedTo;
+		//设置新的绑定的tag
+		mesh->ComponentTags.SetNum(0);
+		mesh->ComponentTags.Add(tag);
 		mesh->CreateMeshSection(0/*id*/, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), true);
-		
+
 		return id;
 	}
 
-	void MeshManager::updateMeshWithId(int id, const TArray<FVector>& vertices, const TArray<int32>& triangles)
+	void MeshManager::updateMeshWithId(void* bindedTo, int id, const TArray<FVector>& vertices, const TArray<int32>& triangles)
 	{
 		auto mesh = meshCompPool[id];
-		
+		mesh->bUseAsyncCooking = true;
+		mesh->bindedTo = bindedTo;
 		mesh->CreateMeshSection(0/*id*/, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), true);
 	}
 

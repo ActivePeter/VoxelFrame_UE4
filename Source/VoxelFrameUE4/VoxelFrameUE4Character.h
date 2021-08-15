@@ -20,6 +20,7 @@ class AVoxelFrameUE4Character : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
 		/** Pawn mesh: 1st person view (arms; seen only by self) */
 		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		USkeletalMeshComponent* Mesh1P;
@@ -52,7 +53,6 @@ class AVoxelFrameUE4Character : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UMotionControllerComponent* L_MotionController;
 
-public:
 	AVoxelFrameUE4Character();
 
 protected:
@@ -139,7 +139,7 @@ protected:
 	 * @returns true if touch controls were enabled.
 	 */
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
-
+	
 public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }

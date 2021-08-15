@@ -43,6 +43,18 @@
 
 ## Progress（進度
 
+- 2021/8/16
+
+  基本完成放置方块预览
+
+  ![image-20210815195843489](https://hanbaoaaa.xyz/tuchuang/images/2021/08/15/image-20210815195843489.png)
+
+- 2021/8/15
+
+  射线碰撞检测，
+
+  ![image-20210815030953538](https://hanbaoaaa.xyz/tuchuang/images/2021/08/15/image-20210815030953538.png)
+
 - 2021/8/14
 
   - 发光方块，用来作为以后选择方块用的

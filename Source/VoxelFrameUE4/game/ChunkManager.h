@@ -29,8 +29,8 @@ namespace VF
 
 		Type::Vec3I oldPlayerChunkPos;
 
-		
-		
+
+
 		//判断区块是否在可视范围内0
 		bool isChunkInRange(int x, int y, int z,
 			int centerX = 0, int centerY = 0, int centerZ = 0)
@@ -58,6 +58,7 @@ namespace VF
 		}
 		void constructMeshForChunk(Chunk& chunk);
 
+		//输入须先转换为vf坐标
 		void checkPlayerChunkPosChange(const Type::Vec3F& curPlayerPos);
 
 		void cookOneChunk();

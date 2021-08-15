@@ -12,6 +12,7 @@
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 
+#include "./game/Physic.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -123,6 +124,7 @@ void AVoxelFrameUE4Character::Tick(float DeltaTime)
 	{
 		world->context->chunkManager->checkPlayerChunkPosChange(
 			FVector(GetActorLocation().X, GetActorLocation().Z, GetActorLocation().Y)/VF_WorldScale);
+		VF::_Physic::sys_checkPlayerRay2Chunk(this);
 	}
 	else
 	{

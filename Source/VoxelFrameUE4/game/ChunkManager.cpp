@@ -171,7 +171,7 @@ namespace VF
 	}
 	void ChunkManager::checkPlayerChunkPosChange(const Type::Vec3F& curPlayerPos)
 	{
-		auto curPlayerChunkPos = _Chunk::getChunkPositionOfAPoint(curPlayerPos);
+		auto curPlayerChunkPos = PositionInfoInChunk::fromVfPoint(curPlayerPos).chunkKey.keyData;
 		if (curPlayerChunkPos != oldPlayerChunkPos)
 		{
 			for (int i = 0; i < chunks2Draw.size(); i++) {
@@ -237,14 +237,17 @@ namespace VF
 			{*/
 		if (chunkCookMutex.TryLock())
 		{
-			while (chunks2Cook.size() > 0)
+			int cnt = 0;
+			while (chunks2Cook.size() > 0 && cnt < 10)//限制数量
 			{
+				cnt++;
 				auto back = chunks2Cook.back();
 				chunks2Cook.pop_back();
 				if (back->meshId < 0)
 				{
 					//context->meshManager->customMesh = context->worldActor->CreateDefaultSubobject<UProceduralMeshComponent>("customMesh");
-					back->meshId = context->meshManager->createMeshAndGetId(back->vertices, back->triangles);
+					back->meshId = context->meshManager->createMeshAndGetId(back.get(), VF_Tag_ChunkMesh, back->vertices, back->triangles);
+					context->meshManager->getMeshById(back->meshId)->SetCollisionObjectType(VF_PhysicChannel_ChunkMesh);
 				}
 				else
 				{

@@ -3,34 +3,6 @@
 #include "Chunk.h"
 namespace VF
 {
-	namespace _Chunk
-	{
-		Type::Vec3I getChunkPositionOfAPoint(const Type::Vec3F pos)
-		{
-			Type::Vec3I chunkP;
-			{ //1. recalc chunk pos
-				if (pos.X >= 0) {
-					chunkP.X = (int)pos.X / (VF_ChunkWidth);
-				}
-				else {
-					chunkP.X = ((int)pos.X / (VF_ChunkWidth)) - 1;
-				}
-				if (pos.Y >= 0) {
-					chunkP.Y = (int)pos.Y / (VF_ChunkWidth);
-				}
-				else {
-					chunkP.Y = ((int)pos.Y / (VF_ChunkWidth)) - 1;
-				}
-				if (pos.Z >= 0) {
-					chunkP.Z = (int)pos.Z / (VF_ChunkWidth);
-				}
-				else {
-					chunkP.Z = ((int)pos.Z / (VF_ChunkWidth)) - 1;
-				}
-			}
-			return chunkP;
-		}
-	}
 	static inline int inChunk_blockPos2blockIndex(int x, int y, int z)
 	{
 		return x + y * VF_ChunkWidth + z * VF_ChunkWidth * VF_ChunkWidth;
@@ -54,16 +26,16 @@ namespace VF
 					{
 						if (x == 8 && z == 8)
 						{
-							chunkData.dataSet[inChunk_blockPos2blockIndex(x, y, z)] = 1;
+							chunkData.dataSet[x + y * VF_ChunkWidth + z * VF_ChunkWidth * VF_ChunkWidth] = 1;
 						}
 						else
 						{
-							chunkData.dataSet[inChunk_blockPos2blockIndex(x, y, z)] = 0;
+							chunkData.dataSet[x + y * VF_ChunkWidth + z * VF_ChunkWidth * VF_ChunkWidth] = 0;
 						}
 					}
 					else
 					{
-						chunkData.dataSet[inChunk_blockPos2blockIndex(x, y, z)] = 1;
+						chunkData.dataSet[x + y * VF_ChunkWidth + z * VF_ChunkWidth * VF_ChunkWidth] = 1;
 					}
 				}
 			}

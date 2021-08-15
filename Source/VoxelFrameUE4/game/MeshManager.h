@@ -8,21 +8,28 @@
 
 namespace VF
 {
+	class UProceduralMeshComponentWithBind :public UProceduralMeshComponent
+	{
+	public:
+		void* bindedTo;
+	};
 	struct MeshManager {
 		GameContext* context;
 
-		UProceduralMeshComponent* customMesh;
+		UProceduralMeshComponentWithBind* customMesh;
 
-		/*Ïú»Ùºó¿ÉÔÙÀûÓÃµÄÍø¸ñ²å¼ş*/
+		/*é”€æ¯åå¯å†åˆ©ç”¨çš„ç½‘æ ¼æ’ä»¶*/
 		std::list<int> recycledSectionIds;
 
-		/*Íø¸ñ×é¼ş³Ø*/
-		std::vector<UProceduralMeshComponent*> meshCompPool;
+		/*ç½‘æ ¼ç»„ä»¶æ± */
+		std::vector<UProceduralMeshComponentWithBind*> meshCompPool;
 
 		int nextSectionId = 0;
 
-		int createMeshAndGetId(const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
-		void updateMeshWithId(int id, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+		UProceduralMeshComponentWithBind* getMeshById(int id);
+
+		int createMeshAndGetId(void* bindedTo, const FName& tag, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+		void updateMeshWithId(void* bindedTo, int id, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
 		void delMeshWithId(int id);
 
 		void init(GameContext* context1)

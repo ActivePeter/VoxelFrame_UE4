@@ -6,10 +6,6 @@
 
 namespace VF
 {
-	namespace _Chunk
-	{
-		Type::Vec3I getChunkPositionOfAPoint(const Type::Vec3F pos);
-	}
 	//const int ChunkLoadRange;
 	struct ChunkKey
 	{
@@ -95,4 +91,43 @@ namespace VF
 		//Chunk();
 		~Chunk();
 	};
+
+	namespace PositionInfoInChunk
+	{
+		template <typename VecType>
+		struct Result
+		{
+			ChunkKey chunkKey;
+			VecType p;
+		};
+		template <typename VecType>
+		Result<VecType> fromVfPoint(const VecType& pos)
+		{
+			Result<VecType> r;
+
+			auto& chunkP = r.chunkKey.keyData;
+			{ //1. recalc chunk pos
+				if (pos.X >= 0) {
+					chunkP.X = (int)pos.X / (VF_ChunkWidth);
+				}
+				else {
+					chunkP.X = ((int)pos.X / (VF_ChunkWidth)) - 1;
+				}
+				if (pos.Y >= 0) {
+					chunkP.Y = (int)pos.Y / (VF_ChunkWidth);
+				}
+				else {
+					chunkP.Y = ((int)pos.Y / (VF_ChunkWidth)) - 1;
+				}
+				if (pos.Z >= 0) {
+					chunkP.Z = (int)pos.Z / (VF_ChunkWidth);
+				}
+				else {
+					chunkP.Z = ((int)pos.Z / (VF_ChunkWidth)) - 1;
+				}
+			}
+			r.p = pos - VecType(chunkP.X * VF_ChunkWidth, chunkP.Y * VF_ChunkWidth, chunkP.Z * VF_ChunkWidth);
+			return r;
+		}
+	}
 }
