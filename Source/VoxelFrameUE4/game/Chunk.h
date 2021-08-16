@@ -76,6 +76,10 @@ namespace VF
 			return_pos.Y = chunkData.chunkKey.y() * (VF_ChunkWidth);
 			return_pos.Z = chunkData.chunkKey.z() * (VF_ChunkWidth);
 		}
+		inline void setData(int data1, int x, int y, int z)
+		{
+			chunkData.dataSet[x + y * VF_ChunkWidth + z * VF_ChunkWidth * VF_ChunkWidth] = data1;
+		}
 		inline char readData(int x, int y, int z)
 		{
 			assert(x + y * VF_ChunkWidth + z * VF_ChunkWidth * VF_ChunkWidth < VF_ChunkSize);

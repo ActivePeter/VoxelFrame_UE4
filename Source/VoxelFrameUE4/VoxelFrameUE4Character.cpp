@@ -13,7 +13,7 @@
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 
 #include "./game/Physic.h"
-
+#include "./game/GameContext.h"
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //////////////////////////////////////////////////////////////////////////
@@ -146,7 +146,8 @@ void AVoxelFrameUE4Character::SetupPlayerInputComponent(class UInputComponent* P
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AVoxelFrameUE4Character::OnFire);
-
+	PlayerInputComponent->BindAction("MouseRight", IE_Pressed, this, &AVoxelFrameUE4Character::OnRight);
+	
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
 
@@ -164,7 +165,10 @@ void AVoxelFrameUE4Character::SetupPlayerInputComponent(class UInputComponent* P
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AVoxelFrameUE4Character::LookUpAtRate);
 }
-
+void AVoxelFrameUE4Character::OnRight()
+{
+	VF::GameContext::getContext()->blockPreviewManager->putBlock();
+}
 void AVoxelFrameUE4Character::OnFire()
 {
 	// try and fire a projectile

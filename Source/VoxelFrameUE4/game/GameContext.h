@@ -7,7 +7,7 @@ namespace VF
 {
 	class ChunkManager;
 	struct MeshManager;
-	
+
 	namespace _Block
 	{
 		class BlockManager;
@@ -16,17 +16,17 @@ namespace VF
 
 	class GameContext
 	{
-		
+
 	public:
 		static GameContext* getContext();
-		std::shared_ptr<ChunkManager> chunkManager;
-		std::shared_ptr<MeshManager> meshManager;
-		std::shared_ptr<_Block::BlockManager> blockManager;
-		std::shared_ptr<_Block::BlockPreviewManager> blockPreviewManager;
+		std::unique_ptr<ChunkManager> chunkManager;
+		std::unique_ptr<MeshManager> meshManager;
+		std::unique_ptr<_Block::BlockManager> blockManager;
+		std::unique_ptr<_Block::BlockPreviewManager> blockPreviewManager;
 		AWorldActor* worldActor;
 
 		/*
-		 *WorldActor µ÷ÓÃµÄº¯Êı£¬ÓÃÀ´¼ì²éÊÇ·ñÒ»ÇĞ¾ÍĞ÷
+		 *WorldActor è°ƒç”¨çš„å‡½æ•°ï¼Œç”¨æ¥æ£€æŸ¥æ˜¯å¦ä¸€åˆ‡å°±ç»ª
 		 ***/
 		void worldActorCallWhenBeginPlay();
 

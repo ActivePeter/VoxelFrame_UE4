@@ -6,6 +6,8 @@
 #define VF_CommonBlockSize (VF_WorldScale)
 #define VF_Tag_ChunkMesh (FName("chunk_mesh"))
 
+#define VF_RoughEpsilon (0.0001)
+
 #define VF_PhysicChannel_ChunkMesh ECollisionChannel::ECC_GameTraceChannel2
 #include "memory"
 #include "vector"

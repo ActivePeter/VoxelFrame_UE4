@@ -43,6 +43,12 @@
 
 ## Progress（進度
 
+- 2021/8/17
+
+  方块放置完成
+
+  ![image-20210816195208272](https://hanbaoaaa.xyz/tuchuang/images/2021/08/16/image-20210816195208272.png)
+
 - 2021/8/16
 
   基本完成放置方块预览
@@ -66,8 +72,6 @@
   - 区块构建的卡顿修复，原因是在一个mesh component下create会复制之前的数据，
 
   - 无限加载
-
-    ![](./image/Compress_20210813_155849.gif)
 
     
 

@@ -25,7 +25,7 @@ namespace VF
 		/**
 		 * 要被绘制的区块
 		 */
-		std::vector<std::shared_ptr<Chunk>> chunks2Draw;
+		std::vector<std::weak_ptr<Chunk>> chunks2Draw;
 
 		Type::Vec3I oldPlayerChunkPos;
 
@@ -49,7 +49,7 @@ namespace VF
 
 	public:
 		FCriticalSection chunkCookMutex;
-		std::list<std::shared_ptr<Chunk>> chunks2Cook;
+		std::list<std::weak_ptr<Chunk>> chunks2Cook;
 
 		ChunkManager();
 		void init(GameContext* context1)
@@ -57,6 +57,7 @@ namespace VF
 			context = context1;
 		}
 		void constructMeshForChunk(Chunk& chunk);
+		void asyncConstructMeshForChunk(std::weak_ptr<Chunk>& chunk2Draw);
 
 		//输入须先转换为vf坐标
 		void checkPlayerChunkPosChange(const Type::Vec3F& curPlayerPos);
@@ -64,7 +65,7 @@ namespace VF
 		void cookOneChunk();
 
 		//通过Key获取chunk，若不存在则创建chunk
-		std::shared_ptr<Chunk> getChunkOfKey(const ChunkKey& ck);
+		std::weak_ptr<Chunk> getChunkOfKey(const ChunkKey& ck);
 
 		void loop();
 	};

@@ -22,19 +22,19 @@ namespace VF
 		BlockGridSide checkPointOnBlockGridSide(const Type::Vec3F& p)
 		{
 			if (
-				abs(p.X / VF_CommonBlockSize - roundf(p.X / VF_CommonBlockSize)) < std::numeric_limits<float>::epsilon()
+				abs(p.X / VF_CommonBlockSize - roundf(p.X / VF_CommonBlockSize)) < VF_RoughEpsilon
 				)
 			{
 				return BlockGridSide::X;
 			}
 			else if (
-				abs(p.Y / VF_CommonBlockSize - roundf(p.Y / VF_CommonBlockSize)) < std::numeric_limits<float>::epsilon()
+				abs(p.Y / VF_CommonBlockSize - roundf(p.Y / VF_CommonBlockSize)) < VF_RoughEpsilon
 				)
 			{
 				return BlockGridSide::Y;
 			}
 			else if (
-				abs(p.Z / VF_CommonBlockSize - roundf(p.Z / VF_CommonBlockSize)) < std::numeric_limits<float>::epsilon()
+				abs(p.Z / VF_CommonBlockSize - roundf(p.Z / VF_CommonBlockSize)) < VF_RoughEpsilon
 				)
 			{
 				return BlockGridSide::Z;

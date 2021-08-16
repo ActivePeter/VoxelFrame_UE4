@@ -130,6 +130,7 @@ namespace VF
 				}
 			}
 		}
+
 		/*
 		FVector b;
 		chunk.getChunkWorldPos(b);
@@ -169,23 +170,38 @@ namespace VF
 
 
 	}
+	void ChunkManager::asyncConstructMeshForChunk(std::weak_ptr<Chunk>& chunk2Draw)
+	{
+		AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask,
+			[this, chunk2Draw]()
+			{
+				assert(chunk2Draw.lock());
+				constructMeshForChunk(*chunk2Draw.lock());
+
+				chunkCookMutex.Lock();
+				chunks2Cook.emplace_back(chunk2Draw);
+				chunkCookMutex.Unlock();
+			}
+		);
+	}
 	void ChunkManager::checkPlayerChunkPosChange(const Type::Vec3F& curPlayerPos)
 	{
 		auto curPlayerChunkPos = PositionInfoInChunk::fromVfPoint(curPlayerPos).chunkKey.keyData;
 		if (curPlayerChunkPos != oldPlayerChunkPos)
 		{
 			for (int i = 0; i < chunks2Draw.size(); i++) {
-				if (chunks2Draw[i]) {
+				auto chunk2draw = chunks2Draw[i].lock();
+				if (chunk2draw) {
 
 					//不在范围内,即旧区块,从graph的绘制列表中拿出
 					//并加入销毁列表
-					if (!isChunkInRange(chunks2Draw[i]->chunkData.chunkKey, curPlayerChunkPos.X, curPlayerChunkPos.Y, curPlayerChunkPos.Z)) {
+					if (!isChunkInRange(chunk2draw->chunkData.chunkKey, curPlayerChunkPos.X, curPlayerChunkPos.Y, curPlayerChunkPos.Z)) {
 						/*App::getInstance().graphPtr->meshes2draw.erase(chunks2Draw[i].get());
 						chunksDestroyQuene.push_back(chunks2Draw[i]);*/
-						auto key = chunks2Draw[i]->chunkData.chunkKey;
+						auto key = chunk2draw->chunkData.chunkKey;
 						//UE_LOG(LogTemp, Warning, TEXT("mesh del %d %d %d"), key.x(), key.y(), key.z());
-						context->meshManager->delMeshWithId(chunks2Draw[i]->meshId);
-						chunks2Draw[i]->unbindMesh();
+						context->meshManager->delMeshWithId(chunk2draw->meshId);
+						chunk2draw->unbindMesh();
 					}
 					else {
 						/*printf("%-2d %-2d %-2d,", player.chunkX - chunks2Draw[i]->key.x, player.chunkY - chunks2Draw[i]->key.y, player.chunkZ - chunks2Draw[i]->key.z);*/
@@ -204,17 +220,10 @@ namespace VF
 				);
 				chunks2Draw[i] = chunk2Draw;
 				//chunkPtr = chunk2Draw.get(;
-				AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask,
-					[this, chunk2Draw]()
-					{
-						constructMeshForChunk(*chunk2Draw);
 
-						chunkCookMutex.Lock();
-						chunks2Cook.emplace_back(chunk2Draw);
-						chunkCookMutex.Unlock();
-					}
-				);
 				//App::getInstance().graphPtr->meshes2draw.emplace(chunks2Draw[i].get());
+
+				asyncConstructMeshForChunk(chunk2Draw);
 
 				//threadPool2BuildChunkMeshes->enqueue(
 				//	[](std::shared_ptr<Chunk> chunkPtr) { // Chunk *chunkPtr)
@@ -241,25 +250,25 @@ namespace VF
 			while (chunks2Cook.size() > 0 && cnt < 10)//限制数量
 			{
 				cnt++;
-				auto back = chunks2Cook.back();
+				auto back = chunks2Cook.back().lock();
 				chunks2Cook.pop_back();
 				if (back->meshId < 0)
 				{
 					//context->meshManager->customMesh = context->worldActor->CreateDefaultSubobject<UProceduralMeshComponent>("customMesh");
-					back->meshId = context->meshManager->createMeshAndGetId(back.get(), VF_Tag_ChunkMesh, back->vertices, back->triangles);
+					back->meshId = context->meshManager->createMeshAndGetId(back, VF_Tag_ChunkMesh, back->vertices, back->triangles);
 					context->meshManager->getMeshById(back->meshId)->SetCollisionObjectType(VF_PhysicChannel_ChunkMesh);
 				}
 				else
 				{
 
-					//context->meshManager->updateMesh_withId(back->meshId, back->vertices, back->triangles);
+					context->meshManager->updateMeshWithId(back->meshId, back->vertices, back->triangles);
 				}
 			}
 
 			chunkCookMutex.Unlock();
 		}
 	}
-	std::shared_ptr<Chunk> ChunkManager::getChunkOfKey(const ChunkKey& ck)
+	std::weak_ptr<Chunk> ChunkManager::getChunkOfKey(const ChunkKey& ck)
 	{
 		if (!chunkKey2chunksMap.contains(ck))
 		{

@@ -76,7 +76,7 @@ namespace VF
 				auto positionInChunk = PositionInfoInChunk::fromVfPoint(blockWorldPos);
 
 				auto chunkMesh = Cast<UProceduralMeshComponentWithBind>(hitResult.Component);
-				auto chunk = (Chunk*)chunkMesh->bindedTo;
+				auto chunk = std::static_pointer_cast<Chunk>(chunkMesh->bindedTo.lock());
 				auto blockId = chunk->readData(
 					positionInChunk.p.X,
 					positionInChunk.p.Y,
@@ -91,12 +91,14 @@ namespace VF
 					//blockId
 					)
 				{
-					auto p1 = FVector(
-						relatePos.X + VF_CommonBlockSize / 2,
-						relatePos.Y + VF_CommonBlockSize / 2,
-						relatePos.Z + VF_CommonBlockSize / 2);
-					//previewer->SetActorHiddenInGame(false);
-					previewer->SetActorLocation(p1);
+					//auto p1 = FVector(
+					//	relatePos.X + VF_CommonBlockSize / 2,
+					//	relatePos.Y + VF_CommonBlockSize / 2,
+					//	relatePos.Z + VF_CommonBlockSize / 2);
+					////previewer->SetActorHiddenInGame(false);
+					//previewer->SetActorLocation(p1);
+					GameContext::getContext()->blockPreviewManager->setPosition(blockWorldPos, chunk);
+
 					previewer->UpdateOverlaps();
 					TArray<UPrimitiveComponent*> comps;
 					previewer->GetOverlappingComponents(comps);

@@ -11,7 +11,12 @@ namespace VF
 	class UProceduralMeshComponentWithBind :public UProceduralMeshComponent
 	{
 	public:
-		void* bindedTo;
+
+		std::weak_ptr<void> bindedTo;
+		void init()
+		{
+			memset(&bindedTo, 0, sizeof(bindedTo));
+		}
 	};
 	struct MeshManager {
 		GameContext* context;
@@ -28,8 +33,8 @@ namespace VF
 
 		UProceduralMeshComponentWithBind* getMeshById(int id);
 
-		int createMeshAndGetId(void* bindedTo, const FName& tag, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
-		void updateMeshWithId(void* bindedTo, int id, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+		int createMeshAndGetId(std::weak_ptr<void> bindedTo, const FName& tag, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+		void updateMeshWithId(int id, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
 		void delMeshWithId(int id);
 
 		void init(GameContext* context1)

@@ -84,7 +84,7 @@ void AWorldActor::generateCubeTest()
 	VertexColors.Add(FLinearColor(0.f, 1.f, 1.f));*/
 
 	//context.meshManager->customMesh->CreateMeshSection(0, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), true);
-	context->meshManager->createMeshAndGetId(this, FName("test"), vertices, triangles);
+	//context->meshManager->createMeshAndGetId(this, FName("test"), vertices, triangles);
 	// customMesh->section
 	//customMesh->CreateMeshSection_LinearColor(0, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), VertexColors, TArray<FProcMeshTangent>(), true);
 }
