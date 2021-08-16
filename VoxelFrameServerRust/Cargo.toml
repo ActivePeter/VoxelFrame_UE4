@@ -7,3 +7,6 @@ edition = "2018"
 
 [dependencies]
 tokio = { version = "1.7.0", features = ["full"] }
+
+[build-dependencies]
+protobuf-codegen-pure = "2.14"

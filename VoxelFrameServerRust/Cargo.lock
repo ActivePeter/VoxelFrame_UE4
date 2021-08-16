@@ -162,6 +162,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "protobuf"
+version = "2.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "020f86b07722c5c4291f7c723eac4676b3892d47d9a7708dc2779696407f039b"
+
+[[package]]
+name = "protobuf-codegen"
+version = "2.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b8ac7c5128619b0df145d9bace18e8ed057f18aebda1aa837a5525d4422f68c"
+dependencies = [
+ "protobuf",
+]
+
+[[package]]
+name = "protobuf-codegen-pure"
+version = "2.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6d0daa1b61d6e7a128cdca8c8604b3c5ee22c424c15c8d3a92fafffeda18aaf"
+dependencies = [
+ "protobuf",
+ "protobuf-codegen",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -252,6 +277,7 @@ checksum = "8ccb82d61f80a663efe1f787a51b16b5a51e3314d6ac365b08639f52387b33f3"
 name = "voxelframe_server"
 version = "0.1.0"
 dependencies = [
+ "protobuf-codegen-pure",
  "tokio",
 ]
 
