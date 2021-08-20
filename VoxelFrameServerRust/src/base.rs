@@ -15,35 +15,41 @@ pub use crate::*;
 
 pub type Point3f = ArrayVec<f32, 3>;
 
+pub use std::rc::Rc;
 pub use tokio::io::{AsyncReadExt, AsyncWriteExt};
 pub use tokio::net::TcpListener;
 
 #[macro_export]
 macro_rules! new {
     ($a:ident)=>{
-        $a::new()
+          $a::new()
     };
-    ($a:expr)=>{
-           $a
+    ($a:ident,$b:ident)=>{
+          $a::new($b::new())
     };
-    ($a:ident $b:ident)=>{
-        $a::new($b::new())
+    ($a:ident,$b:expr)=>{
+          $a::new($b)
     };
-    ($a:ident $($b:tt )*)=>{
+
+    ($a:ident,$($b:tt )*)=>{
            $a::new(new!($($b)*))
 
     };
+    // ($a:ident,$b:ident,$c:ident)=>{
+    //       $a::new($b::new($c::new()))
+    // };
+    // ($a:ident,$b:ident,$c:expr)=>{
+    //       $a::new($b::new($c))
+    // };
 }
 
 /////////////////////////////////////////////////
 pub type ArcRw<T> = Arc<RwLock<T>>;
 #[macro_export]
 macro_rules! ArcRw_new {
-    ($a:ident)=>{
-          new!(Arc RwLock $a)
-    };
     ($a:expr)=>{
-          new!(Arc RwLock $a)
+          Arc::new(RwLock::new($a))
+        // new!(Arc,RwLock,$a)
     };
 }
 //////////////////////////////////////////////////

@@ -1,5 +1,6 @@
 use crate::base::*;
 use std::iter::Map;
+use std::cell::RefCell;
 
 
 pub const VF_CHUNK_LOAD_RADIUS: i32 = (4);
@@ -48,12 +49,15 @@ impl ChunkManager {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct Chunk {
-    pub data: [u8; VF_CHUNK_SIZE as usize],
+    pub chunk_data: Vec<u8>,
 }
 
 impl Chunk {
     pub fn new() -> Chunk {
-        Chunk { data: [0; VF_CHUNK_SIZE as usize] }
+        let mut v = Vec::new();
+        v.resize(VF_CHUNK_SIZE as usize, 0);
+
+        return Chunk { chunk_data: v };
     }
 
     pub async fn load(&mut self) {
@@ -61,15 +65,15 @@ impl Chunk {
             for y in 0..VF_CHUNK_WIDTH {
                 for z in 0..VF_CHUNK_WIDTH {
                     if (y < VF_CHUNK_WIDTH / 2) {
-                        self.data[Chunk::conv_p_2_index(x, y, z)] = 1;
+                        self.chunk_data[Chunk::conv_p_2_index(x, y, z)] = 1;
                     } else {
-                        self.data[Chunk::conv_p_2_index(x, y, z)] = 0;
+                        self.chunk_data[Chunk::conv_p_2_index(x, y, z)] = 0;
                     }
                 }
             }
         }
     }
-    pub async fn send(&mut self, p_ptr: ArcRw<Player>) {}
+
     fn conv_p_2_index(x: i32, y: i32, z: i32) -> usize {
         return (x + y * VF_CHUNK_WIDTH + z * VF_CHUNK_WIDTH * VF_CHUNK_WIDTH) as usize;
     }

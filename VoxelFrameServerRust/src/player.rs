@@ -2,7 +2,6 @@ use crate::base::*;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use std::sync::Mutex;
-use crate::get_game_context;
 // use std::rc::Weak;
 
 type PlayerId = i32;
@@ -36,7 +35,7 @@ pub struct Player {
 
 impl Player {
     fn new(id_cnt: i32) -> ArcRw<Player> {
-        let p = new!(Arc RwLock Player {
+        let p = ArcRw_new!(Player {
             new_in_world: true,
             id: id_cnt,
             data: BaseEntityData::new(),
@@ -92,7 +91,9 @@ pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
 
                         chunks_not_sent
                             // .write().unwrap()
-                            .push_back(GAME_CONTEXT.lock().await.chunk_manager.get_chunk_by_chunk_key(ck));
+                            .push_back(GAME_CONTEXT.
+                        lock().await.
+                        chunk_manager.get_chunk_by_chunk_key(ck));
                     }
                 }
             );
@@ -108,7 +109,8 @@ pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
             let p_clone = p_ptr.clone();
             tokio::spawn(async move {
                 chunk.write().await.load().await;
-                chunk.write().await.send(p_clone).await;
+                // chunk.read().await.send(p_clone).await;
+                send::chunk_2_player(chunk, p_clone);
             });
         }
     }

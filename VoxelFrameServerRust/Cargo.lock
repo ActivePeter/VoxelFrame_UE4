@@ -21,6 +21,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
+name = "byteorder"
+version = "1.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
+
+[[package]]
 name = "bytes"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -178,6 +184,9 @@ name = "protobuf"
 version = "2.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "020f86b07722c5c4291f7c723eac4676b3892d47d9a7708dc2779696407f039b"
+dependencies = [
+ "bytes",
+]
 
 [[package]]
 name = "protobuf-codegen"
@@ -290,7 +299,9 @@ name = "voxelframe_server"
 version = "0.1.0"
 dependencies = [
  "arrayvec",
+ "byteorder",
  "lazy_static",
+ "protobuf",
  "protobuf-codegen-pure",
  "tokio",
 ]

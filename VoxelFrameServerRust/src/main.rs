@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
 
+// extern crate protobuf;
 //
 pub mod game;
 #[macro_use]
@@ -9,22 +10,20 @@ pub mod player;
 #[macro_use]
 pub mod base;
 
+mod send;
+mod protos;
+
 use crate::base::*;
 use tokio::sync::MutexGuard;
-
-
-
-
 
 lazy_static! {
      pub static ref  GAME_CONTEXT:Arc<tokio::sync::Mutex<Game>>=Arc::new(tokio::sync::Mutex::new(Game::new()));
 }
-pub async fn get_game_context() -> tokio::sync::MutexGuard<'static, Game> {
-    return GAME_CONTEXT.lock().await;
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+
+
     // let a = ArcRw_new!(Chunk);
     let listener = TcpListener::bind("127.0.0.1:7776").await?;
     // thread::spawn(|| {
@@ -39,10 +38,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("server launched");
     loop {
         let (mut socket, addr) = listener.accept().await?;
-
+        // socket.write_all()
         tokio::spawn(async move {
             println!("client connected {0}", addr);
-            let socket_lock = Arc::new(RwLock::new(socket));
+            let socket_lock = ArcRw_new!(socket);// Arc::new(RwLock::new(socket));
             let player = GAME_CONTEXT.lock().await.player_manager.
                 add_player();
             player.write().await.socket = Arc::downgrade(&socket_lock);
