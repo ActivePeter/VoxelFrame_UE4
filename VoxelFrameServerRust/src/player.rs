@@ -59,7 +59,7 @@ impl ITick for Player {
 }
 
 //call when first init& position change.
-pub async fn player_check_chunk_load(p_ptr: ArcRw<Player>) {
+pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
     //首次进入游戏 或 区块坐标变化
     //首先计算player区块坐标
     let mut p = p_ptr.write().await;
@@ -105,7 +105,11 @@ pub async fn player_check_chunk_load(p_ptr: ArcRw<Player>) {
         //2、遍历not sent
         //未发送的区块，进行加载和加入player的发送队列（当前线程
         for chunk in chunks_not_sent {
-            // chunk
+            let p_clone = p_ptr.clone();
+            tokio::spawn(async move {
+                chunk.write().await.load().await;
+                chunk.write().await.send(p_clone).await;
+            });
         }
     }
 }

@@ -56,7 +56,7 @@ impl Chunk {
         Chunk { data: [0; VF_CHUNK_SIZE as usize] }
     }
 
-    pub fn load(&mut self) {
+    pub async fn load(&mut self) {
         for x in 0..VF_CHUNK_WIDTH {
             for y in 0..VF_CHUNK_WIDTH {
                 for z in 0..VF_CHUNK_WIDTH {
@@ -69,10 +69,15 @@ impl Chunk {
             }
         }
     }
+    pub async fn send(&mut self, p_ptr: ArcRw<Player>) {}
     fn conv_p_2_index(x: i32, y: i32, z: i32) -> usize {
         return (x + y * VF_CHUNK_WIDTH + z * VF_CHUNK_WIDTH * VF_CHUNK_WIDTH) as usize;
     }
 }
+
+// impl MsgDataOwner for Chunk {
+//     async fn send(&mut self, p_ptr: ArcRw<Player>) {}
+// }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

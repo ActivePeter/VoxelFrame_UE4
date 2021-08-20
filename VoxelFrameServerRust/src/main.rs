@@ -46,7 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let player = GAME_CONTEXT.lock().await.player_manager.
                 add_player();
             player.write().await.socket = Arc::downgrade(&socket_lock);
-            player_check_chunk_load(player);
+            async_player_check_chunk_load(player).await;
 
             let mut buf = [0; 1024];
             // In a loop, read data from the socket and write the data back.
