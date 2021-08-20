@@ -7,6 +7,8 @@ edition = "2018"
 
 [dependencies]
 tokio = { version = "1.7.0", features = ["full"] }
+lazy_static = "1.4.0"
+arrayvec = "0.7.1"
 
 [build-dependencies]
 protobuf-codegen-pure = "2.14"
