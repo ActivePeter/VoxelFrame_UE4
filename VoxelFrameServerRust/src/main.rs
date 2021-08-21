@@ -1,3 +1,4 @@
+#![feature(map_try_insert)]
 #[macro_use]
 extern crate lazy_static;
 
@@ -43,7 +44,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("client connected {0}", addr);
             let socket_lock = ArcRw_new!(socket);// Arc::new(RwLock::new(socket));
             let player = GAME_CONTEXT.lock().await.player_manager.
-                add_player();
+                add_player().await;
             player.write().await.socket = Arc::downgrade(&socket_lock);
             async_player_check_chunk_load(player).await;
 

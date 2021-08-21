@@ -27,6 +27,9 @@
 pub struct Chunk {
     // message fields
     pub data: ::std::vec::Vec<u8>,
+    pub x: i32,
+    pub y: i32,
+    pub z: i32,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -68,6 +71,51 @@ impl Chunk {
     pub fn take_data(&mut self) -> ::std::vec::Vec<u8> {
         ::std::mem::replace(&mut self.data, ::std::vec::Vec::new())
     }
+
+    // int32 x = 2;
+
+
+    pub fn get_x(&self) -> i32 {
+        self.x
+    }
+    pub fn clear_x(&mut self) {
+        self.x = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_x(&mut self, v: i32) {
+        self.x = v;
+    }
+
+    // int32 y = 3;
+
+
+    pub fn get_y(&self) -> i32 {
+        self.y
+    }
+    pub fn clear_y(&mut self) {
+        self.y = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_y(&mut self, v: i32) {
+        self.y = v;
+    }
+
+    // int32 z = 4;
+
+
+    pub fn get_z(&self) -> i32 {
+        self.z
+    }
+    pub fn clear_z(&mut self) {
+        self.z = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_z(&mut self, v: i32) {
+        self.z = v;
+    }
 }
 
 impl ::protobuf::Message for Chunk {
@@ -81,6 +129,27 @@ impl ::protobuf::Message for Chunk {
             match field_number {
                 1 => {
                     ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.data)?;
+                },
+                2 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.x = tmp;
+                },
+                3 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.y = tmp;
+                },
+                4 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.z = tmp;
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -97,6 +166,15 @@ impl ::protobuf::Message for Chunk {
         if !self.data.is_empty() {
             my_size += ::protobuf::rt::bytes_size(1, &self.data);
         }
+        if self.x != 0 {
+            my_size += ::protobuf::rt::value_size(2, self.x, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if self.y != 0 {
+            my_size += ::protobuf::rt::value_size(3, self.y, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if self.z != 0 {
+            my_size += ::protobuf::rt::value_size(4, self.z, ::protobuf::wire_format::WireTypeVarint);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
@@ -105,6 +183,15 @@ impl ::protobuf::Message for Chunk {
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
         if !self.data.is_empty() {
             os.write_bytes(1, &self.data)?;
+        }
+        if self.x != 0 {
+            os.write_int32(2, self.x)?;
+        }
+        if self.y != 0 {
+            os.write_int32(3, self.y)?;
+        }
+        if self.z != 0 {
+            os.write_int32(4, self.z)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -149,6 +236,21 @@ impl ::protobuf::Message for Chunk {
                 |m: &Chunk| { &m.data },
                 |m: &mut Chunk| { &mut m.data },
             ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                "x",
+                |m: &Chunk| { &m.x },
+                |m: &mut Chunk| { &mut m.x },
+            ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                "y",
+                |m: &Chunk| { &m.y },
+                |m: &mut Chunk| { &mut m.y },
+            ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                "z",
+                |m: &Chunk| { &m.z },
+                |m: &mut Chunk| { &mut m.z },
+            ));
             ::protobuf::reflect::MessageDescriptor::new_pb_name::<Chunk>(
                 "Chunk",
                 fields,
@@ -166,6 +268,9 @@ impl ::protobuf::Message for Chunk {
 impl ::protobuf::Clear for Chunk {
     fn clear(&mut self) {
         self.data.clear();
+        self.x = 0;
+        self.y = 0;
+        self.z = 0;
         self.unknown_fields.clear();
     }
 }
@@ -183,8 +288,10 @@ impl ::protobuf::reflect::ProtobufValue for Chunk {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0bchunk.proto\"\x1f\n\x05Chunk\x12\x14\n\x04data\x18\x01\x20\x01(\
-    \x0cR\x04dataB\0:\0B\0b\x06proto3\
+    \n\x0bchunk.proto\"O\n\x05Chunk\x12\x14\n\x04data\x18\x01\x20\x01(\x0cR\
+    \x04dataB\0\x12\x0e\n\x01x\x18\x02\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\
+    \x18\x03\x20\x01(\x05R\x01yB\0\x12\x0e\n\x01z\x18\x04\x20\x01(\x05R\x01z\
+    B\0:\0B\0b\x06proto3\
 ";
 
 static file_descriptor_proto_lazy: ::protobuf::rt::LazyV2<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::rt::LazyV2::INIT;

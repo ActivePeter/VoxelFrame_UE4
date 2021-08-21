@@ -2,6 +2,7 @@ use crate::base::*;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use std::sync::Mutex;
+use crate::base::collections::hash_map::OccupiedError;
 // use std::rc::Weak;
 
 type PlayerId = i32;
@@ -25,7 +26,7 @@ impl PlayerChunkInfo {
 
 pub struct Player {
     new_in_world: bool,
-    id: PlayerId,
+    pub id: PlayerId,
     data: BaseEntityData,
     // chunks_sent: HashMap<ChunkKey, RwLock<SyncWeak<Chunk>>>,
     chunk_info: PlayerChunkInfo,
@@ -110,7 +111,7 @@ pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
             tokio::spawn(async move {
                 chunk.write().await.load().await;
                 // chunk.read().await.send(p_clone).await;
-                send::chunk_2_player(chunk, p_clone);
+                send::chunk_2_player(chunk, p_clone).await;
             });
         }
     }
@@ -128,18 +129,26 @@ impl PlayerManager {
     pub fn new() -> PlayerManager {
         return PlayerManager {
             id_cnt: 0,
-            player_id2detail: Default::default(),
+            player_id2detail: HashMap::new(),
             msg_list: Default::default(),
         };
     }
-    pub fn add_player(&mut self) -> ArcRw<Player> {
-        let a = self.player_id2detail.insert(
-            self.id_cnt,
-            Player::new(self.id_cnt),
-        ).unwrap();
+    pub async fn add_player(&mut self) -> ArcRw<Player> {
+        println!("player{0} added.", self.id_cnt);
+        let a = Player::new(self.id_cnt);
+        // let a =
+        self.player_id2detail.insert(self.id_cnt, a.clone());
+        // self.player_id2detail.insert(
+        //     self.id_cnt,
+        //     a.clone(),
+        // ).unwrap();
+        // println!("error {}", a);
+
+        let op = self.player_id2detail.get(&self.id_cnt).unwrap();
         self.id_cnt += 1;
 
-        // let op = self.player_id2detail.get(&self.id_cnt);
+
+        println!("player id:{0}", op.read().await.id);
 
         return a;
     }

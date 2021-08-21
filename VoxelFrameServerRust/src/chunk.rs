@@ -35,7 +35,7 @@ impl ChunkManager {
         // let mut new_chunk = Chunk::new();
         // let mchunk = &mut new_chunk;
         // self.chunks.insert(*ck, new_chunk);
-        let mchunk = self.chunks.entry(ck).or_insert(Arc::new(RwLock::from(Chunk::new())));
+        let mchunk = self.chunks.entry(ck).or_insert(Arc::new(RwLock::from(Chunk::new(&ck))));
         return mchunk.clone();
     }
 // pub fn setGame(&mut self, game:sync::Weak<RwLock<Game>>){
@@ -49,15 +49,16 @@ impl ChunkManager {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct Chunk {
+    pub chunk_key: ChunkKey,
     pub chunk_data: Vec<u8>,
 }
 
 impl Chunk {
-    pub fn new() -> Chunk {
+    pub fn new(key: &ChunkKey) -> Chunk {
         let mut v = Vec::new();
         v.resize(VF_CHUNK_SIZE as usize, 0);
 
-        return Chunk { chunk_data: v };
+        return Chunk { chunk_data: v, chunk_key: key.clone() };
     }
 
     pub async fn load(&mut self) {
