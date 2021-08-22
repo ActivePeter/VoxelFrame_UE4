@@ -43,6 +43,12 @@
 
 ## Progress（進度
 
+- 2021/8/18-23
+
+  rust server 的基本结构，protobuf打包发出
+
+  ue client 的包解析
+
 - 2021/8/17
 
   方块放置完成
