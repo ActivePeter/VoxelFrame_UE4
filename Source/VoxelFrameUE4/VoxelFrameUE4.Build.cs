@@ -7,12 +7,16 @@ public class VoxelFrameUE4 : ModuleRules
     public VoxelFrameUE4(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
+        PrivateIncludePaths.Add(
+                "./VoxelFrameUE4/paecslib/src"
+        );
         PublicDependencyModuleNames.AddRange(
-            new string[] 
+            new string[]
             {
                 "Core", "CoreUObject", "Engine", "InputCore",
-                "HeadMountedDisplay", "ProceduralMeshComponent" 
+                "HeadMountedDisplay", "ProceduralMeshComponent",
+
+                "Sockets","Networking","Protobuf"
             }
         );
     }

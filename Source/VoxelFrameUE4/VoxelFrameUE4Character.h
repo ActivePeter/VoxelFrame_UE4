@@ -5,8 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "WorldActor.h"
-#include "VoxelFrameUE4Character.generated.h"
+#include "paecs/paecs.h"
 
+#include "VoxelFrameUE4Character.generated.h"
 class UInputComponent;
 class USkeletalMeshComponent;
 class USceneComponent;
@@ -21,8 +22,9 @@ class AVoxelFrameUE4Character : public ACharacter
 	GENERATED_BODY()
 
 public:
-		/** Pawn mesh: 1st person view (arms; seen only by self) */
-		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	paecs::EntityID ecsId;
+	/** Pawn mesh: 1st person view (arms; seen only by self) */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		USkeletalMeshComponent* Mesh1P;
 
 	/** Gun mesh: 1st person view (seen only by self) */
@@ -140,7 +142,7 @@ protected:
 	 * @returns true if touch controls were enabled.
 	 */
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
-	
+
 public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -149,3 +151,4 @@ public:
 
 };
 
+//struct ABC {};

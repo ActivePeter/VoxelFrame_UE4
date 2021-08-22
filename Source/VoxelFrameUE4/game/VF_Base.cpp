@@ -19,22 +19,22 @@ namespace VF
 		}
 
 		//检测点是否在方块边界上
-		BlockGridSide checkPointOnBlockGridSide(const Type::Vec3F& p)
+		BlockGridSide checkPointUEOnBlockGridSide(const Type::Vec3F& p)
 		{
 			if (
-				abs(p.X / VF_CommonBlockSize - roundf(p.X / VF_CommonBlockSize)) < VF_RoughEpsilon
+				abs(p.X - roundf(p.X)) < VF_RoughEpsilon
 				)
 			{
 				return BlockGridSide::X;
 			}
 			else if (
-				abs(p.Y / VF_CommonBlockSize - roundf(p.Y / VF_CommonBlockSize)) < VF_RoughEpsilon
+				abs(p.Y - roundf(p.Y)) < VF_RoughEpsilon
 				)
 			{
 				return BlockGridSide::Y;
 			}
 			else if (
-				abs(p.Z / VF_CommonBlockSize - roundf(p.Z / VF_CommonBlockSize)) < VF_RoughEpsilon
+				abs(p.Z - roundf(p.Z)) < VF_RoughEpsilon
 				)
 			{
 				return BlockGridSide::Z;

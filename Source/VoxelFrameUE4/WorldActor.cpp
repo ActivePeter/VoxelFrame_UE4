@@ -31,6 +31,8 @@ void AWorldActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	context->chunkManager->cookOneChunk();
+
+	context->ecs.commonUpdateSys.runAll();
 }
 
 void AWorldActor::generateCubeTest()

@@ -1,6 +1,8 @@
 #include "GameContext.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "paecs/paecs.h"
+#include "VoxelFrameUE4/net/NetworkManager.h"
 
 namespace VF
 {
@@ -13,6 +15,12 @@ namespace VF
 	}
 	GameContext::GameContext()
 	{
+		networkManager = std::make_unique<NetworkManager>();
+		
+
+		ecs.init();
+
+
 		chunkManager = std::make_unique<ChunkManager>();
 		chunkManager->init(this);
 
@@ -24,6 +32,8 @@ namespace VF
 
 		blockPreviewManager = std::make_unique<_Block::BlockPreviewManager>();
 
+
+
 		context = this;
 	}
 	GameContext::~GameContext()
@@ -32,6 +42,8 @@ namespace VF
 	}
 	void GameContext::worldActorCallWhenBeginPlay()
 	{
+		networkManager->connectServer();
+
 		TArray<AActor*> blockPutPreviewerArr;
 		UGameplayStatics::GetAllActorsWithTag(worldActor->GetWorld(), "blockPutPreviewer", blockPutPreviewerArr);
 		assert(blockPutPreviewerArr.Num() == 1);

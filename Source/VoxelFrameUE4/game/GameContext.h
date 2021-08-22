@@ -2,17 +2,30 @@
 
 
 #include "VF_Base.h"
+#include "paecs/paecs.h"
+
 class AWorldActor;
 namespace VF
 {
 	class ChunkManager;
 	struct MeshManager;
+	class NetworkManager;
 
 	namespace _Block
 	{
 		class BlockManager;
 		class BlockPreviewManager;
 	}
+
+	struct Ecs
+	{
+		std::unique_ptr<paecs::Scene> scene;
+		paecs::SysGroup commonUpdateSys;
+		void init()
+		{
+			scene = std::make_unique<paecs::Scene>();
+		}
+	};
 
 	class GameContext
 	{
@@ -23,6 +36,9 @@ namespace VF
 		std::unique_ptr<MeshManager> meshManager;
 		std::unique_ptr<_Block::BlockManager> blockManager;
 		std::unique_ptr<_Block::BlockPreviewManager> blockPreviewManager;
+		std::unique_ptr < NetworkManager> networkManager;
+
+		Ecs ecs;
 		AWorldActor* worldActor;
 
 		/*

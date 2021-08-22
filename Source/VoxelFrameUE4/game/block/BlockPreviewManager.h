@@ -11,10 +11,21 @@ namespace VF
 		{
 		public:
 			AStaticMeshActor* blockPutPreviewer;
-			Type::Vec3I blockWorldPos;
-			std::weak_ptr<Chunk> chunkBlockIn;
+
+
+			std::weak_ptr<Chunk> chunkPutBlockIn;
+			Type::Vec3I putBlockChunkPos;
+
+			std::weak_ptr<Chunk> chunkTargetBlockIn;
+			Type::Vec3I targetBlockChunkPos;
+			bool targeting = false;
+
 			void init(AStaticMeshActor* blockPutPreviewer);
-			void setPosition(Type::Vec3I blockWorldPos, std::weak_ptr<Chunk> chunkBlockIn1);
+
+			void setTargetBlockPosition(Type::Vec3I targetBlockChunkPos1, std::weak_ptr<Chunk> chunkTargetBlockIn1);
+			void setPutBlockPosition(Type::Vec3I putBlockChunkPos1, std::weak_ptr<Chunk> chunkPutBlockIn1);
+			void destroyBlock();
+
 			void putBlock();
 			bool checkInited() override;
 		};

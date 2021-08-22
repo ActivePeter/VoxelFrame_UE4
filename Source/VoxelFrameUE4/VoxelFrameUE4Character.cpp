@@ -12,8 +12,10 @@
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 
-#include "./game/Physic.h"
+
 #include "./game/GameContext.h"
+#include "./game/ecs/Physic.h"
+
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //////////////////////////////////////////////////////////////////////////
@@ -92,7 +94,17 @@ void AVoxelFrameUE4Character::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	//TSubclassOf<AWorldActor> classToFind;
+	///////////////////////////////////////////////////
+	/// ecs
+	///////////////////////////////////////////////////
+	auto& ecs = VF::GameContext::getContext()->ecs;
+	this->ecsId = ecs.scene->createEntity().addComponent<>(this).entityId;
+	ecs.scene->addSys2Group(ecs.commonUpdateSys, VF::_Ecs::_Sys::_Physic::checkPlayerRay2Chunk);
+	///////////////////////////////////////////////////
+
+		//ecsScene->createEntity().addComponent()
+
+		//TSubclassOf<AWorldActor> classToFind;
 	auto classToFind = AWorldActor::StaticClass();
 	TArray<AActor*> foundEnemies;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), classToFind, foundEnemies);
@@ -123,8 +135,8 @@ void AVoxelFrameUE4Character::Tick(float DeltaTime)
 	if (world)
 	{
 		world->context->chunkManager->checkPlayerChunkPosChange(
-			FVector(GetActorLocation().X, GetActorLocation().Z, GetActorLocation().Y)/VF_WorldScale);
-		VF::_Physic::sys_checkPlayerRay2Chunk(this);
+			FVector(GetActorLocation().X, GetActorLocation().Z, GetActorLocation().Y) / VF_WorldScale);
+		//VF::_Physic::sys_checkPlayerRay2Chunk(this);
 	}
 	else
 	{
@@ -147,7 +159,7 @@ void AVoxelFrameUE4Character::SetupPlayerInputComponent(class UInputComponent* P
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AVoxelFrameUE4Character::OnFire);
 	PlayerInputComponent->BindAction("MouseRight", IE_Pressed, this, &AVoxelFrameUE4Character::OnRight);
-	
+
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
 
@@ -195,6 +207,7 @@ void AVoxelFrameUE4Character::OnFire()
 
 				// spawn the projectile at the muzzle
 				World->SpawnActor<AVoxelFrameUE4Projectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				VF::GameContext::getContext()->blockPreviewManager->destroyBlock();
 			}
 		}
 	}

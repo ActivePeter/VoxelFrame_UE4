@@ -14,6 +14,9 @@
 #include "list"
 #include "CoreMinimal.h"
 #include <cassert>
+
+#define VF_LogWarning(Str,...) UE_LOG(LogTemp, Warning, TEXT(Str),__VA_ARGS__)
+
 namespace VF
 {
 	namespace Type
@@ -41,7 +44,7 @@ namespace VF
 			Z,
 			No
 		};
-		BlockGridSide checkPointOnBlockGridSide(const Type::Vec3F& p);
+		BlockGridSide checkPointUEOnBlockGridSide(const Type::Vec3F& p);
 	}
 
 }

@@ -24,14 +24,14 @@ pub async fn chunk_2_player(chunk_ptr: ArcRw<Chunk>, p_ptr: ArcRw<Player>) {
         chunk_lock.chunk_data = proto_chunk.data;
     }
     let msg_byte_len = msg_byte.len();
-    let head = &mut [0; 4];
-    // println!("head len", )
-    BigEndian::write_u32(head, (msg_byte_len - 4) as u32);
+    let msg_head = &mut [0; 4];
+    // println!("msg_head len", )
+    BigEndian::write_u32(msg_head, (msg_byte_len - 4) as u32);
 
     // len_bytes.join(body_byte);
     {
         let mut socket = _socket_lock.write().await;
-        socket.write_all(head).await.unwrap();//长度
+        socket.write_all(msg_head).await.unwrap();//长度
         socket.write_all(msg_byte.as_slice()).await.unwrap();//数据
     }
 }
