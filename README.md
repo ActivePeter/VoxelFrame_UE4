@@ -43,6 +43,15 @@
 
 ## Progress（進度
 
+- 2021/8/24-25
+
+  修复tcp接收bug，protobuf可以正常接收
+
+  下一步：
+
+  	- protobuf解析
+  	- 根据解析数据加载区块
+
 - 2021/8/18-23
 
   rust server 的基本结构，protobuf打包发出

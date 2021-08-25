@@ -39,10 +39,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("server launched");
     loop {
         let (mut socket, addr) = listener.accept().await?;
+        let (mut rd, mut wr) = socket.into_split();
         // socket.write_all()
         tokio::spawn(async move {
             println!("client connected {0}", addr);
-            let socket_lock = ArcRw_new!(socket);// Arc::new(RwLock::new(socket));
+            let socket_lock = ArcRw_new!(wr);// Arc::new(RwLock::new(socket));
             let player = GAME_CONTEXT.lock().await.player_manager.
                 add_player().await;
             player.write().await.socket = Arc::downgrade(&socket_lock);
@@ -51,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut buf = [0; 1024];
             // In a loop, read data from the socket and write the data back.
             loop {
-                let n = match socket_lock.write().await.read(&mut buf).await {
+                let n = match rd.read(&mut buf).await {
                     // socket closed
                     Ok(n) if n == 0 => break,
                     Ok(n) => n,

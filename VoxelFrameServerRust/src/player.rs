@@ -3,6 +3,7 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use std::sync::Mutex;
 use crate::base::collections::hash_map::OccupiedError;
+use tokio::net::tcp::{WriteHalf, OwnedWriteHalf};
 // use std::rc::Weak;
 
 type PlayerId = i32;
@@ -30,7 +31,7 @@ pub struct Player {
     data: BaseEntityData,
     // chunks_sent: HashMap<ChunkKey, RwLock<SyncWeak<Chunk>>>,
     chunk_info: PlayerChunkInfo,
-    pub socket: SyncWeak<RwLock<TcpStream>>,
+    pub socket: SyncWeak<RwLock<OwnedWriteHalf>>,
 }
 
 
@@ -62,9 +63,12 @@ impl ITick for Player {
 pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
     //首次进入游戏 或 区块坐标变化
     //首先计算player区块坐标
-    let mut p = p_ptr.write().await;
-    if p.new_in_world {
-        p.new_in_world = false;
+
+
+    if p_ptr.read().await.new_in_world {
+        // let mut p = p_ptr.write().await;
+
+        p_ptr.write().await.new_in_world = false;
         //0.清空not sent
         // 因为之前未发送的已经无效了
         // self.chunk_info.chunks_not_loaded.clear();
@@ -79,7 +83,10 @@ pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
         chunk_key_in_range_relative!(
                 ck,
                 {
-                    let find = p.chunk_info.chunks_sent.get(&ck);
+
+                    let p=p_ptr.read().await;
+                    let find=p.chunk_info.chunks_sent.get(&ck).clone();
+
                     if let Some(s) = find
                     {
                         // new_chunks_sent_lock.write().unwrap().
@@ -99,19 +106,25 @@ pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
                 }
             );
         // 取代旧的已发送的，去除掉已经不在范围内的已发送的
-        p.chunk_info.chunks_sent =
+        p_ptr.write().await.chunk_info.chunks_sent =
             new_chunks_sent
                 // new_chunks_sent_lock.read().unwrap()
                 .clone();
 
+
         //2、遍历not sent
         //未发送的区块，进行加载和加入player的发送队列（当前线程
-        for chunk in chunks_not_sent {
+        let mut a = 0;
+        for chunk in chunks_not_sent
+        {
+            // let chunk = chunks_not_sent.front().unwrap().clone();
             let p_clone = p_ptr.clone();
             tokio::spawn(async move {
                 chunk.write().await.load().await;
                 // chunk.read().await.send(p_clone).await;
                 send::chunk_2_player(chunk, p_clone).await;
+                println!("sent cnt:{0}", a);
+                a = a + 1;
             });
         }
     }
