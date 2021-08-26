@@ -3,6 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "paecs/paecs.h"
 #include "VoxelFrameUE4/net/NetworkManager.h"
+//#include "ecs/ChunkEvent.h"
 
 namespace VF
 {
@@ -16,7 +17,7 @@ namespace VF
 	GameContext::GameContext()
 	{
 		networkManager = std::make_unique<NetworkManager>();
-		
+
 
 		ecs.init();
 
@@ -42,6 +43,10 @@ namespace VF
 	}
 	void GameContext::worldActorCallWhenBeginPlay()
 	{
+		//{//注册所有系统
+		//	ecs.scene->addSys2Group(ecs.commonUpdateSys, _Ecs::ChunkEvent::sys_handle_new_chunk_event);
+		//}
+
 		networkManager->connectServer();
 
 		TArray<AActor*> blockPutPreviewerArr;

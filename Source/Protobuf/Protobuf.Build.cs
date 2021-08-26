@@ -4,26 +4,29 @@ using UnrealBuildTool;
 
 public class Protobuf : ModuleRules
 {
-	public Protobuf(ReadOnlyTargetRules Target) : base(Target)
-	{
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core" });
+    public Protobuf(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core" });
 
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+        PrivateDependencyModuleNames.AddRange(new string[] { });
+        PublicIncludePaths.Add(
+               "./Protobuf"
+       );
 
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
+        // Uncomment if you are using Slate UI
+        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+        // Uncomment if you are using online features
+        // PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
-		bEnableShadowVariableWarnings = false;
-		bEnableUndefinedIdentifierWarnings = false;
-		bEnableExceptions = true;
+        // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
 
-		Definitions.Add("_CRT_SECURE_NO_WARNINGS");
-	}
+        bEnableShadowVariableWarnings = false;
+        bEnableUndefinedIdentifierWarnings = false;
+        bEnableExceptions = true;
+
+        Definitions.Add("_CRT_SECURE_NO_WARNINGS");
+    }
 }

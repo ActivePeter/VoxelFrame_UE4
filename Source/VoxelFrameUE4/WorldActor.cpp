@@ -30,6 +30,16 @@ void AWorldActor::BeginPlay()
 void AWorldActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	while (context->event_list.size() > 0)
+	{
+		auto a = context->event_list.pop();
+		a->run();
+	}
+	/*for (auto& event : context->events)
+	{
+		event.run();
+	}*/
+
 	context->chunkManager->cookOneChunk();
 
 	context->ecs.commonUpdateSys.runAll();

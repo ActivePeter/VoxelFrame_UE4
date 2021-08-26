@@ -38,7 +38,6 @@ namespace VF
 		auto mesh = meshCompPool[id];
 		assert(mesh);
 		//设置绑定到的对象指针
-		mesh->bindedTo.reset();
 		mesh->bindedTo = bindedTo;
 		//设置新的绑定的tag
 		mesh->ComponentTags.SetNum(0);

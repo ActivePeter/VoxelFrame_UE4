@@ -3,6 +3,7 @@
 
 #include "VF_Base.h"
 #include "paecs/paecs.h"
+#include "event/Event.h"
 
 class AWorldActor;
 namespace VF
@@ -40,6 +41,9 @@ namespace VF
 
 		Ecs ecs;
 		AWorldActor* worldActor;
+
+		//std::list<std::shared_ptr<_Event::IEvent>> events;
+		_Event::EventList event_list;
 
 		/*
 		 *WorldActor 调用的函数，用来检查是否一切就绪
