@@ -24,7 +24,7 @@
 // const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_2_25_0;
 
 #[derive(PartialEq,Clone,Default)]
-pub struct Chunk {
+pub struct ChunkPack {
     // message fields
     pub data: ::std::vec::Vec<u8>,
     pub x: i32,
@@ -35,14 +35,14 @@ pub struct Chunk {
     pub cached_size: ::protobuf::CachedSize,
 }
 
-impl<'a> ::std::default::Default for &'a Chunk {
-    fn default() -> &'a Chunk {
-        <Chunk as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a ChunkPack {
+    fn default() -> &'a ChunkPack {
+        <ChunkPack as ::protobuf::Message>::default_instance()
     }
 }
 
-impl Chunk {
-    pub fn new() -> Chunk {
+impl ChunkPack {
+    pub fn new() -> ChunkPack {
         ::std::default::Default::default()
     }
 
@@ -118,7 +118,7 @@ impl Chunk {
     }
 }
 
-impl ::protobuf::Message for Chunk {
+impl ::protobuf::Message for ChunkPack {
     fn is_initialized(&self) -> bool {
         true
     }
@@ -223,8 +223,8 @@ impl ::protobuf::Message for Chunk {
         Self::descriptor_static()
     }
 
-    fn new() -> Chunk {
-        Chunk::new()
+    fn new() -> ChunkPack {
+        ChunkPack::new()
     }
 
     fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
@@ -233,39 +233,39 @@ impl ::protobuf::Message for Chunk {
             let mut fields = ::std::vec::Vec::new();
             fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
                 "data",
-                |m: &Chunk| { &m.data },
-                |m: &mut Chunk| { &mut m.data },
+                |m: &ChunkPack| { &m.data },
+                |m: &mut ChunkPack| { &mut m.data },
             ));
             fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
                 "x",
-                |m: &Chunk| { &m.x },
-                |m: &mut Chunk| { &mut m.x },
+                |m: &ChunkPack| { &m.x },
+                |m: &mut ChunkPack| { &mut m.x },
             ));
             fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
                 "y",
-                |m: &Chunk| { &m.y },
-                |m: &mut Chunk| { &mut m.y },
+                |m: &ChunkPack| { &m.y },
+                |m: &mut ChunkPack| { &mut m.y },
             ));
             fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
                 "z",
-                |m: &Chunk| { &m.z },
-                |m: &mut Chunk| { &mut m.z },
+                |m: &ChunkPack| { &m.z },
+                |m: &mut ChunkPack| { &mut m.z },
             ));
-            ::protobuf::reflect::MessageDescriptor::new_pb_name::<Chunk>(
-                "Chunk",
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<ChunkPack>(
+                "ChunkPack",
                 fields,
                 file_descriptor_proto()
             )
         })
     }
 
-    fn default_instance() -> &'static Chunk {
-        static instance: ::protobuf::rt::LazyV2<Chunk> = ::protobuf::rt::LazyV2::INIT;
-        instance.get(Chunk::new)
+    fn default_instance() -> &'static ChunkPack {
+        static instance: ::protobuf::rt::LazyV2<ChunkPack> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(ChunkPack::new)
     }
 }
 
-impl ::protobuf::Clear for Chunk {
+impl ::protobuf::Clear for ChunkPack {
     fn clear(&mut self) {
         self.data.clear();
         self.x = 0;
@@ -275,21 +275,21 @@ impl ::protobuf::Clear for Chunk {
     }
 }
 
-impl ::std::fmt::Debug for Chunk {
+impl ::std::fmt::Debug for ChunkPack {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for Chunk {
+impl ::protobuf::reflect::ProtobufValue for ChunkPack {
     fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
         ::protobuf::reflect::ReflectValueRef::Message(self)
     }
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0bchunk.proto\"O\n\x05Chunk\x12\x14\n\x04data\x18\x01\x20\x01(\x0cR\
-    \x04dataB\0\x12\x0e\n\x01x\x18\x02\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\
+    \n\x0bchunk.proto\"S\n\tChunkPack\x12\x14\n\x04data\x18\x01\x20\x01(\x0c\
+    R\x04dataB\0\x12\x0e\n\x01x\x18\x02\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\
     \x18\x03\x20\x01(\x05R\x01yB\0\x12\x0e\n\x01z\x18\x04\x20\x01(\x05R\x01z\
     B\0:\0B\0b\x06proto3\
 ";

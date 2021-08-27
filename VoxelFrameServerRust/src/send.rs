@@ -7,13 +7,14 @@ use tokio::io::AsyncWrite;
 pub async fn chunk_2_player(chunk_ptr: ArcRw<Chunk>, p_ptr: ArcRw<Player>) {
     let _socket_lock = p_ptr.read().await.socket.upgrade().unwrap().clone();
 
-    let mut proto_chunk = protos::chunk::Chunk::new();
+    let mut proto_chunk = protos::chunk::ChunkPack::new();
     let mut msg_byte;
     // msg_byte.resize(4, 0);
     let key = chunk_ptr.read().await.chunk_key.clone();
     proto_chunk.x = key.x;
     proto_chunk.y = key.y;
     proto_chunk.z = key.z;
+    println!("{0} {1} {2}", proto_chunk.x, proto_chunk.y, proto_chunk.z);
     {
         //锁住chunk，提取数据
         let mut chunk_lock = chunk_ptr.write().await;
@@ -37,8 +38,7 @@ pub async fn chunk_2_player(chunk_ptr: ArcRw<Chunk>, p_ptr: ArcRw<Player>) {
              msg_head[3],
              msg_head[4]
     );
-    // ;
-    // len_bytes.join(body_byte);
+
     let mut a = msg_head.to_vec();
     a.append(&mut msg_byte);
 

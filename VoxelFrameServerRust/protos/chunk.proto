@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-message Chunk{
+message ChunkPack{
   bytes data = 1;
   int32 x = 2;
   int32 y = 3;
