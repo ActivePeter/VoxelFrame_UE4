@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+enum EntityType {
+    T_Null=0;
+    T_Player=1;
+}
+
+message EntityMove{
+    EntityType t=1;
+    float x=2;
+    float y=3;
+    float z=4;
+}

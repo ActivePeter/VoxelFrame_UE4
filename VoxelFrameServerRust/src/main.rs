@@ -13,6 +13,7 @@ pub mod base;
 
 mod send;
 mod protos;
+mod receive;
 
 use crate::base::*;
 use tokio::sync::MutexGuard;
@@ -62,11 +63,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 };
 
-                // Write the data back
-                if let Err(e) = socket_lock.write().await.write_all(&buf[0..n]).await {
-                    eprintln!("failed to write to socket; err = {:?}", e);
-                    return;
-                }
+                // // Write the data back
+                // if let Err(e) = socket_lock.write().await.write_all(&buf[0..n]).await {
+                //     eprintln!("failed to write to socket; err = {:?}", e);
+                //     return;
+                // }
             }
 
             println!("client disconnect");
