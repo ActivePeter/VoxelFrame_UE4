@@ -13,6 +13,7 @@ pub use std::sync::Weak as SyncWeak;
 
 pub use crate::*;
 
+/**type def**/
 pub type Point3f = ArrayVec<f32, 3>;
 
 pub use std::rc::Rc;
@@ -66,9 +67,13 @@ pub struct BaseEntityData {
 
 impl BaseEntityData {
     pub fn new() -> Self {
-        BaseEntityData {
+        let mut bed = BaseEntityData {
             position: Point3f::new()
-        }
+        };
+        bed.position.push(0.0);
+        bed.position.push(0.0);
+        bed.position.push(0.0);
+        return bed;
     }
 }
 

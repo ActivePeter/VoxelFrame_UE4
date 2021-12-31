@@ -66,3 +66,53 @@ pub async fn chunk_2_player(chunk_ptr: ArcRw<Chunk>, p_ptr: ArcRw<Player>) {
         println!("one was sent");
     }
 }
+
+//////////////////////////////////////////////
+
+pub struct SendFilter {
+    pub in_chunk: LinkedList<ChunkKey>,
+    pub player_blacklist: LinkedList<i32>,
+}
+
+impl SendFilter {
+    pub fn new() -> SendFilter {
+        SendFilter {
+            in_chunk: LinkedList::new(),
+            player_blacklist: LinkedList::new(),
+        }
+    }
+    pub fn is_player_in_blacklist(&self, id: i32) -> bool {
+        for playerId in &self.player_blacklist {
+            if id == *playerId {
+                return true;
+            }
+        }
+        return false;
+    }
+    pub fn add_player_2_blacklist(mut self, pid: PlayerId) -> SendFilter {
+        self.player_blacklist.push_back(pid);
+        return self;
+    }
+}
+
+//////////////////////////////////////////////
+
+pub async fn data2all_with_filter(sendFilter: &SendFilter, data: &[u8]) {
+    for chunkKey in &sendFilter.in_chunk {
+        let chunk = GAME_CONTEXT.lock().await.chunk_manager.get_chunk_by_chunk_key(chunkKey);
+        for playerId in &chunk.read().await.players {
+            if (!sendFilter.is_player_in_blacklist(playerId.clone())) {//如果不在黑名单里
+                let playerOpt = GAME_CONTEXT.lock().await.player_manager.player_id2detail.get_mut(&playerId).unwrap().clone();
+                // match playerOpt {
+                //     Some(x) => {
+                let mut socket = playerOpt.read().await.socket.upgrade().unwrap().clone();
+
+                socket.write().await.write_all(data);
+                socket.write().await.flush().await.unwrap();
+                // }
+                // None => println!("player None{}", playerId)
+                // }
+            }
+        }
+    }
+}

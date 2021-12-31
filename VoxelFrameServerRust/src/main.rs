@@ -3,17 +3,19 @@
 extern crate lazy_static;
 
 // extern crate protobuf;
-//
+
+//****  mods  ****
 pub mod game;
 #[macro_use]
 pub mod chunk;
 pub mod player;
 #[macro_use]
 pub mod base;
-
 mod send;
 mod protos;
 mod receive;
+mod handle_pack;
+mod conv;
 
 use crate::base::*;
 use tokio::sync::MutexGuard;
@@ -42,16 +44,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let (mut socket, addr) = listener.accept().await?;
         let (mut rd, mut wr) = socket.into_split();
         // socket.write_all()
+        // tokio::spawn()
         tokio::spawn(async move {
             println!("client connected {0}", addr);
             let socket_lock = ArcRw_new!(wr);// Arc::new(RwLock::new(socket));
             let player = GAME_CONTEXT.lock().await.player_manager.
                 add_player().await;
             player.write().await.socket = Arc::downgrade(&socket_lock);
-            async_player_check_chunk_load(player).await;
+            async_player_check_chunk_load(player.clone()).await;
 
             let mut buf = [0; 1024];
             // In a loop, read data from the socket and write the data back.
+            let mut rh = receive::ReceiveHandler::new();
             loop {
                 let n = match rd.read(&mut buf).await {
                     // socket closed
@@ -62,7 +66,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return;
                     }
                 };
-
+                rh.handle_rec(player.read().await.id, &buf, n);
                 // // Write the data back
                 // if let Err(e) = socket_lock.write().await.write_all(&buf[0..n]).await {
                 //     eprintln!("failed to write to socket; err = {:?}", e);

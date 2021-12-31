@@ -4,9 +4,10 @@ use tokio::net::{TcpListener, TcpStream};
 use std::sync::Mutex;
 use crate::base::collections::hash_map::OccupiedError;
 use tokio::net::tcp::{WriteHalf, OwnedWriteHalf};
+use crate::conv::conv_point3f_2_chunk_key;
 // use std::rc::Weak;
 
-type PlayerId = i32;
+pub type PlayerId = i32;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -50,6 +51,9 @@ impl Player {
 
         return p;
     }
+    fn get_chunk_key(&self) -> ChunkKey {
+        return conv_point3f_2_chunk_key(&self.data.position);
+    }
 }
 
 impl ITick for Player {
@@ -72,6 +76,7 @@ pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
         //0.清空not sent
         // 因为之前未发送的已经无效了
         // self.chunk_info.chunks_not_loaded.clear();
+
         //1、遍历感兴趣范围的map里的chunk
         let mut new_chunks_sent: HashMap<ChunkKey, SyncWeak<RwLock<Chunk>>> = Default::default();
         let mut chunks_not_sent: LinkedList<ArcRw<Chunk>> = LinkedList::new();
@@ -79,10 +84,16 @@ pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
         // let mut test: LinkedList<&Chunk> = LinkedList::new();
         // let mut mng = get_game_context();
         // mng.get_test();
+
+        //计算玩家区块
+        let p_ck = p_ptr.read().await.get_chunk_key();
+
         // 从原先的已发送队列中拿出有效的
+
         chunk_key_in_range_relative!(
-                ck,
+                relate_ck,//相对位置
                 {
+                    let ck=p_ck.plus(relate_ck);
 
                     let p=p_ptr.read().await;
                     let find=p.chunk_info.chunks_sent.get(&ck).clone();
@@ -100,8 +111,8 @@ pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
                         chunks_not_sent
                             // .write().unwrap()
                             .push_back(GAME_CONTEXT.
-                        lock().await.
-                        chunk_manager.get_chunk_by_chunk_key(ck));
+                            lock().await.
+                            chunk_manager.get_chunk_by_chunk_key(&ck));
                     }
                 }
             );

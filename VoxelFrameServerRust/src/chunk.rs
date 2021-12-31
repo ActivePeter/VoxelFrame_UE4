@@ -21,7 +21,7 @@ impl ChunkManager {
             chunks: Default::default()
         };
     }
-    pub fn get_chunk_by_chunk_key(&mut self, ck: ChunkKey) -> Arc<RwLock<Chunk>> {
+    pub fn get_chunk_by_chunk_key(&mut self, ck: &ChunkKey) -> Arc<RwLock<Chunk>> {
         // let chunk_op;
         // {
         // {
@@ -35,7 +35,7 @@ impl ChunkManager {
         // let mut new_chunk = Chunk::new();
         // let mchunk = &mut new_chunk;
         // self.chunks.insert(*ck, new_chunk);
-        let mchunk = self.chunks.entry(ck).or_insert(Arc::new(RwLock::from(Chunk::new(&ck))));
+        let mchunk = self.chunks.entry(ck.clone()).or_insert(Arc::new(RwLock::from(Chunk::new(&ck))));
         return mchunk.clone();
     }
 // pub fn setGame(&mut self, game:sync::Weak<RwLock<Game>>){
@@ -51,6 +51,7 @@ impl ChunkManager {
 pub struct Chunk {
     pub chunk_key: ChunkKey,
     pub chunk_data: Vec<u8>,
+    pub players: LinkedList<PlayerId>,
 }
 
 impl Chunk {
@@ -58,7 +59,11 @@ impl Chunk {
         let mut v = Vec::new();
         v.resize(VF_CHUNK_SIZE as usize, 0);
 
-        return Chunk { chunk_data: v, chunk_key: key.clone() };
+        return Chunk {
+            chunk_data: v,
+            chunk_key: key.clone(),
+            players: LinkedList::new(),
+        };
     }
 
     pub async fn load(&mut self) {
@@ -101,23 +106,32 @@ impl ChunkKey {
         return self.x * self.x + self.y * self.y + self.z * self.z < VF_CHUNK_LOAD_RADIUS * VF_CHUNK_LOAD_RADIUS;
     }
 
-    //加载范围内的区块相对坐标
-    pub fn in_range_relative<F: FnMut(ChunkKey)>(mut callback: F) {
-        // pub fn in_range_relative(callback: impl FnMut(ChunkKey)) {
-        for x in -VF_CHUNK_LOAD_RADIUS..VF_CHUNK_LOAD_RADIUS {
-            for y in -VF_CHUNK_LOAD_RADIUS..VF_CHUNK_LOAD_RADIUS {
-                for z in -VF_CHUNK_LOAD_RADIUS..VF_CHUNK_LOAD_RADIUS {
-                    let ck = ChunkKey { x, y, z };
-                    if ck.is_in_range() {
-                        callback(ck);
-                    }
-                }
-            }
-        }
+    pub fn plus(self, ck: ChunkKey) -> ChunkKey {
+        return ChunkKey {
+            x: self.x + ck.x,
+            y: self.y + ck.y,
+            z: self.z + ck.z,
+        };
     }
+    // //加载范围内的区块相对坐标
+    // pub fn in_range_relative<F: FnMut(ChunkKey)>(mut callback: F) {
+    //     // pub fn in_range_relative(callback: impl FnMut(ChunkKey)) {
+    //     for x in -VF_CHUNK_LOAD_RADIUS..VF_CHUNK_LOAD_RADIUS {
+    //         for y in -VF_CHUNK_LOAD_RADIUS..VF_CHUNK_LOAD_RADIUS {
+    //             for z in -VF_CHUNK_LOAD_RADIUS..VF_CHUNK_LOAD_RADIUS {
+    //                 let ck = ChunkKey { x, y, z };
+    //                 if ck.is_in_range() {
+    //                     callback(ck);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//遍历视野范围所有区块 相对位置
 macro_rules! chunk_key_in_range_relative {
   ($chunk_name:ident ,$callback:block) => {
     for x in -VF_CHUNK_LOAD_RADIUS..VF_CHUNK_LOAD_RADIUS {
