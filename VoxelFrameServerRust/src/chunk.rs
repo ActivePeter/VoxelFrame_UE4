@@ -38,6 +38,7 @@ impl ChunkManager {
         let mchunk = self.chunks.entry(ck.clone()).or_insert(Arc::new(RwLock::from(Chunk::new(&ck))));
         return mchunk.clone();
     }
+    pub async fn born_entity_in_chunk(&mut self, entityData: entity::EntityData) {}
 // pub fn setGame(&mut self, game:sync::Weak<RwLock<Game>>){
 //     self.game= game;
 // }
@@ -52,6 +53,8 @@ pub struct Chunk {
     pub chunk_key: ChunkKey,
     pub chunk_data: Vec<u8>,
     pub players: LinkedList<PlayerId>,
+    pub entities: LinkedList<entity::EntityId>,
+    pub be_interested_by: LinkedList<PlayerId>,
 }
 
 impl Chunk {

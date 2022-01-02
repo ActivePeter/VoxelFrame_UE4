@@ -56,26 +56,26 @@ macro_rules! ArcRw_new {
 //////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-pub struct BaseEntityData {
-    // #[serde(rename = "Pos")]
-    pub position: Point3f,
-    // #[serde(rename = "Rotation")]
-    // pub rotation: ArrayVec<f32, 2>,
-    // #[serde(rename = "Motion")]
-    // pub velocity: ArrayVec<f64, 3>,
-}
-
-impl BaseEntityData {
-    pub fn new() -> Self {
-        let mut bed = BaseEntityData {
-            position: Point3f::new()
-        };
-        bed.position.push(0.0);
-        bed.position.push(0.0);
-        bed.position.push(0.0);
-        return bed;
-    }
-}
+// pub struct BaseEntityData {
+//     // #[serde(rename = "Pos")]
+//     pub position: Point3f,
+//     // #[serde(rename = "Rotation")]
+//     // pub rotation: ArrayVec<f32, 2>,
+//     // #[serde(rename = "Motion")]
+//     // pub velocity: ArrayVec<f64, 3>,
+// }
+//
+// impl BaseEntityData {
+//     pub fn new() -> Self {
+//         let mut bed = BaseEntityData {
+//             position: Point3f::new()
+//         };
+//         bed.position.push(0.0);
+//         bed.position.push(0.0);
+//         bed.position.push(0.0);
+//         return bed;
+//     }
+// }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

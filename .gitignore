@@ -2,3 +2,4 @@ unzip_2_current_folder/
 VoxelFrameServerRust/target/
 VoxelFrameServerRust/.idea/
 VoxelFrameServerRust/.vs/
+vf_server/target/

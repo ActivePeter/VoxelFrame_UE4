@@ -27,24 +27,28 @@ impl PlayerChunkInfo {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 pub struct Player {
-    new_in_world: bool,
+    pub new_in_world: bool,
     pub id: PlayerId,
-    data: BaseEntityData,
+    // data: BaseEntityData,
     // chunks_sent: HashMap<ChunkKey, RwLock<SyncWeak<Chunk>>>,
-    chunk_info: PlayerChunkInfo,
+    pub chunk_info: PlayerChunkInfo,
     pub socket: SyncWeak<RwLock<OwnedWriteHalf>>,
+    pub entity_data: entity::EntityData,
 }
 
 
 impl Player {
-    fn new(id_cnt: i32) -> ArcRw<Player> {
+    pub(crate) fn new(id_cnt: i32) -> ArcRw<Player> {
         let p = ArcRw_new!(Player {
             new_in_world: true,
             id: id_cnt,
-            data: BaseEntityData::new(),
+            // data: BaseEntityData::new(),
             // chunks_sent: Default::default(),
             chunk_info: PlayerChunkInfo::new(),
-            socket:Default::default()
+            socket:Default::default(),
+
+
+            entity_data:Default::default()
         });
 
         // p.write().unwrap().check_chunk_load();
@@ -62,6 +66,10 @@ impl ITick for Player {
         // todo!()
     }
 }
+
+// pub async fn player_first_in_world(p_ptr: ArcRw<Player>) {
+//     async_player_check_chunk_load().await;
+// }
 
 //call when first init& position change.
 pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
@@ -143,42 +151,5 @@ pub async fn async_player_check_chunk_load(p_ptr: ArcRw<Player>) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-pub struct PlayerManager {
-    id_cnt: PlayerId,
-    pub player_id2detail: HashMap<PlayerId, ArcRw<Player>>,
-    pub msg_list: LinkedList<Arc<Vec<u8>>>,
-}
-
-impl PlayerManager {
-    pub fn new() -> PlayerManager {
-        return PlayerManager {
-            id_cnt: 0,
-            player_id2detail: HashMap::new(),
-            msg_list: Default::default(),
-        };
-    }
-    pub async fn add_player(&mut self) -> ArcRw<Player> {
-        println!("player{0} added.", self.id_cnt);
-        let a = Player::new(self.id_cnt);
-        // let a =
-        self.player_id2detail.insert(self.id_cnt, a.clone());
-        // self.player_id2detail.insert(
-        //     self.id_cnt,
-        //     a.clone(),
-        // ).unwrap();
-        // println!("error {}", a);
-
-        let op = self.player_id2detail.get(&self.id_cnt).unwrap();
-        self.id_cnt += 1;
-
-
-        println!("player id:{0}", op.read().await.id);
-
-        return a;
-    }
-    // pub fn setGame(&mut self, game:sync::Weak<RwLock<Game>>){
-    //     self.game= game;
-    // }
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+enum EntityType {
+  T_Null = 0;
+  T_Player = 1;
+}
+
+message EntityPos{
+  EntityType t = 1;
+  int32 entity_id = 2;
+  float x = 3;
+  float y = 4;
+  float z = 5;
+}
+
+//首次进入游戏
+message PlayerBasic{
+  uint32 entity_id = 1;
+}
+
+message ChunkPack{
+  bytes data = 1;
+  int32 x = 2;
+  int32 y = 3;
+  int32 z = 4;
+}
+
+message ChunkEntityPack{
+  repeated EntityPos entity_pos=1;
+  int32 x = 2;
+  int32 y = 3;
+  int32 z = 4;
+}

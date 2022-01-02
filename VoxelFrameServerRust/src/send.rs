@@ -4,6 +4,7 @@ use byteorder::{LittleEndian, ByteOrder, BigEndian};
 use tokio::io::AsyncWrite;
 // use protos::generated_with_native::
 
+
 pub async fn chunk_2_player(chunk_ptr: ArcRw<Chunk>, p_ptr: ArcRw<Player>) {
     let _socket_lock = p_ptr.read().await.socket.upgrade().unwrap().clone();
 
@@ -41,27 +42,13 @@ pub async fn chunk_2_player(chunk_ptr: ArcRw<Chunk>, p_ptr: ArcRw<Player>) {
 
     let mut a = msg_head.to_vec();
     a.append(&mut msg_byte);
-
+    // let hhh=a.as_slice()
     {
         println!("before socket locked");
         let mut socket = _socket_lock.write().await;
         println!("socket locked");
-        // socket.poll_write().is_ready()
-        // let mut offset = 0;
-        // let alen = a.len();
-        // while offset < alen {
-        //     let r = socket.write(&a.as_slice()[offset..]).await;
-        //     match r {
-        //         Ok(n) => {
-        //             offset += n;
-        //         }
-        //         Err(e) => println!("error: {:?}", e),
-        //     }
-        // }
         socket.write_all(a.as_slice()).await.unwrap();
         socket.flush().await.unwrap();
-        // socket.write_all(msg_head).await.unwrap();//长度
-        // socket.write_all(msg_byte.as_slice()).await.unwrap();//数据
 
         println!("one was sent");
     }

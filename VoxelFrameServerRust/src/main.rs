@@ -16,6 +16,7 @@ mod protos;
 mod receive;
 mod handle_pack;
 mod conv;
+mod entity;
 
 use crate::base::*;
 use tokio::sync::MutexGuard;
@@ -47,11 +48,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // tokio::spawn()
         tokio::spawn(async move {
             println!("client connected {0}", addr);
-            let socket_lock = ArcRw_new!(wr);// Arc::new(RwLock::new(socket));
-            let player = GAME_CONTEXT.lock().await.player_manager.
-                add_player().await;
-            player.write().await.socket = Arc::downgrade(&socket_lock);
-            async_player_check_chunk_load(player.clone()).await;
+            let socketWrLock = ArcRw_new!(wr);// Arc::new(RwLock::new(socket));
+
+
+            // let player = GAME_CONTEXT.lock().await.player_manager.
+            //     add_player().await;
+            // player.write().await.socket = Arc::downgrade(&socket_lock);
+            // socket_lock
+            // player::player_first_in_world(player.clone());
 
             let mut buf = [0; 1024];
             // In a loop, read data from the socket and write the data back.
