@@ -12,6 +12,7 @@ mod conv;
 mod send;
 mod send_packer;
 mod protos;
+mod send_packer_head;
 // mod base_func;
 
 // use std::net::TcpListener;
@@ -24,15 +25,30 @@ pub use std::rc::Rc;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //创建游戏
-    let mut the_game = game::Game::create();
+
+    let game_main_loop_channels=
+        game::main_loop().await;
 
     let listener = TcpListener::bind("127.0.0.1:7776").await?;
     println!("server launched");
+
     loop {
         let (mut socket, addr) = listener.accept().await?;
-        // let (mut rd, mut wr) = socket.into_split();
-        the_game.spawn_player(socket,addr);
-        // tokio::spawn(async move {
+        let gmlc = game_main_loop_channels.clone();
+
+
+            // let (mut rd, mut wr) = socket.into_split();
+        // let game_handle=the_game.clone();
+        tokio::spawn(async move {
+            println!("one connection");
+            // game_handle.write().await.spawn_player(socket,addr).await;
+
+            //1.创建消息循环
+            let mut client =client::Client::create(socket,addr);
+            let tx= client::start_rw_loop(client);
+            //2.new_player消息
+            gmlc.new_player_channel_tx.send(tx).await;
+        });
         //     println!("client connected {0}", addr);
         //     let mut buf = [0; 1024];
         //     loop {

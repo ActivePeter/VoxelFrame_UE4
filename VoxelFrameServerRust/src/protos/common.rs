@@ -27,6 +27,7 @@
 pub struct EntityMove {
     // message fields
     pub t: EntityType,
+    pub entityId: i32,
     pub x: f32,
     pub y: f32,
     pub z: f32,
@@ -61,7 +62,22 @@ impl EntityMove {
         self.t = v;
     }
 
-    // float x = 2;
+    // int32 entityId = 2;
+
+
+    pub fn get_entityId(&self) -> i32 {
+        self.entityId
+    }
+    pub fn clear_entityId(&mut self) {
+        self.entityId = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_entityId(&mut self, v: i32) {
+        self.entityId = v;
+    }
+
+    // float x = 3;
 
 
     pub fn get_x(&self) -> f32 {
@@ -76,7 +92,7 @@ impl EntityMove {
         self.x = v;
     }
 
-    // float y = 3;
+    // float y = 4;
 
 
     pub fn get_y(&self) -> f32 {
@@ -91,7 +107,7 @@ impl EntityMove {
         self.y = v;
     }
 
-    // float z = 4;
+    // float z = 5;
 
 
     pub fn get_z(&self) -> f32 {
@@ -120,20 +136,27 @@ impl ::protobuf::Message for EntityMove {
                     ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.t, 1, &mut self.unknown_fields)?
                 },
                 2 => {
-                    if wire_type != ::protobuf::wire_format::WireTypeFixed32 {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
-                    let tmp = is.read_float()?;
-                    self.x = tmp;
+                    let tmp = is.read_int32()?;
+                    self.entityId = tmp;
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed32 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_float()?;
-                    self.y = tmp;
+                    self.x = tmp;
                 },
                 4 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed32 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_float()?;
+                    self.y = tmp;
+                },
+                5 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed32 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
@@ -155,6 +178,9 @@ impl ::protobuf::Message for EntityMove {
         if self.t != EntityType::T_Null {
             my_size += ::protobuf::rt::enum_size(1, self.t);
         }
+        if self.entityId != 0 {
+            my_size += ::protobuf::rt::value_size(2, self.entityId, ::protobuf::wire_format::WireTypeVarint);
+        }
         if self.x != 0. {
             my_size += 5;
         }
@@ -173,14 +199,17 @@ impl ::protobuf::Message for EntityMove {
         if self.t != EntityType::T_Null {
             os.write_enum(1, ::protobuf::ProtobufEnum::value(&self.t))?;
         }
+        if self.entityId != 0 {
+            os.write_int32(2, self.entityId)?;
+        }
         if self.x != 0. {
-            os.write_float(2, self.x)?;
+            os.write_float(3, self.x)?;
         }
         if self.y != 0. {
-            os.write_float(3, self.y)?;
+            os.write_float(4, self.y)?;
         }
         if self.z != 0. {
-            os.write_float(4, self.z)?;
+            os.write_float(5, self.z)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -225,6 +254,11 @@ impl ::protobuf::Message for EntityMove {
                 |m: &EntityMove| { &m.t },
                 |m: &mut EntityMove| { &mut m.t },
             ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                "entityId",
+                |m: &EntityMove| { &m.entityId },
+                |m: &mut EntityMove| { &mut m.entityId },
+            ));
             fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeFloat>(
                 "x",
                 |m: &EntityMove| { &m.x },
@@ -257,6 +291,7 @@ impl ::protobuf::Message for EntityMove {
 impl ::protobuf::Clear for EntityMove {
     fn clear(&mut self) {
         self.t = EntityType::T_Null;
+        self.entityId = 0;
         self.x = 0.;
         self.y = 0.;
         self.z = 0.;
@@ -271,6 +306,448 @@ impl ::std::fmt::Debug for EntityMove {
 }
 
 impl ::protobuf::reflect::ProtobufValue for EntityMove {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct PlayerFirstInGame {
+    // message fields
+    pub entityId: u32,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a PlayerFirstInGame {
+    fn default() -> &'a PlayerFirstInGame {
+        <PlayerFirstInGame as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl PlayerFirstInGame {
+    pub fn new() -> PlayerFirstInGame {
+        ::std::default::Default::default()
+    }
+
+    // uint32 entityId = 1;
+
+
+    pub fn get_entityId(&self) -> u32 {
+        self.entityId
+    }
+    pub fn clear_entityId(&mut self) {
+        self.entityId = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_entityId(&mut self, v: u32) {
+        self.entityId = v;
+    }
+}
+
+impl ::protobuf::Message for PlayerFirstInGame {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.entityId = tmp;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if self.entityId != 0 {
+            my_size += ::protobuf::rt::value_size(1, self.entityId, ::protobuf::wire_format::WireTypeVarint);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if self.entityId != 0 {
+            os.write_uint32(1, self.entityId)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> PlayerFirstInGame {
+        PlayerFirstInGame::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                "entityId",
+                |m: &PlayerFirstInGame| { &m.entityId },
+                |m: &mut PlayerFirstInGame| { &mut m.entityId },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<PlayerFirstInGame>(
+                "PlayerFirstInGame",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static PlayerFirstInGame {
+        static instance: ::protobuf::rt::LazyV2<PlayerFirstInGame> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(PlayerFirstInGame::new)
+    }
+}
+
+impl ::protobuf::Clear for PlayerFirstInGame {
+    fn clear(&mut self) {
+        self.entityId = 0;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for PlayerFirstInGame {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for PlayerFirstInGame {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct GrantAuthorOfEntity {
+    // message fields
+    pub entityMove: ::protobuf::SingularPtrField<EntityMove>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a GrantAuthorOfEntity {
+    fn default() -> &'a GrantAuthorOfEntity {
+        <GrantAuthorOfEntity as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl GrantAuthorOfEntity {
+    pub fn new() -> GrantAuthorOfEntity {
+        ::std::default::Default::default()
+    }
+
+    // .EntityMove entityMove = 2;
+
+
+    pub fn get_entityMove(&self) -> &EntityMove {
+        self.entityMove.as_ref().unwrap_or_else(|| <EntityMove as ::protobuf::Message>::default_instance())
+    }
+    pub fn clear_entityMove(&mut self) {
+        self.entityMove.clear();
+    }
+
+    pub fn has_entityMove(&self) -> bool {
+        self.entityMove.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_entityMove(&mut self, v: EntityMove) {
+        self.entityMove = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_entityMove(&mut self) -> &mut EntityMove {
+        if self.entityMove.is_none() {
+            self.entityMove.set_default();
+        }
+        self.entityMove.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_entityMove(&mut self) -> EntityMove {
+        self.entityMove.take().unwrap_or_else(|| EntityMove::new())
+    }
+}
+
+impl ::protobuf::Message for GrantAuthorOfEntity {
+    fn is_initialized(&self) -> bool {
+        for v in &self.entityMove {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                2 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.entityMove)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if let Some(ref v) = self.entityMove.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if let Some(ref v) = self.entityMove.as_ref() {
+            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> GrantAuthorOfEntity {
+        GrantAuthorOfEntity::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<EntityMove>>(
+                "entityMove",
+                |m: &GrantAuthorOfEntity| { &m.entityMove },
+                |m: &mut GrantAuthorOfEntity| { &mut m.entityMove },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<GrantAuthorOfEntity>(
+                "GrantAuthorOfEntity",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static GrantAuthorOfEntity {
+        static instance: ::protobuf::rt::LazyV2<GrantAuthorOfEntity> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(GrantAuthorOfEntity::new)
+    }
+}
+
+impl ::protobuf::Clear for GrantAuthorOfEntity {
+    fn clear(&mut self) {
+        self.entityMove.clear();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for GrantAuthorOfEntity {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for GrantAuthorOfEntity {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct AcceptGrant {
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a AcceptGrant {
+    fn default() -> &'a AcceptGrant {
+        <AcceptGrant as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl AcceptGrant {
+    pub fn new() -> AcceptGrant {
+        ::std::default::Default::default()
+    }
+}
+
+impl ::protobuf::Message for AcceptGrant {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> AcceptGrant {
+        AcceptGrant::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let fields = ::std::vec::Vec::new();
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<AcceptGrant>(
+                "AcceptGrant",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static AcceptGrant {
+        static instance: ::protobuf::rt::LazyV2<AcceptGrant> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(AcceptGrant::new)
+    }
+}
+
+impl ::protobuf::Clear for AcceptGrant {
+    fn clear(&mut self) {
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for AcceptGrant {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for AcceptGrant {
     fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
         ::protobuf::reflect::ReflectValueRef::Message(self)
     }
@@ -327,11 +804,15 @@ impl ::protobuf::reflect::ProtobufValue for EntityType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0ccommon.proto\"[\n\nEntityMove\x12\x1b\n\x01t\x18\x01\x20\x01(\x0e2\
-    \x0b.EntityTypeR\x01tB\0\x12\x0e\n\x01x\x18\x02\x20\x01(\x02R\x01xB\0\
-    \x12\x0e\n\x01y\x18\x03\x20\x01(\x02R\x01yB\0\x12\x0e\n\x01z\x18\x04\x20\
-    \x01(\x02R\x01zB\0:\0*(\n\nEntityType\x12\n\n\x06T_Null\x10\0\x12\x0c\n\
-    \x08T_Player\x10\x01\x1a\0B\0b\x06proto3\
+    \n\x0ccommon.proto\"y\n\nEntityMove\x12\x1b\n\x01t\x18\x01\x20\x01(\x0e2\
+    \x0b.EntityTypeR\x01tB\0\x12\x1c\n\x08entityId\x18\x02\x20\x01(\x05R\x08\
+    entityIdB\0\x12\x0e\n\x01x\x18\x03\x20\x01(\x02R\x01xB\0\x12\x0e\n\x01y\
+    \x18\x04\x20\x01(\x02R\x01yB\0\x12\x0e\n\x01z\x18\x05\x20\x01(\x02R\x01z\
+    B\0:\0\"3\n\x11PlayerFirstInGame\x12\x1c\n\x08entityId\x18\x01\x20\x01(\
+    \rR\x08entityIdB\0:\0\"F\n\x13GrantAuthorOfEntity\x12-\n\nentityMove\x18\
+    \x02\x20\x01(\x0b2\x0b.EntityMoveR\nentityMoveB\0:\0\"\x0f\n\x0bAcceptGr\
+    ant:\0*(\n\nEntityType\x12\n\n\x06T_Null\x10\0\x12\x0c\n\x08T_Player\x10\
+    \x01\x1a\0B\0b\x06proto3\
 ";
 
 static file_descriptor_proto_lazy: ::protobuf::rt::LazyV2<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::rt::LazyV2::INIT;

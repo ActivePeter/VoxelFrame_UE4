@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+
 enum EntityType {
   T_Null = 0;
   T_Player = 1;
