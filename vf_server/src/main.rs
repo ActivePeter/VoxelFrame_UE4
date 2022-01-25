@@ -7,7 +7,7 @@ mod game_player_manager;
 mod player;
 mod entity;
 mod base_type;
-mod client;
+mod net;
 mod conv;
 mod send;
 mod send_packer;
@@ -44,10 +44,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // game_handle.write().await.spawn_player(socket,addr).await;
 
             //1.创建消息循环
-            let mut client =client::Client::create(socket,addr);
-            let tx= client::start_rw_loop(client);
-            //2.new_player消息
-            gmlc.new_player_channel_tx.send(tx).await;
+            let mut client = net::Client::create(socket, addr);
+            let tx= net::start_rw_loop(client);
+            // tx.sender.send(vec![0]).await
+            // //2.new_player消息
+            // gmlc.new_player_channel_tx.send(tx).await;
         });
         //     println!("client connected {0}", addr);
         //     let mut buf = [0; 1024];

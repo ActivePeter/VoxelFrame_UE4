@@ -12,7 +12,7 @@ use tokio::net::windows::named_pipe::PipeEnd::Client;
 // use std::borrow::{Borrow, BorrowMut};
 use std::thread::{spawn, LocalKey};
 use tokio::sync::{mpsc, oneshot};
-use crate::client::ClientSender;
+use crate::net::ClientSender;
 use tokio::task;
 
 // use crate::client::Client;
@@ -189,13 +189,13 @@ impl Game {
 
 
 pub struct GameMainLoopChannels {
-    pub new_player_channel_tx: mpsc::Sender<ClientSender>,
+    pub msg_channel_tx: mpsc::Sender<ClientSender>
 }
 
 impl Clone for GameMainLoopChannels {
     fn clone(&self) -> Self {
         return GameMainLoopChannels {
-            new_player_channel_tx: self.new_player_channel_tx.clone()
+            msg_channel_tx: self.msg_channel_tx.clone(),
         };
     }
 }
@@ -206,9 +206,9 @@ pub async fn main_loop() -> GameMainLoopChannels {
     let (new_player_channel_tx, mut new_player_channel_rx):
         (mpsc::Sender<ClientSender>, mpsc::Receiver<ClientSender>)
         = mpsc::channel(10);
-    //
+
     let game_channels = GameMainLoopChannels {
-        new_player_channel_tx,
+        msg_channel_tx,
     };
     //
     let mut game = game::Game::create();
@@ -222,7 +222,10 @@ pub async fn main_loop() -> GameMainLoopChannels {
             tokio::select! {
                 Some(client_sender) = new_player_channel_rx.recv() => {
                     println!("new player in msg rx");
-                    game.spawn_player(client_sender).await;
+                    // game.spawn_player(client_sender).await;
+                },
+                Some(player_msg)=player_msg_channel_rx.recv()=>{
+                    println!("player msg {}",player_msg)
                 },
                 else => break,
             }

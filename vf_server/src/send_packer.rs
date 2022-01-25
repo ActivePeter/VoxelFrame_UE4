@@ -63,7 +63,7 @@ pub fn pack_chunk_pack(chunk: &Chunk) -> Vec<u8> {
         // msg_byte = proto_chunk.write_to_bytes().unwrap();
     }
     let final_vec=
-        util::proto2buf(proto_chunk,PackIds::ChunkPack);
+        util::proto2buf(proto_chunk,PackIds::EChunkPack);
     // let msg_byte_len = msg_byte.len();
     //
     // //制作包头
@@ -81,7 +81,7 @@ pub fn pack_player_basic(entity:&EntityData) -> Vec<u8> {
     proto_pack.entity_id=entity.entity_id;
 
     let final_vec=
-        util::proto2buf(proto_pack,PackIds::PlayerBasic);
+        util::proto2buf(proto_pack,PackIds::EPlayerBasic);
 
     // for a in final_vec.iter(){
     //     print!("{} ",a);
@@ -114,8 +114,18 @@ pub fn pack_chunk_entity_pack(
 
     proto_pack.entity_pos=
         util::make_repeated(
-            EntityPos::new(),entities.len());
-
+            EntityPos::new(),chunk.entities.len());
+    {//拷贝entity数据到数组中
+        let mut i=0;
+        for eid in chunk.entities.iter(){
+            proto_pack.entity_pos[i].entity_id=*eid as i32;
+            let entity=entities.get(eid).unwrap();
+            proto_pack.entity_pos[i].x=entity.position[0];
+            proto_pack.entity_pos[i].y=entity.position[1];
+            proto_pack.entity_pos[i].z=entity.position[2];
+            i+=1;
+        }
+    }
     let mut i =0;
     //拷贝到proto构造器
     for eid in chunk.entities.iter(){
@@ -128,7 +138,7 @@ pub fn pack_chunk_entity_pack(
     }
 
     let final_vec=
-        util::proto2buf(proto_pack,PackIds::ChunkEntityPack);
+        util::proto2buf(proto_pack,PackIds::EChunkEntityPack);
 
     return final_vec;
 }

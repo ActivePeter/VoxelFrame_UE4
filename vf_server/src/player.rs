@@ -1,5 +1,5 @@
 use crate::*;
-use crate::client::{Client, ClientSender};
+use crate::net::{Client, ClientSender};
 use tokio::sync::mpsc::Sender;
 
 pub type PlayerId = i32;

@@ -2,7 +2,7 @@ use crate::*;
 use std::collections::{LinkedList, HashMap};
 use crate::player::{Player, PlayerId};
 use tokio::net::TcpStream;
-use crate::client::{Client, ClientSender};
+use crate::net::{Client, ClientSender};
 
 
 pub struct PlayerManager {

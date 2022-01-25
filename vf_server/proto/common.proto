@@ -1,6 +1,16 @@
 syntax = "proto3";
 
+//架构层
+enum ClientType{
+  ClientType_GameServer=0;
+  ClientType_Player=1;
+}
+message ClientFirstConfirm{
+  ClientType client_type=1;
+}
 
+
+//游戏层
 enum EntityType {
   T_Null = 0;
   T_Player = 1;

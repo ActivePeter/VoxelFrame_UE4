@@ -24,6 +24,154 @@
 // const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_2_25_2;
 
 #[derive(PartialEq,Clone,Default)]
+pub struct ClientFirstConfirm {
+    // message fields
+    pub client_type: ClientType,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a ClientFirstConfirm {
+    fn default() -> &'a ClientFirstConfirm {
+        <ClientFirstConfirm as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl ClientFirstConfirm {
+    pub fn new() -> ClientFirstConfirm {
+        ::std::default::Default::default()
+    }
+
+    // .ClientType client_type = 1;
+
+
+    pub fn get_client_type(&self) -> ClientType {
+        self.client_type
+    }
+    pub fn clear_client_type(&mut self) {
+        self.client_type = ClientType::ClientType_GameServer;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_client_type(&mut self, v: ClientType) {
+        self.client_type = v;
+    }
+}
+
+impl ::protobuf::Message for ClientFirstConfirm {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.client_type, 1, &mut self.unknown_fields)?
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if self.client_type != ClientType::ClientType_GameServer {
+            my_size += ::protobuf::rt::enum_size(1, self.client_type);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if self.client_type != ClientType::ClientType_GameServer {
+            os.write_enum(1, ::protobuf::ProtobufEnum::value(&self.client_type))?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> ClientFirstConfirm {
+        ClientFirstConfirm::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<ClientType>>(
+                "client_type",
+                |m: &ClientFirstConfirm| { &m.client_type },
+                |m: &mut ClientFirstConfirm| { &mut m.client_type },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<ClientFirstConfirm>(
+                "ClientFirstConfirm",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static ClientFirstConfirm {
+        static instance: ::protobuf::rt::LazyV2<ClientFirstConfirm> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(ClientFirstConfirm::new)
+    }
+}
+
+impl ::protobuf::Clear for ClientFirstConfirm {
+    fn clear(&mut self) {
+        self.client_type = ClientType::ClientType_GameServer;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for ClientFirstConfirm {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for ClientFirstConfirm {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
 pub struct EntityPos {
     // message fields
     pub t: EntityType,
@@ -999,6 +1147,56 @@ impl ::protobuf::reflect::ProtobufValue for ChunkEntityPack {
 }
 
 #[derive(Clone,PartialEq,Eq,Debug,Hash)]
+pub enum ClientType {
+    ClientType_GameServer = 0,
+    ClientType_Player = 1,
+}
+
+impl ::protobuf::ProtobufEnum for ClientType {
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<ClientType> {
+        match value {
+            0 => ::std::option::Option::Some(ClientType::ClientType_GameServer),
+            1 => ::std::option::Option::Some(ClientType::ClientType_Player),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    fn values() -> &'static [Self] {
+        static values: &'static [ClientType] = &[
+            ClientType::ClientType_GameServer,
+            ClientType::ClientType_Player,
+        ];
+        values
+    }
+
+    fn enum_descriptor_static() -> &'static ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            ::protobuf::reflect::EnumDescriptor::new_pb_name::<ClientType>("ClientType", file_descriptor_proto())
+        })
+    }
+}
+
+impl ::std::marker::Copy for ClientType {
+}
+
+impl ::std::default::Default for ClientType {
+    fn default() -> Self {
+        ClientType::ClientType_GameServer
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for ClientType {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Enum(::protobuf::ProtobufEnum::descriptor(self))
+    }
+}
+
+#[derive(Clone,PartialEq,Eq,Debug,Hash)]
 pub enum EntityType {
     T_Null = 0,
     T_Player = 1,
@@ -1049,19 +1247,22 @@ impl ::protobuf::reflect::ProtobufValue for EntityType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0ccommon.proto\"y\n\tEntityPos\x12\x1b\n\x01t\x18\x01\x20\x01(\x0e2\
-    \x0b.EntityTypeR\x01tB\0\x12\x1d\n\tentity_id\x18\x02\x20\x01(\x05R\x08e\
-    ntityIdB\0\x12\x0e\n\x01x\x18\x03\x20\x01(\x02R\x01xB\0\x12\x0e\n\x01y\
-    \x18\x04\x20\x01(\x02R\x01yB\0\x12\x0e\n\x01z\x18\x05\x20\x01(\x02R\x01z\
-    B\0:\0\".\n\x0bPlayerBasic\x12\x1d\n\tentity_id\x18\x01\x20\x01(\rR\x08e\
-    ntityIdB\0:\0\"S\n\tChunkPack\x12\x14\n\x04data\x18\x01\x20\x01(\x0cR\
-    \x04dataB\0\x12\x0e\n\x01x\x18\x02\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\
-    \x18\x03\x20\x01(\x05R\x01yB\0\x12\x0e\n\x01z\x18\x04\x20\x01(\x05R\x01z\
-    B\0:\0\"p\n\x0fChunkEntityPack\x12+\n\nentity_pos\x18\x01\x20\x03(\x0b2\
-    \n.EntityPosR\tentityPosB\0\x12\x0e\n\x01x\x18\x02\x20\x01(\x05R\x01xB\0\
-    \x12\x0e\n\x01y\x18\x03\x20\x01(\x05R\x01yB\0\x12\x0e\n\x01z\x18\x04\x20\
-    \x01(\x05R\x01zB\0:\0*(\n\nEntityType\x12\n\n\x06T_Null\x10\0\x12\x0c\n\
-    \x08T_Player\x10\x01\x1a\0B\0b\x06proto3\
+    \n\x0ccommon.proto\"F\n\x12ClientFirstConfirm\x12.\n\x0bclient_type\x18\
+    \x01\x20\x01(\x0e2\x0b.ClientTypeR\nclientTypeB\0:\0\"y\n\tEntityPos\x12\
+    \x1b\n\x01t\x18\x01\x20\x01(\x0e2\x0b.EntityTypeR\x01tB\0\x12\x1d\n\tent\
+    ity_id\x18\x02\x20\x01(\x05R\x08entityIdB\0\x12\x0e\n\x01x\x18\x03\x20\
+    \x01(\x02R\x01xB\0\x12\x0e\n\x01y\x18\x04\x20\x01(\x02R\x01yB\0\x12\x0e\
+    \n\x01z\x18\x05\x20\x01(\x02R\x01zB\0:\0\".\n\x0bPlayerBasic\x12\x1d\n\t\
+    entity_id\x18\x01\x20\x01(\rR\x08entityIdB\0:\0\"S\n\tChunkPack\x12\x14\
+    \n\x04data\x18\x01\x20\x01(\x0cR\x04dataB\0\x12\x0e\n\x01x\x18\x02\x20\
+    \x01(\x05R\x01xB\0\x12\x0e\n\x01y\x18\x03\x20\x01(\x05R\x01yB\0\x12\x0e\
+    \n\x01z\x18\x04\x20\x01(\x05R\x01zB\0:\0\"p\n\x0fChunkEntityPack\x12+\n\
+    \nentity_pos\x18\x01\x20\x03(\x0b2\n.EntityPosR\tentityPosB\0\x12\x0e\n\
+    \x01x\x18\x02\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\x18\x03\x20\x01(\x05R\
+    \x01yB\0\x12\x0e\n\x01z\x18\x04\x20\x01(\x05R\x01zB\0:\0*@\n\nClientType\
+    \x12\x19\n\x15ClientType_GameServer\x10\0\x12\x15\n\x11ClientType_Player\
+    \x10\x01\x1a\0*(\n\nEntityType\x12\n\n\x06T_Null\x10\0\x12\x0c\n\x08T_Pl\
+    ayer\x10\x01\x1a\0B\0b\x06proto3\
 ";
 
 static file_descriptor_proto_lazy: ::protobuf::rt::LazyV2<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::rt::LazyV2::INIT;
