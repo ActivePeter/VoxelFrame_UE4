@@ -1,6 +1,6 @@
 use crate::*;
 use crate::base_type::Point3f;
-use crate::chunk::{ChunkKey, VF_CHUNK_SIZE, VF_CHUNK_WIDTH};
+use crate::game_chunk::{ChunkKey, VF_CHUNK_SIZE, VF_CHUNK_WIDTH};
 
 pub fn point3f_2_chunkkey(p: &Point3f)->ChunkKey{
     let mut ck = ChunkKey {

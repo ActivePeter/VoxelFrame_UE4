@@ -1,17 +1,20 @@
 use crate::*;
-use crate::player::Player;
-use crate::entity::EntityData;
-use crate::game::Game;
+use crate::game_player::Player;
+use crate::game::{Game, ClientManager};
+use crate::game_entity::EntityData;
+
 
 pub async fn player_basic(
+    client_manager: &ClientManager,
     player: &Player,
     entity: &EntityData) {
     let packed = send_packer::pack_player_basic(entity);
-    player.sender.as_ref().unwrap().clone().sender.
-        send(packed).await;
+    let sender = client_manager.get_player_sender(player);
+    sender.send(packed).await;
 }
 
 pub async fn player_interested_chunk_block_data(
+    client_manager: &ClientManager,
     player: &Player,
     entity: &EntityData,
     game: &Game,
@@ -24,13 +27,15 @@ pub async fn player_interested_chunk_block_data(
         {
             let cur_ck=p_ck.plus(r_ck);
             let packed=send_packer::pack_chunk_pack(game.chunk_get(&cur_ck).unwrap());
-            player.sender.as_ref().unwrap().clone().
+            let sender = client_manager.get_player_sender(player);
+            // player.sender.as_ref().unwrap().clone().
                 sender.send(packed).await;
         }
     )
 }
 
 pub async fn player_interested_chunk_entity_data(
+    client_manager: &ClientManager,
     player: &Player,
     entity: &EntityData,
     game: &Game,
@@ -45,8 +50,10 @@ pub async fn player_interested_chunk_entity_data(
                 game.chunk_get(&cur_ck).unwrap(),
                 &game.entities
             );
+            let sender = client_manager.get_player_sender(player);
+            println!("send player {}",player.client_id);
             //send_packer::pack_chunk_pack(game.chunk_get(&cur_ck).unwrap());
-            player.sender.as_ref().unwrap().clone().
+            // player.sender.as_ref().unwrap().clone().
                 sender.send(packed).await;
         }
     )

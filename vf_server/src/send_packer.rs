@@ -1,39 +1,20 @@
 use crate::*;
 use std::mem;
-use crate::chunk::Chunk;
+use crate::game_chunk::Chunk;
 use protobuf::{Message, CodedOutputStream, RepeatedField};
 use byteorder::{LittleEndian, ByteOrder, BigEndian};
-use crate::entity::{EntityData, EntityId};
-use crate::send_packer_head::PackIds;
 use crate::game::Game;
 use std::collections::HashMap;
 use crate::protos::common::EntityPos;
+use crate::net_pack_convert::PackIds;
+use crate::game_entity::{EntityData, EntityId};
+use crate::protos::common;
 
 mod util{
-    use crate::{send_packer_head, protos};
-    use crate::send_packer_head::PackIds;
     use protobuf::{CodedOutputStream, RepeatedField};
     // use std::alloc::Global;
 
-    pub fn proto2buf<T: ::protobuf::Message>(proto_pack: T,pack_id:PackIds) -> Vec<u8> {
-        //消息体 长度
-        let msg_body_len=proto_pack.compute_size() as usize;
-        //消息头
-        let msg_head=send_packer_head::make(
-            pack_id, msg_body_len);
-        //给拷贝准备好空间
-        let mut final_vec =msg_head.to_vec();
-        final_vec.resize(5 + msg_body_len, 0);
-        // let final_vec_slice=final_vec.as_mut_slice();
-        // 流输出器
-        let mut stream =
-            CodedOutputStream::bytes(&mut final_vec[5..]);
-        proto_pack.write_to(&mut stream);
-        stream.flush();
-        println!("player basic packed bodylen:{0}"
-                 ,msg_body_len);
-        return final_vec
-    }
+
 
     pub fn make_repeated<T:Clone>(model:T,n:usize)
         ->RepeatedField::<T>{
@@ -63,7 +44,8 @@ pub fn pack_chunk_pack(chunk: &Chunk) -> Vec<u8> {
         // msg_byte = proto_chunk.write_to_bytes().unwrap();
     }
     let final_vec=
-        util::proto2buf(proto_chunk,PackIds::EChunkPack);
+        net_pack_convert::pack_to_bytes(
+            proto_chunk,PackIds::EChunkPack);
     // let msg_byte_len = msg_byte.len();
     //
     // //制作包头
@@ -80,8 +62,8 @@ pub fn pack_player_basic(entity:&EntityData) -> Vec<u8> {
     let mut proto_pack =protos::common::PlayerBasic::new();
     proto_pack.entity_id=entity.entity_id;
 
-    let final_vec=
-        util::proto2buf(proto_pack,PackIds::EPlayerBasic);
+    let final_vec= net_pack_convert::pack_to_bytes(
+            proto_pack,PackIds::EPlayerBasic);
 
     // for a in final_vec.iter(){
     //     print!("{} ",a);
@@ -137,8 +119,10 @@ pub fn pack_chunk_entity_pack(
         i=i+1;
     }
 
-    let final_vec=
-        util::proto2buf(proto_pack,PackIds::EChunkEntityPack);
+    let final_vec= net_pack_convert::pack_to_bytes(
+        proto_pack,PackIds::EChunkEntityPack);
+        // util::proto2buf(proto_pack,PackIds::EChunkEntityPack);
 
     return final_vec;
 }
+

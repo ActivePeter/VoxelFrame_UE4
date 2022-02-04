@@ -1,6 +1,9 @@
 use crate::*;
 use std::collections::LinkedList;
-use crate::player::PlayerId;
+use crate::game_player::PlayerId;
+use crate::game::{Game, ClientId};
+use crate::conv::point3f_2_chunkkey;
+use crate::game_entity::EntityId;
 
 pub const VF_CHUNK_LOAD_RADIUS: i32 = (4);
 pub const VF_CHUNK_WIDTH: i32 = (32);
@@ -27,9 +30,10 @@ impl ChunkKey{
 pub struct Chunk {
     pub chunk_key: ChunkKey,
     pub chunk_data: Vec<u8>,
-    pub players: LinkedList<player::PlayerId>,
-    pub entities: LinkedList<entity::EntityId>,
-    pub be_interested_by: LinkedList<player::PlayerId>,
+    pub players: LinkedList<game_player::PlayerId>,
+    pub entities: LinkedList<EntityId>,
+    pub be_interested_by: LinkedList<game_player::PlayerId>,
+    pub part_server_cid:Option<ClientId>,
 }
 
 impl Chunk{
@@ -42,7 +46,8 @@ impl Chunk{
             chunk_key: key.clone(),
             players: Default::default(),
             entities: Default::default(),
-            be_interested_by: Default::default()
+            be_interested_by: Default::default(),
+            part_server_cid:None,
         };
         chunk.load();
 
@@ -88,10 +93,10 @@ impl Chunk{
 #[macro_export]
 macro_rules! iter_relative_chunk_key_in_interest_range {
   ($chunk_name:ident ,$callback:block) => {
-    for x in -chunk::VF_CHUNK_LOAD_RADIUS..chunk::VF_CHUNK_LOAD_RADIUS {
-        for y in -chunk::VF_CHUNK_LOAD_RADIUS..chunk::VF_CHUNK_LOAD_RADIUS {
-            for z in -chunk::VF_CHUNK_LOAD_RADIUS..chunk::VF_CHUNK_LOAD_RADIUS {
-                let $chunk_name = chunk::ChunkKey { x, y, z };
+    for x in -game_chunk::VF_CHUNK_LOAD_RADIUS..game_chunk::VF_CHUNK_LOAD_RADIUS {
+        for y in -game_chunk::VF_CHUNK_LOAD_RADIUS..game_chunk::VF_CHUNK_LOAD_RADIUS {
+            for z in -game_chunk::VF_CHUNK_LOAD_RADIUS..game_chunk::VF_CHUNK_LOAD_RADIUS {
+                let $chunk_name = game_chunk::ChunkKey { x, y, z };
                 if $chunk_name.is_in_range() {
                     // $callback(ck);
                     $callback
@@ -100,4 +105,38 @@ macro_rules! iter_relative_chunk_key_in_interest_range {
         }
     }
   }
+}
+
+//chunk related operations
+//chunk 加入玩家
+pub async fn chunk_add_player(game:&mut Game,
+                    playerid: PlayerId,
+                    player_entity_id: EntityId,
+) {
+    let entity = game.entity_get(&player_entity_id).unwrap();
+    //1.根据位置计算chunk_key
+    let chunk_key = point3f_2_chunkkey(&entity.position);
+    //2.获取区块
+    let chunk = game.chunk_get_mut(&chunk_key).await;
+    //3.entity
+    chunk.entities.push_back(player_entity_id);
+    //4.player
+    chunk.players.push_back(playerid);
+}
+pub async fn chunks_add_be_interested(
+    game:&mut Game,
+    playerid: PlayerId,
+    player_entity_id: EntityId,
+) {
+    let entity = game.entity_get(&player_entity_id).unwrap();
+    let p_ck = point3f_2_chunkkey(&entity.position);
+
+    iter_relative_chunk_key_in_interest_range!(
+            relate_ck,
+            {
+                let ck=p_ck.plus(relate_ck);
+                let chunk=game.chunk_get_mut(&ck).await;
+                chunk.add_be_interested_by(playerid);
+            }
+        )
 }

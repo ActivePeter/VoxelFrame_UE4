@@ -2,17 +2,19 @@
 
 mod game;
 #[macro_use]
-pub mod chunk;
+pub mod game_chunk;
 mod game_player_manager;
-mod player;
-mod entity;
+mod game_player;
 mod base_type;
 mod net;
 mod conv;
 mod send;
 mod send_packer;
 mod protos;
-mod send_packer_head;
+mod net_pack_convert;
+mod part_server_sync;
+mod game_flow;
+mod game_entity;
 // mod base_func;
 
 // use std::net::TcpListener;
@@ -44,8 +46,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // game_handle.write().await.spawn_player(socket,addr).await;
 
             //1.创建消息循环
-            let mut client = net::Client::create(socket, addr);
-            let tx= net::start_rw_loop(client);
+            // let mut client = net::Client::create(socket, addr);
+            let(mut r,mut w)=socket.into_split();
+            let tx= net::start_rw_loop(gmlc,r,w,addr);
             // tx.sender.send(vec![0]).await
             // //2.new_player消息
             // gmlc.new_player_channel_tx.send(tx).await;

@@ -1,33 +1,107 @@
 use crate::*;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use crate::game_player_manager::PlayerManager;
 use tokio::net::TcpStream;
 use std::any::Any;
-use crate::player::{Player, PlayerId};
+use crate::game_player::{Player, PlayerId};
 use crate::conv::point3f_2_chunkkey;
-use crate::entity::{EntityData, EntityId};
-use crate::chunk::{ChunkKey, Chunk};
+use crate::game_chunk::{ChunkKey, Chunk};
 use std::net::SocketAddr;
 use tokio::net::windows::named_pipe::PipeEnd::Client;
 // use std::borrow::{Borrow, BorrowMut};
 use std::thread::{spawn, LocalKey};
 use tokio::sync::{mpsc, oneshot};
-use crate::net::ClientSender;
 use tokio::task;
+use crate::net::{ClientMsg, ClientMsgEnum, ClientDescription, ClientSender};
+use std::borrow::Borrow;
+use crate::protos::common::ClientType;
+use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
+use crate::part_server_sync::PartServerSync;
+use crate::game_entity::{EntityId, EntityData};
+use crate::net_pack_convert::MsgEnum;
+use crate::net_pack_convert::MsgEnum::MainPlayerMoveCmd;
 
+pub type ClientId = usize;
 // use crate::client::Client;
 
 // tokio::task_local! {
 //     static game_local: RefCell<Game>;
 // }
 
+// #[derive(Default, Debug)]
+// struct ServerContext{
+//     client_manager:ClientManager,
+//     game:Game,
+//     part_server_sync:PartServerSync,
+// }
+// impl ServerContext{
+//     fn create() -> ServerContext {
+//         ServerContext{
+//             client_manager:ClientManager{
+//                 next_client_id: 0,
+//                 id2client: Default::default(),
+//                 partserver_clients: Default::default(),
+//                 player_clients: Default::default()
+//             },
+//             game:Game::create(),
+//             part_server_sync:PartServerSync::create(),
+//         }
+//     }
+
+// }
+// #[derive(Default, Debug)]
+pub struct ClientManager{
+    next_client_id:ClientId,
+    pub(crate) id2client :HashMap<ClientId,ClientDescription>,
+    partserver_clients:HashSet<ClientId>,
+    player_clients:HashSet<ClientId>,
+}
+impl ClientManager{
+    pub fn get_player_sender(&self, player: &Player) -> ClientSender {
+        return self.id2client.get(&(player.client_id)).unwrap().sender.clone();
+    }
+    pub fn get_sender(&self,cid:ClientId)->ClientSender{
+        return self.id2client.get(&(cid)).unwrap().sender.clone();
+    }
+    fn add_new_client(&mut self, mut sender:ClientSender, client_type:ClientType) ->ClientId{
+        // sender.id=self.next_client_id;
+        self.id2client.insert(self.next_client_id,ClientDescription{
+            client_type,
+            sender,
+            client_id: self.next_client_id
+        });
+        if(client_type==ClientType_GameServer){
+            self.partserver_clients.insert(self.next_client_id);
+        }else{
+            self.player_clients.insert(self.next_client_id);
+        }
+        self.next_client_id+=1;
+
+        return self.next_client_id-1;
+    }
+    fn remove_client(&mut self,cid:ClientId){
+        let ctype=self.id2client.get(&cid).unwrap().client_type;
+        if ctype==ClientType_GameServer{
+            self.partserver_clients.remove(&cid);
+        }else{
+            self.player_clients.remove(&cid);
+        }
+        self.id2client.remove(&cid);
+    }
+}
 pub struct Game {
     //enityid_entity_map:
+
+    //游戏逻辑
     pub entity_cnt: u32,
-    pub chunks: HashMap<chunk::ChunkKey, chunk::Chunk>,
+    pub chunks: HashMap<game_chunk::ChunkKey, game_chunk::Chunk>,
     pub entities: HashMap<EntityId, EntityData>,
     // pub entities: HashMap<EntityId,<EntityData>>,
     pub player_manager: PlayerManager,
+
+    //网络相关
+    pub client_manager:ClientManager,
+    pub part_server_sync:PartServerSync,
 }
 
 impl Game {
@@ -37,15 +111,23 @@ impl Game {
             chunks: Default::default(),
             entities: Default::default(),
             player_manager: PlayerManager::create_once(),
+
+            client_manager:ClientManager{
+                next_client_id: 0,
+                id2client: Default::default(),
+                partserver_clients: Default::default(),
+                player_clients: Default::default()
+            },
+            part_server_sync:PartServerSync::create(),
         }
     }
 
     //entity related operations
-    fn entity_spawn(&mut self) -> u32 {
+    pub fn entity_spawn(&mut self) -> u32 {
         let entity =
             self.entities.entry(self.entity_cnt)
                 .or_insert(
-                    entity::EntityData {
+                    game::EntityData {
                         entity_id: self.entity_cnt,
                         position: base_type::point3f_new(),
                         entity_type: 0,
@@ -58,90 +140,13 @@ impl Game {
 
         return entity_id;
     }
-    fn entity_get(&self, entity_id: &EntityId) -> Option<&EntityData> {
+    pub fn entity_get(&self, entity_id: &EntityId) -> Option<&EntityData> {
         return self.entities.get(entity_id);
     }
-    fn entity_get_mut(&mut self, entity_id: &EntityId) -> Option<&mut EntityData> {
+    pub fn entity_get_mut(&mut self, entity_id: &EntityId) -> Option<&mut EntityData> {
         return self.entities.get_mut(entity_id);
     }
 
-    //chunk related operations
-    //chunk 加入玩家
-    fn chunk_add_player(&mut self,
-                        playerid: PlayerId,
-                        player_entity_id: EntityId,
-    ) {
-        let entity = self.entity_get(&player_entity_id).unwrap();
-        //1.根据位置计算chunk_key
-        let chunk_key = point3f_2_chunkkey(&entity.position);
-        //2.获取区块
-        let chunk = self.chunk_get_mut(&chunk_key);
-        //3.entity
-        chunk.entities.push_back(player_entity_id);
-        //4.player
-        chunk.players.push_back(playerid);
-    }
-    fn chunks_add_be_interested(
-        &mut self,
-        playerid: PlayerId,
-        player_entity_id: EntityId,
-    ) {
-        let entity = self.entity_get(&player_entity_id).unwrap();
-        let p_ck = point3f_2_chunkkey(&entity.position);
-
-        iter_relative_chunk_key_in_interest_range!(
-            relate_ck,
-            {
-                let ck=p_ck.plus(relate_ck);
-                let chunk=self.chunk_get_mut(&ck);
-                chunk.add_be_interested_by(playerid);
-            }
-        )
-    }
-    //基本函数
-    pub async fn spawn_player(&mut self,client_sender:ClientSender) {
-        // //1.获取player码以及绑定tcp
-        let playerid =
-            (self).player_manager.create_player_and_bind_client(client_sender);
-        //
-        //
-        // entity=(self).spawn_entity_for_player(&player);
-
-        //2.出生entity 这个过程是产生entity，
-        let player_entity_id = self.entity_spawn();
-
-        //2.5产生完entity id 就与player绑定
-        {
-            let p = self.player_manager.get_player_handle(&playerid).unwrap();
-            p.entity_id = player_entity_id;
-        }
-
-        //3.将player id 和entity id 加入区块
-        // self.add_player_entity_2_chunk(&player, entity);
-        {
-            self.chunk_add_player(playerid, player_entity_id);
-        }
-
-        //4.刷新被感兴趣的区块
-        self.chunks_add_be_interested(playerid, player_entity_id);
-
-        // 5.发送玩家进入后的全部内容
-        {
-            let player=
-                self.player_manager.playerid_2_player.get(&playerid).unwrap();
-            let entity=self.entity_get(&player_entity_id).unwrap();
-            // 1.player基本信息（player_entity_id
-            send::player_basic(player,entity).await;
-            // 2.区块地形
-            send::player_interested_chunk_block_data(
-                player,entity,self
-            ).await;
-            // 3.感兴趣区块的entity数据
-            send::player_interested_chunk_entity_data(
-                player,entity,self
-            ).await;
-        }
-    }
     // fn  add_chunks_be_interested_by(
     //     &mut self, player:&Rc<RefCell<Player>>, player_entity:Rc<RefCell<EntityData>>){
     //
@@ -170,11 +175,29 @@ impl Game {
     // }
     //
     // //若没有则进行初始化
-    pub fn chunk_get_mut(&mut self, chunk_key: &ChunkKey) -> &mut Chunk {
-        let chunk = self.chunks
-            .entry(*chunk_key)
-            .or_insert(chunk::Chunk::new_and_load(chunk_key));
-        return chunk;
+    //创建chunk同时要将其加入到part server sync中
+    pub async fn chunk_get_mut(&mut self, chunk_key: &ChunkKey) -> &mut Chunk {
+        let a=self.chunks.contains_key(chunk_key);
+        // let chunk=self.chunks.get_mut(chunk_key);
+        // match chunk {
+        //     None => {
+            if(a){
+                return self.chunks.get_mut(chunk_key).unwrap();
+            }else{
+
+                self.chunks.insert(chunk_key.clone(), game_chunk::Chunk::new_and_load(chunk_key));
+                // .add_free_chunk(chunk_key.clone());
+                part_server_sync::add_free_chunk(self,chunk_key.clone()).await;
+                return self.chunks.get_mut(chunk_key).unwrap();
+            }
+            // }
+            // Some(chunk) => {
+            // }
+        // }
+        // let chunk = self.chunks
+        //     .entry(*chunk_key)
+        //     .or_insert(chunk::Chunk::new_and_load(chunk_key));
+
     }
     pub fn chunk_get(&self, chunk_key: &ChunkKey) -> Option<&Chunk> {
         return self.chunks.get(chunk_key);
@@ -189,7 +212,7 @@ impl Game {
 
 
 pub struct GameMainLoopChannels {
-    pub msg_channel_tx: mpsc::Sender<ClientSender>
+    pub msg_channel_tx: mpsc::Sender<ClientMsgEnum>,
 }
 
 impl Clone for GameMainLoopChannels {
@@ -200,35 +223,71 @@ impl Clone for GameMainLoopChannels {
     }
 }
 
-pub async fn main_loop() -> GameMainLoopChannels {
+pub async fn main_loop()
+    -> GameMainLoopChannels
+{
     println!("main_loop()");
 
-    let (new_player_channel_tx, mut new_player_channel_rx):
-        (mpsc::Sender<ClientSender>, mpsc::Receiver<ClientSender>)
+    let (msg_channel_tx, mut msg_channel_rx):
+        (mpsc::Sender<ClientMsgEnum>, mpsc::Receiver<ClientMsgEnum>)
         = mpsc::channel(10);
+
 
     let game_channels = GameMainLoopChannels {
         msg_channel_tx,
     };
     //
-    let mut game = game::Game::create();
-    let local = task::LocalSet::new();
+    // let mut game = game::Game::create();
     // local.spawn_local(async move {
     tokio::spawn(async move {
-
+        let mut context =game::Game::create();
         // task::spawn_local(async move{
         println!("game main loop task spawned");
         loop {
-            tokio::select! {
-                Some(client_sender) = new_player_channel_rx.recv() => {
-                    println!("new player in msg rx");
-                    // game.spawn_player(client_sender).await;
-                },
-                Some(player_msg)=player_msg_channel_rx.recv()=>{
-                    println!("player msg {}",player_msg)
-                },
-                else => break,
+            let msg=  msg_channel_rx.recv().await.unwrap();
+            match msg {
+                ClientMsgEnum::ClientCommonMsg(common_msg) => {
+                    match common_msg.msg_enum{
+                        MsgEnum::ClientFirstConfirm(_) => {}
+                        MsgEnum::EntityPos(_) => {}
+                        MsgEnum::PlayerBasic(_) => {}
+                        MsgEnum::ChunkPack(_) => {}
+                        MsgEnum::ChunkEntityPack(_) => {}
+                        MsgEnum::MainPlayerMoveCmd(cmd) => {
+                            if(common_msg.client_type==MainPlayerMoveCmd){
+                                game_player::handle_player_move_cmd(common_msg.client_id,
+                                    &mut context, cmd);
+                            }
+                        }
+                    }
+                }
+                ClientMsgEnum::ClientConnect(m) => {
+                    let id=
+                        context.client_manager.add_new_client(m.sender,m.client_type);
+                    m.response.send(id);
+                    game_flow::after_client_connect(&mut context, id).await;
+                }
+                ClientMsgEnum::ClientDisconnect(m) => {
+                    context.client_manager.remove_client(m.client_id);
+                }
             }
+                // match msg {
+                //     ClientStateMsg::ClientConnect(s)=>{
+                //
+                //     }
+                // }
+
+            // tokio::select! {
+            //     // Some(client_sender) = new_player_channel_rx.recv() => {
+            //     //     println!("new player in msg rx");
+            //     //     // game.spawn_player(client_sender).await;
+            //     // },
+            //
+            //     Some(msg)=msg_channel_rx.recv()=>{
+            //         println!("client msg to game loop")
+            //     },
+            //     else => break,
+            // }
         }
         println!("game main loop task end");
         // });
