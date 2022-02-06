@@ -3,6 +3,7 @@ use std::collections::{LinkedList, HashMap};
 use crate::game_player::{Player, PlayerId};
 use tokio::net::TcpStream;
 use crate::game::ClientId;
+use crate::game_entity::EntityId;
 
 
 pub struct PlayerManager {
@@ -12,6 +13,7 @@ pub struct PlayerManager {
         Player
     >,
     pub clientid_2_playerid:HashMap<ClientId,PlayerId>,
+    entityid_2_playerid:HashMap<EntityId,PlayerId>,
     // pub msg_list: LinkedList<Vec<u8>>,
 }
 impl PlayerManager{
@@ -20,6 +22,7 @@ impl PlayerManager{
             id_cnt: 0,
             playerid_2_player: Default::default(),
             clientid_2_playerid:Default::default(),
+            entityid_2_playerid:Default::default(),
             // msg_list: Default::default()
         }
     }
@@ -37,12 +40,23 @@ impl PlayerManager{
         return player.player_id;
     }
 
-    pub fn get_player_handle(&mut self, playerid :&PlayerId) -> Option<&mut Player> {
+    pub fn get_player_mut(&mut self, playerid :&PlayerId) -> Option<&mut Player> {
         return self.playerid_2_player.get_mut(playerid);
+    }
+
+    pub fn set_player_entity_id(&mut self,playerid :PlayerId,entity_id:EntityId){
+        self.entityid_2_playerid.insert(entity_id,playerid);
+        self.get_player_mut(&playerid).unwrap().entity_id=entity_id;
     }
 
     pub fn get_player_by_cid(&self, cid:ClientId) -> &Player {
         let pid=self.clientid_2_playerid.get(&cid).unwrap();
+        return self.playerid_2_player.get(pid).unwrap();
+    }
+
+    //unwrap
+    pub fn get_player_by_eid(&self,eid:EntityId)->&Player{
+        let pid=self.entityid_2_playerid.get(&eid).unwrap();
         return self.playerid_2_player.get(pid).unwrap();
     }
 }

@@ -20,6 +20,7 @@ use crate::part_server_sync::PartServerSync;
 use crate::game_entity::{EntityId, EntityData};
 use crate::net_pack_convert::MsgEnum;
 use crate::net_pack_convert::MsgEnum::MainPlayerMoveCmd;
+use crate::async_task::AsyncTaskManager;
 
 pub type ClientId = usize;
 // use crate::client::Client;
@@ -60,6 +61,8 @@ impl ClientManager{
     pub fn get_player_sender(&self, player: &Player) -> ClientSender {
         return self.id2client.get(&(player.client_id)).unwrap().sender.clone();
     }
+
+    //make sure the cid is valid before call
     pub fn get_sender(&self,cid:ClientId)->ClientSender{
         return self.id2client.get(&(cid)).unwrap().sender.clone();
     }
@@ -102,6 +105,7 @@ pub struct Game {
     //网络相关
     pub client_manager:ClientManager,
     pub part_server_sync:PartServerSync,
+    pub async_task_manager:AsyncTaskManager,
 }
 
 impl Game {
@@ -119,27 +123,11 @@ impl Game {
                 player_clients: Default::default()
             },
             part_server_sync:PartServerSync::create(),
+            async_task_manager: AsyncTaskManager::create(),
         }
     }
 
-    //entity related operations
-    pub fn entity_spawn(&mut self) -> u32 {
-        let entity =
-            self.entities.entry(self.entity_cnt)
-                .or_insert(
-                    game::EntityData {
-                        entity_id: self.entity_cnt,
-                        position: base_type::point3f_new(),
-                        entity_type: 0,
-                    }
-                );
-        // let entity=
 
-        let entity_id = self.entity_cnt;
-        self.entity_cnt += 1;
-
-        return entity_id;
-    }
     pub fn entity_get(&self, entity_id: &EntityId) -> Option<&EntityData> {
         return self.entities.get(entity_id);
     }
@@ -247,6 +235,7 @@ pub async fn main_loop()
             let msg=  msg_channel_rx.recv().await.unwrap();
             match msg {
                 ClientMsgEnum::ClientCommonMsg(common_msg) => {
+
                     match common_msg.msg_enum{
                         MsgEnum::ClientFirstConfirm(_) => {}
                         MsgEnum::EntityPos(_) => {}
@@ -254,9 +243,14 @@ pub async fn main_loop()
                         MsgEnum::ChunkPack(_) => {}
                         MsgEnum::ChunkEntityPack(_) => {}
                         MsgEnum::MainPlayerMoveCmd(cmd) => {
-                            if(common_msg.client_type==MainPlayerMoveCmd){
-                                game_player::handle_player_move_cmd(common_msg.client_id,
-                                    &mut context, cmd);
+                            if common_msg.client_type==ClientType::ClientType_Player {
+                                game_player::handle_MainPlayerMoveCmd(common_msg.client_id,
+                                    &mut context, cmd).await;
+                            }
+                        }
+                        MsgEnum::Rpl_SpawnEntityInPs(rpl) => {
+                            if common_msg.client_type==ClientType_GameServer{
+                                async_task::spawn_entity_in_ps_rpl(&mut context,rpl).await;
                             }
                         }
                     }

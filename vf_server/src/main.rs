@@ -15,6 +15,7 @@ mod net_pack_convert;
 mod part_server_sync;
 mod game_flow;
 mod game_entity;
+mod async_task;
 // mod base_func;
 
 // use std::net::TcpListener;

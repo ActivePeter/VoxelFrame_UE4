@@ -9,6 +9,8 @@ pub enum PackIds {
     EClientFirstConfirm=3,
     EEntityPos=4,
     EMainPlayerMoveCmd=5,
+    ECmd_SpawnEntityInPs=6,
+    ERpl_SpawnEntityInPs=7,
 }
 //用于携带消息包
 pub enum MsgEnum {
@@ -18,6 +20,7 @@ pub enum MsgEnum {
     ChunkPack(common::ChunkPack),
     ChunkEntityPack(common::ChunkEntityPack),
     MainPlayerMoveCmd(common::MainPlayerMoveCmd),
+    Rpl_SpawnEntityInPs(common::Rpl_SpawnEntityInPs),
 }
 
 fn make_pack_head(pack_id: PackIds, pack_len: usize) -> [u8; 5] {
@@ -68,6 +71,8 @@ pub fn bytes_to_pack(msg_pack_id: i32, data_slice: &[u8])
         one_pack!(common::PlayerBasic,MsgEnum::PlayerBasic,data_slice);
     }else if msg_pack_id==PackIds::EMainPlayerMoveCmd as i32{
         one_pack!(common::MainPlayerMoveCmd,MsgEnum::MainPlayerMoveCmd,data_slice);
+    }else if msg_pack_id==PackIds::ERpl_SpawnEntityInPs as i32{
+        one_pack!(common::Rpl_SpawnEntityInPs,MsgEnum::Rpl_SpawnEntityInPs,data_slice);
     }
     return None;
 }

@@ -100,7 +100,7 @@ pub fn pack_chunk_entity_pack(
     {//拷贝entity数据到数组中
         let mut i=0;
         for eid in chunk.entities.iter(){
-            proto_pack.entity_pos[i].entity_id=*eid as i32;
+            proto_pack.entity_pos[i].entity_id=*eid;
             let entity=entities.get(eid).unwrap();
             proto_pack.entity_pos[i].x=entity.position[0];
             proto_pack.entity_pos[i].y=entity.position[1];

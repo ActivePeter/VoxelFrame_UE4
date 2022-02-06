@@ -2,6 +2,7 @@ use crate::game::{ClientId, Game, ClientManager};
 use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
 use crate::send;
 
+
 pub async fn after_client_connect(game:&mut Game,cid:ClientId){
     let disc=game.client_manager.id2client.get(&cid).unwrap();
     // println!("after_client_connect");
@@ -15,11 +16,15 @@ pub async fn after_client_connect(game:&mut Game,cid:ClientId){
     }
 }
 mod _after_client_connect{
+
     use crate::game::{ClientId, Game, ClientManager};
     use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
-    use crate::{send, game_chunk};
-
+    use crate::{send, game_chunk, game_entity};
+    use crate::protos;
     use crate::part_server_sync;
+    use crate::game_player::after_player_data_all_load;
+    use crate::async_task;
+
 
     pub(crate) async fn after_client_connect_part_server(
         game:&mut Game,cid:ClientId) {
@@ -38,42 +43,44 @@ mod _after_client_connect{
         // entity=(game).spawn_entity_for_player(&player);
 
         //2.出生entity 这个过程是产生entity，
-        let player_entity_id = game.entity_spawn();
+        let player_entity_id =game_entity::entity_spawn(game);
 
         //2.5产生完entity id 就与player绑定
-        {
-            let p = game.player_manager.get_player_handle(&playerid).unwrap();
-            p.entity_id = player_entity_id;
-        }
-        println!("before add player -----------------------------------");
-        //3.将player id 和entity id 加入区块
-        // game.add_player_entity_2_chunk(&player, entity);
-        {
-            game_chunk::chunk_add_player(game, playerid, player_entity_id).await;
-        }
-        println!("aft add player -----------------------------------");
-        //4.刷新被感兴趣的区块
-        game_chunk::chunks_add_be_interested(game, playerid, player_entity_id).await;
+        game.player_manager.set_player_entity_id(playerid,player_entity_id);
 
-        println!("aft1 add player -----------------------------------");
+        //3.ps 创建entity
+        let mut epos =protobuf::SingularPtrField::some( protos::common::EntityPos::new());
+        let entity=game.entity_get(&player_entity_id).unwrap();
+        {
+            let epos_ref=epos.as_mut().unwrap();
+            epos_ref.x = entity.position[0];
+            epos_ref.y = entity.position[1];
+            epos_ref.z = entity.position[2];
+            epos_ref.entity_id = player_entity_id;
+            epos_ref.t = protos::common::EntityType::T_Player;
+        }
+
+        //4.将player id 和entity id 加入区块
+        {
+            game_chunk::chunks_add_be_interested(game, playerid, player_entity_id).await;
+            game_chunk::chunk_add_player(game, playerid, player_entity_id).await;
+
+        }
+
+        async_task::spawn_entity_in_ps(game, epos).await;
+
+
+        // println!("before add player -----------------------------------");
+
+        // // println!("aft add player -----------------------------------");
+        // //4.刷新被感兴趣的区块
+        // game_chunk::chunks_add_be_interested(game, playerid, player_entity_id).await;
+
+        // println!("aft1 add player -----------------------------------");
         ////////////////////////////////////
         //  player 进来后所有数据发送
-        println!("send player -----------------------------------");
+        // println!("send player -----------------------------------");
         // 5.发送玩家进入后的全部内容
-        {
-            let player=
-                game.player_manager.playerid_2_player.get(&playerid).unwrap();
-            let entity=game.entity_get(&player_entity_id).unwrap();
-            // 1.player基本信息（player_entity_id
-            send::player_basic(&game.client_manager, player, entity).await;
-            // 2.区块地形
-            send::player_interested_chunk_block_data(&game.client_manager,
-                                                     player,entity,game
-            ).await;
-            // 3.感兴趣区块的entity数据
-            send::player_interested_chunk_entity_data(&game.client_manager,
-                                                      player,entity,game
-            ).await;
-        }
+        // after_player_data_all_load(game,playerid,player_entity_id).await;
     }
 }

@@ -18,7 +18,7 @@ enum EntityType {
 
 message EntityPos{
   EntityType t = 1;
-  int32 entity_id = 2;
+  uint32 entity_id = 2;
   float x = 3;
   float y = 4;
   float z = 5;
@@ -47,4 +47,17 @@ message MainPlayerMoveCmd{
   uint32 entity_id=1;
   float x=2;
   float y=3;
+  float rotate_pitch=4;
+  float rotate_yaw=5;
+  float rotate_roll=6;
+}
+
+message Cmd_SpawnEntityInPs{
+  uint32 task_id=1;
+  EntityPos entity_pos=2;
+}
+
+message Rpl_SpawnEntityInPs{
+  uint32 task_id=1;
+  EntityPos entity_pos=2;
 }

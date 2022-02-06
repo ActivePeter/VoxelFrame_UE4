@@ -25,7 +25,25 @@ impl Player{
     }
 }
 
-pub async fn handle_player_move_cmd(cid:ClientId,game:&mut Game,pmcmd:common::MainPlayerMoveCmd){
+pub async fn after_player_data_all_load(game:&Game,playerid:PlayerId,player_entity_id:EntityId){
+    {
+        let player=
+            game.player_manager.playerid_2_player.get(&playerid).unwrap();
+        let entity=game.entity_get(&player_entity_id).unwrap();
+        // 1.player基本信息（player_entity_id
+        send::player_basic(&game.client_manager, player, entity).await;
+        // 2.区块地形
+        send::player_interested_chunk_block_data(&game.client_manager,
+                                                 player,entity,game
+        ).await;
+        // 3.感兴趣区块的entity数据
+        send::player_interested_chunk_entity_data(&game.client_manager,
+                                                  player,entity,game
+        ).await;
+    }
+}
+
+pub async fn handle_MainPlayerMoveCmd(cid:ClientId,game:&mut Game,pmcmd:common::MainPlayerMoveCmd){
     {
         let player = game.player_manager.get_player_by_cid(cid);
         if (player.entity_id != pmcmd.entity_id) {
@@ -34,7 +52,7 @@ pub async fn handle_player_move_cmd(cid:ClientId,game:&mut Game,pmcmd:common::Ma
         }
     }
     //1.找到player所在区块，
-    let ck=conv::point3f_2_chunkkey(&game.entities.get(&player.entity_id).unwrap().position);
+    let ck=conv::point3f_2_chunkkey(&game.entities.get(&pmcmd.entity_id).unwrap().position);
     //2.确认区块是那个服务端控制的
     let cidop=game.part_server_sync.get_part_server_cid_of_chunk(ck);
     //3.转发

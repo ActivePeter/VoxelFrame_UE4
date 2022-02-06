@@ -51,7 +51,7 @@ pub async fn player_interested_chunk_entity_data(
                 &game.entities
             );
             let sender = client_manager.get_player_sender(player);
-            println!("send player {}",player.client_id);
+            // println!("send player {}",player.client_id);
             //send_packer::pack_chunk_pack(game.chunk_get(&cur_ck).unwrap());
             // player.sender.as_ref().unwrap().clone().
                 sender.send(packed).await;
