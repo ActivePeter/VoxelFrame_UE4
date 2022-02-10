@@ -1,5 +1,5 @@
 use crate::*;
-use std::collections::LinkedList;
+use std::collections::{LinkedList, HashMap};
 use crate::game_player::PlayerId;
 use crate::game::{Game, ClientId};
 use crate::conv::point3f_2_chunkkey;
@@ -32,6 +32,7 @@ pub struct Chunk {
     pub chunk_data: Vec<u8>,
     pub players: LinkedList<game_player::PlayerId>,
     pub entities: LinkedList<EntityId>,
+    pub entity_update: protos::common::EntityPosUpdate,
     pub be_interested_by: LinkedList<game_player::PlayerId>,
     pub part_server_cid:Option<ClientId>,
 }
@@ -48,6 +49,7 @@ impl Chunk{
             entities: Default::default(),
             be_interested_by: Default::default(),
             part_server_cid:None,
+            entity_update: Default::default()
         };
         chunk.load();
 
@@ -89,7 +91,12 @@ impl Chunk{
         }
     }
 }
-
+// pub struct ChunkManager{
+//     pub chunks: HashMap<game_chunk::ChunkKey, game_chunk::Chunk>,
+// }
+// impl ChunkManager{
+//
+// }
 #[macro_export]
 macro_rules! iter_relative_chunk_key_in_interest_range {
   ($chunk_name:ident ,$callback:block) => {

@@ -19,9 +19,18 @@ enum EntityType {
 message EntityPos{
   EntityType t = 1;
   uint32 entity_id = 2;
+
   float x = 3;
   float y = 4;
   float z = 5;
+
+  float r_roll=6;
+  float r_yaw=7;
+  float r_pitch=8;
+
+  float vx=9;
+  float vy=10;
+  float vz=11;
 }
 
 //首次进入游戏
@@ -52,12 +61,19 @@ message MainPlayerMoveCmd{
   float rotate_roll=6;
 }
 
+//rc->ps
 message Cmd_SpawnEntityInPs{
   uint32 task_id=1;
   EntityPos entity_pos=2;
 }
 
+//ps->rc
 message Rpl_SpawnEntityInPs{
   uint32 task_id=1;
   EntityPos entity_pos=2;
+}
+
+//ps->all
+message EntityPosUpdate{
+  repeated EntityPos entity_pos=1;
 }

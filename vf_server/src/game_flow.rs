@@ -22,7 +22,6 @@ mod _after_client_connect{
     use crate::{send, game_chunk, game_entity};
     use crate::protos;
     use crate::part_server_sync;
-    use crate::game_player::after_player_data_all_load;
     use crate::async_task;
 
 

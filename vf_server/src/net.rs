@@ -86,8 +86,11 @@ pub fn start_rw_loop(
                     break;
                 }
                 Some(j) => {
-
                     // println!("one send msg {}",addr2);
+
+                    //模拟网络延迟
+                    tokio::time::sleep(tokio::time::Duration::from_millis(200));
+
                     wr.write_all(j.as_slice()).await;
                     wr.flush().await;
                 }

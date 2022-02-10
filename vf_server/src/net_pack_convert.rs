@@ -11,7 +11,9 @@ pub enum PackIds {
     EMainPlayerMoveCmd=5,
     ECmd_SpawnEntityInPs=6,
     ERpl_SpawnEntityInPs=7,
+    EEntityPosUpdate=8,
 }
+
 //用于携带消息包
 pub enum MsgEnum {
     ClientFirstConfirm(common::ClientFirstConfirm),
@@ -21,6 +23,7 @@ pub enum MsgEnum {
     ChunkEntityPack(common::ChunkEntityPack),
     MainPlayerMoveCmd(common::MainPlayerMoveCmd),
     Rpl_SpawnEntityInPs(common::Rpl_SpawnEntityInPs),
+    EntityPosUpdate(common::EntityPosUpdate),
 }
 
 fn make_pack_head(pack_id: PackIds, pack_len: usize) -> [u8; 5] {
@@ -28,6 +31,26 @@ fn make_pack_head(pack_id: PackIds, pack_len: usize) -> [u8; 5] {
     msg_head[0] = pack_id as u8;
     BigEndian::write_u32(&mut msg_head[1..], (pack_len) as u32);
     return msg_head;
+}
+
+pub fn pack_to_bytes2<T: ::protobuf::Message>(proto_pack: &T, pack_id: PackIds) -> Vec<u8> {
+    //消息体 长度
+    let msg_body_len = proto_pack.compute_size() as usize;
+    //消息头
+    let msg_head = make_pack_head(
+        pack_id, msg_body_len);
+    //给拷贝准备好空间
+    let mut final_vec = msg_head.to_vec();
+    final_vec.resize(5 + msg_body_len, 0);
+    // let final_vec_slice=final_vec.as_mut_slice();
+    // 流输出器
+    let mut stream =
+        CodedOutputStream::bytes(&mut final_vec[5..]);
+    proto_pack.write_to(&mut stream);
+    stream.flush();
+    // println!("player basic packed bodylen:{0}"
+    //          , msg_body_len);
+    return final_vec;
 }
 
 pub fn pack_to_bytes<T: ::protobuf::Message>(proto_pack: T, pack_id: PackIds) -> Vec<u8> {
@@ -73,6 +96,8 @@ pub fn bytes_to_pack(msg_pack_id: i32, data_slice: &[u8])
         one_pack!(common::MainPlayerMoveCmd,MsgEnum::MainPlayerMoveCmd,data_slice);
     }else if msg_pack_id==PackIds::ERpl_SpawnEntityInPs as i32{
         one_pack!(common::Rpl_SpawnEntityInPs,MsgEnum::Rpl_SpawnEntityInPs,data_slice);
+    }else if msg_pack_id==PackIds::EEntityPosUpdate as i32{
+        one_pack!(common::EntityPosUpdate,MsgEnum::EntityPosUpdate,data_slice);
     }
     return None;
 }

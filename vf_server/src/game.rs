@@ -237,11 +237,6 @@ pub async fn main_loop()
                 ClientMsgEnum::ClientCommonMsg(common_msg) => {
 
                     match common_msg.msg_enum{
-                        MsgEnum::ClientFirstConfirm(_) => {}
-                        MsgEnum::EntityPos(_) => {}
-                        MsgEnum::PlayerBasic(_) => {}
-                        MsgEnum::ChunkPack(_) => {}
-                        MsgEnum::ChunkEntityPack(_) => {}
                         MsgEnum::MainPlayerMoveCmd(cmd) => {
                             if common_msg.client_type==ClientType::ClientType_Player {
                                 game_player::handle_MainPlayerMoveCmd(common_msg.client_id,
@@ -253,6 +248,13 @@ pub async fn main_loop()
                                 async_task::spawn_entity_in_ps_rpl(&mut context,rpl).await;
                             }
                         }
+                        MsgEnum::EntityPosUpdate(epu)=>{
+                            if common_msg.client_type==ClientType_GameServer{
+                                game_entity::update_entity_pos(&mut context,epu,
+                                                               false,0).await;
+                            }
+                        }
+                        _ => {}
                     }
                 }
                 ClientMsgEnum::ClientConnect(m) => {

@@ -25,7 +25,7 @@ impl Player{
     }
 }
 
-pub async fn after_player_data_all_load(game:&Game,playerid:PlayerId,player_entity_id:EntityId){
+pub async fn send_player_basic_and_chunk(game:&Game,playerid:PlayerId,player_entity_id:EntityId){
     {
         let player=
             game.player_manager.playerid_2_player.get(&playerid).unwrap();
@@ -49,6 +49,8 @@ pub async fn handle_MainPlayerMoveCmd(cid:ClientId,game:&mut Game,pmcmd:common::
         if (player.entity_id != pmcmd.entity_id) {
             println!("wrong player");
             return;
+        }else{
+            // println!("ok player");
         }
     }
     //1.找到player所在区块，
