@@ -66,7 +66,7 @@ mod _after_client_connect{
 
         }
 
-        async_task::spawn_entity_in_ps(game, epos).await;
+        async_task::entity::spawn_entity_in_ps(game, epos).await;
 
 
         // println!("before add player -----------------------------------");

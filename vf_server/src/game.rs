@@ -1,4 +1,4 @@
-use crate::*;
+pub use crate::*;
 use std::collections::{HashMap, HashSet};
 use crate::game_player_manager::PlayerManager;
 use tokio::net::TcpStream;
@@ -243,18 +243,22 @@ pub async fn main_loop()
                                     &mut context, cmd).await;
                             }
                         }
-                        MsgEnum::Rpl_SpawnEntityInPs(rpl) => {
-                            if common_msg.client_type==ClientType_GameServer{
-                                async_task::spawn_entity_in_ps_rpl(&mut context,rpl).await;
-                            }
-                        }
                         MsgEnum::EntityPosUpdate(epu)=>{
                             if common_msg.client_type==ClientType_GameServer{
                                 game_entity::update_entity_pos(&mut context,epu,
                                                                false,0).await;
                             }
                         }
-                        _ => {}
+                        MsgEnum::PutBlock(pb)=>{
+                            game_block::handle_PutBlock(
+                                &mut context,
+                                common_msg.client_type,common_msg.client_id,
+                                pb
+                            ).await;
+                        }
+                        _ => {
+                            async_task::match_client_rpl_msg(&mut context, common_msg).await;
+                        }
                     }
                 }
                 ClientMsgEnum::ClientConnect(m) => {

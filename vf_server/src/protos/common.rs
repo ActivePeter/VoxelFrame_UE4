@@ -2267,6 +2267,659 @@ impl ::protobuf::reflect::ProtobufValue for EntityPosUpdate {
     }
 }
 
+#[derive(PartialEq,Clone,Default)]
+pub struct PutBlock {
+    // message fields
+    pub x: i32,
+    pub y: i32,
+    pub z: i32,
+    pub block_id: i32,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a PutBlock {
+    fn default() -> &'a PutBlock {
+        <PutBlock as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl PutBlock {
+    pub fn new() -> PutBlock {
+        ::std::default::Default::default()
+    }
+
+    // int32 x = 1;
+
+
+    pub fn get_x(&self) -> i32 {
+        self.x
+    }
+    pub fn clear_x(&mut self) {
+        self.x = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_x(&mut self, v: i32) {
+        self.x = v;
+    }
+
+    // int32 y = 2;
+
+
+    pub fn get_y(&self) -> i32 {
+        self.y
+    }
+    pub fn clear_y(&mut self) {
+        self.y = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_y(&mut self, v: i32) {
+        self.y = v;
+    }
+
+    // int32 z = 3;
+
+
+    pub fn get_z(&self) -> i32 {
+        self.z
+    }
+    pub fn clear_z(&mut self) {
+        self.z = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_z(&mut self, v: i32) {
+        self.z = v;
+    }
+
+    // int32 block_id = 4;
+
+
+    pub fn get_block_id(&self) -> i32 {
+        self.block_id
+    }
+    pub fn clear_block_id(&mut self) {
+        self.block_id = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_block_id(&mut self, v: i32) {
+        self.block_id = v;
+    }
+}
+
+impl ::protobuf::Message for PutBlock {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.x = tmp;
+                },
+                2 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.y = tmp;
+                },
+                3 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.z = tmp;
+                },
+                4 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.block_id = tmp;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if self.x != 0 {
+            my_size += ::protobuf::rt::value_size(1, self.x, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if self.y != 0 {
+            my_size += ::protobuf::rt::value_size(2, self.y, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if self.z != 0 {
+            my_size += ::protobuf::rt::value_size(3, self.z, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if self.block_id != 0 {
+            my_size += ::protobuf::rt::value_size(4, self.block_id, ::protobuf::wire_format::WireTypeVarint);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if self.x != 0 {
+            os.write_int32(1, self.x)?;
+        }
+        if self.y != 0 {
+            os.write_int32(2, self.y)?;
+        }
+        if self.z != 0 {
+            os.write_int32(3, self.z)?;
+        }
+        if self.block_id != 0 {
+            os.write_int32(4, self.block_id)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> PutBlock {
+        PutBlock::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                "x",
+                |m: &PutBlock| { &m.x },
+                |m: &mut PutBlock| { &mut m.x },
+            ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                "y",
+                |m: &PutBlock| { &m.y },
+                |m: &mut PutBlock| { &mut m.y },
+            ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                "z",
+                |m: &PutBlock| { &m.z },
+                |m: &mut PutBlock| { &mut m.z },
+            ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                "block_id",
+                |m: &PutBlock| { &m.block_id },
+                |m: &mut PutBlock| { &mut m.block_id },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<PutBlock>(
+                "PutBlock",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static PutBlock {
+        static instance: ::protobuf::rt::LazyV2<PutBlock> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(PutBlock::new)
+    }
+}
+
+impl ::protobuf::Clear for PutBlock {
+    fn clear(&mut self) {
+        self.x = 0;
+        self.y = 0;
+        self.z = 0;
+        self.block_id = 0;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for PutBlock {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for PutBlock {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct Cmd_PutBlockInPs {
+    // message fields
+    pub task_id: u32,
+    pub put_block: ::protobuf::SingularPtrField<PutBlock>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a Cmd_PutBlockInPs {
+    fn default() -> &'a Cmd_PutBlockInPs {
+        <Cmd_PutBlockInPs as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl Cmd_PutBlockInPs {
+    pub fn new() -> Cmd_PutBlockInPs {
+        ::std::default::Default::default()
+    }
+
+    // uint32 task_id = 1;
+
+
+    pub fn get_task_id(&self) -> u32 {
+        self.task_id
+    }
+    pub fn clear_task_id(&mut self) {
+        self.task_id = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_task_id(&mut self, v: u32) {
+        self.task_id = v;
+    }
+
+    // .PutBlock put_block = 2;
+
+
+    pub fn get_put_block(&self) -> &PutBlock {
+        self.put_block.as_ref().unwrap_or_else(|| <PutBlock as ::protobuf::Message>::default_instance())
+    }
+    pub fn clear_put_block(&mut self) {
+        self.put_block.clear();
+    }
+
+    pub fn has_put_block(&self) -> bool {
+        self.put_block.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_put_block(&mut self, v: PutBlock) {
+        self.put_block = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_put_block(&mut self) -> &mut PutBlock {
+        if self.put_block.is_none() {
+            self.put_block.set_default();
+        }
+        self.put_block.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_put_block(&mut self) -> PutBlock {
+        self.put_block.take().unwrap_or_else(|| PutBlock::new())
+    }
+}
+
+impl ::protobuf::Message for Cmd_PutBlockInPs {
+    fn is_initialized(&self) -> bool {
+        for v in &self.put_block {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.task_id = tmp;
+                },
+                2 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.put_block)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if self.task_id != 0 {
+            my_size += ::protobuf::rt::value_size(1, self.task_id, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if let Some(ref v) = self.put_block.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if self.task_id != 0 {
+            os.write_uint32(1, self.task_id)?;
+        }
+        if let Some(ref v) = self.put_block.as_ref() {
+            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> Cmd_PutBlockInPs {
+        Cmd_PutBlockInPs::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                "task_id",
+                |m: &Cmd_PutBlockInPs| { &m.task_id },
+                |m: &mut Cmd_PutBlockInPs| { &mut m.task_id },
+            ));
+            fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<PutBlock>>(
+                "put_block",
+                |m: &Cmd_PutBlockInPs| { &m.put_block },
+                |m: &mut Cmd_PutBlockInPs| { &mut m.put_block },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<Cmd_PutBlockInPs>(
+                "Cmd_PutBlockInPs",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static Cmd_PutBlockInPs {
+        static instance: ::protobuf::rt::LazyV2<Cmd_PutBlockInPs> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(Cmd_PutBlockInPs::new)
+    }
+}
+
+impl ::protobuf::Clear for Cmd_PutBlockInPs {
+    fn clear(&mut self) {
+        self.task_id = 0;
+        self.put_block.clear();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for Cmd_PutBlockInPs {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for Cmd_PutBlockInPs {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct Rpl_PutBlockInPs {
+    // message fields
+    pub task_id: u32,
+    pub put_succ: u32,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a Rpl_PutBlockInPs {
+    fn default() -> &'a Rpl_PutBlockInPs {
+        <Rpl_PutBlockInPs as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl Rpl_PutBlockInPs {
+    pub fn new() -> Rpl_PutBlockInPs {
+        ::std::default::Default::default()
+    }
+
+    // uint32 task_id = 1;
+
+
+    pub fn get_task_id(&self) -> u32 {
+        self.task_id
+    }
+    pub fn clear_task_id(&mut self) {
+        self.task_id = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_task_id(&mut self, v: u32) {
+        self.task_id = v;
+    }
+
+    // uint32 put_succ = 2;
+
+
+    pub fn get_put_succ(&self) -> u32 {
+        self.put_succ
+    }
+    pub fn clear_put_succ(&mut self) {
+        self.put_succ = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_put_succ(&mut self, v: u32) {
+        self.put_succ = v;
+    }
+}
+
+impl ::protobuf::Message for Rpl_PutBlockInPs {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.task_id = tmp;
+                },
+                2 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.put_succ = tmp;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if self.task_id != 0 {
+            my_size += ::protobuf::rt::value_size(1, self.task_id, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if self.put_succ != 0 {
+            my_size += ::protobuf::rt::value_size(2, self.put_succ, ::protobuf::wire_format::WireTypeVarint);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if self.task_id != 0 {
+            os.write_uint32(1, self.task_id)?;
+        }
+        if self.put_succ != 0 {
+            os.write_uint32(2, self.put_succ)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> Rpl_PutBlockInPs {
+        Rpl_PutBlockInPs::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                "task_id",
+                |m: &Rpl_PutBlockInPs| { &m.task_id },
+                |m: &mut Rpl_PutBlockInPs| { &mut m.task_id },
+            ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                "put_succ",
+                |m: &Rpl_PutBlockInPs| { &m.put_succ },
+                |m: &mut Rpl_PutBlockInPs| { &mut m.put_succ },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<Rpl_PutBlockInPs>(
+                "Rpl_PutBlockInPs",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static Rpl_PutBlockInPs {
+        static instance: ::protobuf::rt::LazyV2<Rpl_PutBlockInPs> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(Rpl_PutBlockInPs::new)
+    }
+}
+
+impl ::protobuf::Clear for Rpl_PutBlockInPs {
+    fn clear(&mut self) {
+        self.task_id = 0;
+        self.put_succ = 0;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for Rpl_PutBlockInPs {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for Rpl_PutBlockInPs {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
 #[derive(Clone,PartialEq,Eq,Debug,Hash)]
 pub enum ClientType {
     ClientType_GameServer = 0,
@@ -2395,10 +3048,17 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     entityPosB\0:\0\"_\n\x13Rpl_SpawnEntityInPs\x12\x19\n\x07task_id\x18\x01\
     \x20\x01(\rR\x06taskIdB\0\x12+\n\nentity_pos\x18\x02\x20\x01(\x0b2\n.Ent\
     ityPosR\tentityPosB\0:\0\"@\n\x0fEntityPosUpdate\x12+\n\nentity_pos\x18\
-    \x01\x20\x03(\x0b2\n.EntityPosR\tentityPosB\0:\0*@\n\nClientType\x12\x19\
-    \n\x15ClientType_GameServer\x10\0\x12\x15\n\x11ClientType_Player\x10\x01\
-    \x1a\0*(\n\nEntityType\x12\n\n\x06T_Null\x10\0\x12\x0c\n\x08T_Player\x10\
-    \x01\x1a\0B\0b\x06proto3\
+    \x01\x20\x03(\x0b2\n.EntityPosR\tentityPosB\0:\0\"Y\n\x08PutBlock\x12\
+    \x0e\n\x01x\x18\x01\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\x18\x02\x20\x01\
+    (\x05R\x01yB\0\x12\x0e\n\x01z\x18\x03\x20\x01(\x05R\x01zB\0\x12\x1b\n\
+    \x08block_id\x18\x04\x20\x01(\x05R\x07blockIdB\0:\0\"Y\n\x10Cmd_PutBlock\
+    InPs\x12\x19\n\x07task_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12(\n\tput_b\
+    lock\x18\x02\x20\x01(\x0b2\t.PutBlockR\x08putBlockB\0:\0\"L\n\x10Rpl_Put\
+    BlockInPs\x12\x19\n\x07task_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12\x1b\
+    \n\x08put_succ\x18\x02\x20\x01(\rR\x07putSuccB\0:\0*@\n\nClientType\x12\
+    \x19\n\x15ClientType_GameServer\x10\0\x12\x15\n\x11ClientType_Player\x10\
+    \x01\x1a\0*(\n\nEntityType\x12\n\n\x06T_Null\x10\0\x12\x0c\n\x08T_Player\
+    \x10\x01\x1a\0B\0b\x06proto3\
 ";
 
 static file_descriptor_proto_lazy: ::protobuf::rt::LazyV2<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::rt::LazyV2::INIT;

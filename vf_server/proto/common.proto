@@ -77,3 +77,20 @@ message Rpl_SpawnEntityInPs{
 message EntityPosUpdate{
   repeated EntityPos entity_pos=1;
 }
+
+message PutBlock{
+  int32 x=1;
+  int32 y=2;
+  int32 z=3;
+  int32 block_id=4;
+}
+
+message Cmd_PutBlockInPs{
+  uint32 task_id=1;
+  PutBlock put_block=2;
+}
+
+message Rpl_PutBlockInPs{
+  uint32 task_id=1;
+  uint32 put_succ=2;//0:fail 1:succ
+}

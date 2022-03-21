@@ -12,6 +12,9 @@ pub enum PackIds {
     ECmd_SpawnEntityInPs=6,
     ERpl_SpawnEntityInPs=7,
     EEntityPosUpdate=8,
+    EPutBlock=9,
+    ECmd_PutBlockInPs=10,
+    ERpl_PutBlockInPs=11,
 }
 
 //用于携带消息包
@@ -24,6 +27,8 @@ pub enum MsgEnum {
     MainPlayerMoveCmd(common::MainPlayerMoveCmd),
     Rpl_SpawnEntityInPs(common::Rpl_SpawnEntityInPs),
     EntityPosUpdate(common::EntityPosUpdate),
+    PutBlock(common::PutBlock),
+    Rpl_PutBlockInPs(common::Rpl_PutBlockInPs),
 }
 
 fn make_pack_head(pack_id: PackIds, pack_len: usize) -> [u8; 5] {
@@ -98,6 +103,8 @@ pub fn bytes_to_pack(msg_pack_id: i32, data_slice: &[u8])
         one_pack!(common::Rpl_SpawnEntityInPs,MsgEnum::Rpl_SpawnEntityInPs,data_slice);
     }else if msg_pack_id==PackIds::EEntityPosUpdate as i32{
         one_pack!(common::EntityPosUpdate,MsgEnum::EntityPosUpdate,data_slice);
+    }else if msg_pack_id==PackIds::EPutBlock as i32{
+        one_pack!(common::PutBlock,MsgEnum::PutBlock,data_slice);
     }
     return None;
 }

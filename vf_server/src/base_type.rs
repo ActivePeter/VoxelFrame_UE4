@@ -1,7 +1,11 @@
 use arrayvec::ArrayVec;
 
 pub type Point3f = ArrayVec<f32, 3>;
-
+pub struct Point3i{
+    pub x:i32,
+    pub y:i32,
+    pub z:i32,
+}
 pub fn point3f_new()->Point3f{
     let mut p =Point3f::new();
     p.push(0.0);
@@ -17,3 +21,4 @@ pub fn point3f_new2(x:f32, y:f32, z:f32) -> Point3f {
     p.push(z);
     return p;
 }
+

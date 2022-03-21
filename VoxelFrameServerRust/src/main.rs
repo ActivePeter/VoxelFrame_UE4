@@ -48,7 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // tokio::spawn()
         tokio::spawn(async move {
             println!("client connected {0}", addr);
-            let socketWrLock = ArcRw_new!(wr);// Arc::new(RwLock::new(socket));
+            // let socketWrLock = ArcRw_new!(wr);// Arc::new(RwLock::new(socket));
 
 
             // let player = GAME_CONTEXT.lock().await.player_manager.
