@@ -34,6 +34,28 @@ pub mod to_part_server{
         sender.send(vec).await;
     }
 }
+pub mod to_player{
+    use crate::game::{ClientOperationId, ClientId};
+    use crate::game;
+    use crate::protos;
+    use crate::net_pack_convert;
+    use crate::net_pack_convert::PackIds;
+
+    pub async fn operation_failed(ctx: &mut game::Game,cid:ClientId,opid:ClientOperationId){
+        let mut pack=protos::common::ClientOperationFailed::new();
+        pack.operation_id=opid;
+        let vec=net_pack_convert::pack_to_bytes(pack,PackIds::EClientOperationFailed);
+        let sender=ctx.client_manager.get_sender(cid);
+        sender.send(vec).await;
+    }
+    pub async fn operation_succ(ctx: &mut game::Game,cid:ClientId,opid:ClientOperationId){
+        let mut pack=protos::common::ClientOperationSucc::new();
+        pack.operation_id=opid;
+        let vec=net_pack_convert::pack_to_bytes(pack,PackIds::EClientOperationSucc);
+        let sender=ctx.client_manager.get_sender(cid);
+        sender.send(vec).await;
+    }
+}
 pub async fn player_basic(
     client_manager: &ClientManager,
     player: &Player,

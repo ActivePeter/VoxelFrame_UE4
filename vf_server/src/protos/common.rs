@@ -2274,6 +2274,7 @@ pub struct PutBlock {
     pub y: i32,
     pub z: i32,
     pub block_id: i32,
+    pub operation_id: u32,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -2349,6 +2350,21 @@ impl PutBlock {
     pub fn set_block_id(&mut self, v: i32) {
         self.block_id = v;
     }
+
+    // uint32 operation_id = 5;
+
+
+    pub fn get_operation_id(&self) -> u32 {
+        self.operation_id
+    }
+    pub fn clear_operation_id(&mut self) {
+        self.operation_id = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_operation_id(&mut self, v: u32) {
+        self.operation_id = v;
+    }
 }
 
 impl ::protobuf::Message for PutBlock {
@@ -2388,6 +2404,13 @@ impl ::protobuf::Message for PutBlock {
                     let tmp = is.read_int32()?;
                     self.block_id = tmp;
                 },
+                5 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.operation_id = tmp;
+                },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
                 },
@@ -2412,6 +2435,9 @@ impl ::protobuf::Message for PutBlock {
         if self.block_id != 0 {
             my_size += ::protobuf::rt::value_size(4, self.block_id, ::protobuf::wire_format::WireTypeVarint);
         }
+        if self.operation_id != 0 {
+            my_size += ::protobuf::rt::value_size(5, self.operation_id, ::protobuf::wire_format::WireTypeVarint);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
@@ -2429,6 +2455,9 @@ impl ::protobuf::Message for PutBlock {
         }
         if self.block_id != 0 {
             os.write_int32(4, self.block_id)?;
+        }
+        if self.operation_id != 0 {
+            os.write_uint32(5, self.operation_id)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -2488,6 +2517,11 @@ impl ::protobuf::Message for PutBlock {
                 |m: &PutBlock| { &m.block_id },
                 |m: &mut PutBlock| { &mut m.block_id },
             ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                "operation_id",
+                |m: &PutBlock| { &m.operation_id },
+                |m: &mut PutBlock| { &mut m.operation_id },
+            ));
             ::protobuf::reflect::MessageDescriptor::new_pb_name::<PutBlock>(
                 "PutBlock",
                 fields,
@@ -2508,6 +2542,7 @@ impl ::protobuf::Clear for PutBlock {
         self.y = 0;
         self.z = 0;
         self.block_id = 0;
+        self.operation_id = 0;
         self.unknown_fields.clear();
     }
 }
@@ -2920,6 +2955,310 @@ impl ::protobuf::reflect::ProtobufValue for Rpl_PutBlockInPs {
     }
 }
 
+#[derive(PartialEq,Clone,Default)]
+pub struct ClientOperationFailed {
+    // message fields
+    pub operation_id: u32,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a ClientOperationFailed {
+    fn default() -> &'a ClientOperationFailed {
+        <ClientOperationFailed as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl ClientOperationFailed {
+    pub fn new() -> ClientOperationFailed {
+        ::std::default::Default::default()
+    }
+
+    // uint32 operation_id = 1;
+
+
+    pub fn get_operation_id(&self) -> u32 {
+        self.operation_id
+    }
+    pub fn clear_operation_id(&mut self) {
+        self.operation_id = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_operation_id(&mut self, v: u32) {
+        self.operation_id = v;
+    }
+}
+
+impl ::protobuf::Message for ClientOperationFailed {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.operation_id = tmp;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if self.operation_id != 0 {
+            my_size += ::protobuf::rt::value_size(1, self.operation_id, ::protobuf::wire_format::WireTypeVarint);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if self.operation_id != 0 {
+            os.write_uint32(1, self.operation_id)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> ClientOperationFailed {
+        ClientOperationFailed::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                "operation_id",
+                |m: &ClientOperationFailed| { &m.operation_id },
+                |m: &mut ClientOperationFailed| { &mut m.operation_id },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<ClientOperationFailed>(
+                "ClientOperationFailed",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static ClientOperationFailed {
+        static instance: ::protobuf::rt::LazyV2<ClientOperationFailed> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(ClientOperationFailed::new)
+    }
+}
+
+impl ::protobuf::Clear for ClientOperationFailed {
+    fn clear(&mut self) {
+        self.operation_id = 0;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for ClientOperationFailed {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for ClientOperationFailed {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct ClientOperationSucc {
+    // message fields
+    pub operation_id: u32,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a ClientOperationSucc {
+    fn default() -> &'a ClientOperationSucc {
+        <ClientOperationSucc as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl ClientOperationSucc {
+    pub fn new() -> ClientOperationSucc {
+        ::std::default::Default::default()
+    }
+
+    // uint32 operation_id = 1;
+
+
+    pub fn get_operation_id(&self) -> u32 {
+        self.operation_id
+    }
+    pub fn clear_operation_id(&mut self) {
+        self.operation_id = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_operation_id(&mut self, v: u32) {
+        self.operation_id = v;
+    }
+}
+
+impl ::protobuf::Message for ClientOperationSucc {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.operation_id = tmp;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if self.operation_id != 0 {
+            my_size += ::protobuf::rt::value_size(1, self.operation_id, ::protobuf::wire_format::WireTypeVarint);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if self.operation_id != 0 {
+            os.write_uint32(1, self.operation_id)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> ClientOperationSucc {
+        ClientOperationSucc::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                "operation_id",
+                |m: &ClientOperationSucc| { &m.operation_id },
+                |m: &mut ClientOperationSucc| { &mut m.operation_id },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<ClientOperationSucc>(
+                "ClientOperationSucc",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static ClientOperationSucc {
+        static instance: ::protobuf::rt::LazyV2<ClientOperationSucc> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(ClientOperationSucc::new)
+    }
+}
+
+impl ::protobuf::Clear for ClientOperationSucc {
+    fn clear(&mut self) {
+        self.operation_id = 0;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for ClientOperationSucc {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for ClientOperationSucc {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
 #[derive(Clone,PartialEq,Eq,Debug,Hash)]
 pub enum ClientType {
     ClientType_GameServer = 0,
@@ -3048,17 +3387,20 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     entityPosB\0:\0\"_\n\x13Rpl_SpawnEntityInPs\x12\x19\n\x07task_id\x18\x01\
     \x20\x01(\rR\x06taskIdB\0\x12+\n\nentity_pos\x18\x02\x20\x01(\x0b2\n.Ent\
     ityPosR\tentityPosB\0:\0\"@\n\x0fEntityPosUpdate\x12+\n\nentity_pos\x18\
-    \x01\x20\x03(\x0b2\n.EntityPosR\tentityPosB\0:\0\"Y\n\x08PutBlock\x12\
+    \x01\x20\x03(\x0b2\n.EntityPosR\tentityPosB\0:\0\"~\n\x08PutBlock\x12\
     \x0e\n\x01x\x18\x01\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\x18\x02\x20\x01\
     (\x05R\x01yB\0\x12\x0e\n\x01z\x18\x03\x20\x01(\x05R\x01zB\0\x12\x1b\n\
-    \x08block_id\x18\x04\x20\x01(\x05R\x07blockIdB\0:\0\"Y\n\x10Cmd_PutBlock\
-    InPs\x12\x19\n\x07task_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12(\n\tput_b\
-    lock\x18\x02\x20\x01(\x0b2\t.PutBlockR\x08putBlockB\0:\0\"L\n\x10Rpl_Put\
-    BlockInPs\x12\x19\n\x07task_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12\x1b\
-    \n\x08put_succ\x18\x02\x20\x01(\rR\x07putSuccB\0:\0*@\n\nClientType\x12\
-    \x19\n\x15ClientType_GameServer\x10\0\x12\x15\n\x11ClientType_Player\x10\
-    \x01\x1a\0*(\n\nEntityType\x12\n\n\x06T_Null\x10\0\x12\x0c\n\x08T_Player\
-    \x10\x01\x1a\0B\0b\x06proto3\
+    \x08block_id\x18\x04\x20\x01(\x05R\x07blockIdB\0\x12#\n\x0coperation_id\
+    \x18\x05\x20\x01(\rR\x0boperationIdB\0:\0\"Y\n\x10Cmd_PutBlockInPs\x12\
+    \x19\n\x07task_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12(\n\tput_block\x18\
+    \x02\x20\x01(\x0b2\t.PutBlockR\x08putBlockB\0:\0\"L\n\x10Rpl_PutBlockInP\
+    s\x12\x19\n\x07task_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12\x1b\n\x08put\
+    _succ\x18\x02\x20\x01(\rR\x07putSuccB\0:\0\">\n\x15ClientOperationFailed\
+    \x12#\n\x0coperation_id\x18\x01\x20\x01(\rR\x0boperationIdB\0:\0\"<\n\
+    \x13ClientOperationSucc\x12#\n\x0coperation_id\x18\x01\x20\x01(\rR\x0bop\
+    erationIdB\0:\0*@\n\nClientType\x12\x19\n\x15ClientType_GameServer\x10\0\
+    \x12\x15\n\x11ClientType_Player\x10\x01\x1a\0*(\n\nEntityType\x12\n\n\
+    \x06T_Null\x10\0\x12\x0c\n\x08T_Player\x10\x01\x1a\0B\0b\x06proto3\
 ";
 
 static file_descriptor_proto_lazy: ::protobuf::rt::LazyV2<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::rt::LazyV2::INIT;

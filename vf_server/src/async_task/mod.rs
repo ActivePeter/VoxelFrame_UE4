@@ -4,7 +4,7 @@ pub mod block;
 
 use std::collections::HashMap;
 use crate::{protos, game_chunk, async_task, game};
-use crate::game::{Game, ClientId};
+use crate::game::{Game, ClientId, ClientOperationId};
 use crate::conv;
 use crate::base_type::point3f_new2;
 use crate::part_server_sync;
@@ -49,7 +49,7 @@ impl AsyncTaskManager{
 }
 pub enum AsyncTask{
     ESpawnEntityInPs,
-    EPutBlockInPs(ClientId),
+    EPutBlockInPs(ClientId,ClientOperationId),
 
     FinishTaskFailed,
 }

@@ -8,7 +8,7 @@ pub async fn put_block_in_ps(
     ctx: &mut game::Game,
     cid: game::ClientId, pb: PutBlock) {
     let task_id=ctx.async_task_manager.add_task(
-        AsyncTask::EPutBlockInPs(cid)
+        AsyncTask::EPutBlockInPs(cid,pb.get_operation_id())
     );
     send::to_part_server::put_block(ctx,task_id,cid,pb).await;
 }
@@ -16,10 +16,13 @@ pub async fn put_block_in_ps(
 pub async fn put_block_in_ps_rpl(ctx: &mut game::Game, rpl: Rpl_PutBlockInPs) {
     let task=ctx.async_task_manager.finish_task(rpl.task_id);
     match task{
-        AsyncTask::EPutBlockInPs(cid) => {
+        AsyncTask::EPutBlockInPs(cid,opid) => {
             if rpl.put_succ==0 {
                 //放置失败
-
+                send::to_player::operation_failed(ctx,cid,opid).await;
+            }else{
+                //放置成功
+                send::to_player::operation_succ(ctx,cid,opid).await;
             }
         }
         _ => {}

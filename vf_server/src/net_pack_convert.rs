@@ -15,6 +15,8 @@ pub enum PackIds {
     EPutBlock=9,
     ECmd_PutBlockInPs=10,
     ERpl_PutBlockInPs=11,
+    EClientOperationFailed=12,
+    EClientOperationSucc=13,
 }
 
 //用于携带消息包

@@ -83,6 +83,7 @@ message PutBlock{
   int32 y=2;
   int32 z=3;
   int32 block_id=4;
+  uint32 operation_id=5;
 }
 
 message Cmd_PutBlockInPs{
@@ -93,4 +94,12 @@ message Cmd_PutBlockInPs{
 message Rpl_PutBlockInPs{
   uint32 task_id=1;
   uint32 put_succ=2;//0:fail 1:succ
+}
+
+message ClientOperationFailed{
+  uint32 operation_id=1;
+}
+
+message ClientOperationSucc{
+  uint32 operation_id=1;
 }

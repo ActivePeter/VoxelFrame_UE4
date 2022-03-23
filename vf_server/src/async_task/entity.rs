@@ -3,7 +3,6 @@ use crate::{protos, conv, net_pack_convert, game_player, game_entity};
 use crate::async_task::AsyncTask;
 use crate::base_type::point3f_new2;
 use crate::net_pack_convert::PackIds;
-use std::intrinsics::raw_eq;
 
 pub async fn spawn_entity_in_ps(
     game:&mut Game,
@@ -31,8 +30,11 @@ pub async fn spawn_entity_in_ps(
 pub async fn spawn_entity_in_ps_rpl(game:&mut Game,rpl:protos::common::Rpl_SpawnEntityInPs){
     println!("spawn_entity_in_ps_rpl{}",rpl.task_id);
     let a=game.async_task_manager.finish_task(rpl.task_id);
-    if a==AsyncTask::FinishTaskFailed{
-        return;
+    match a {
+        AsyncTask::FinishTaskFailed => {
+            return;
+        }
+        _=>{}
     }
     let entitypos=rpl.entity_pos.unwrap();
     if entitypos.t==protos::common::EntityType::T_Player {

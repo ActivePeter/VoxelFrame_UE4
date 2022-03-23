@@ -23,6 +23,7 @@ use crate::net_pack_convert::MsgEnum::MainPlayerMoveCmd;
 use crate::async_task::AsyncTaskManager;
 
 pub type ClientId = usize;
+pub type ClientOperationId=u32;
 // use crate::client::Client;
 
 // tokio::task_local! {
