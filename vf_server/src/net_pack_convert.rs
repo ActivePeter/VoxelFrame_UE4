@@ -17,6 +17,7 @@ pub enum PackIds {
     ERpl_PutBlockInPs=11,
     EClientOperationFailed=12,
     EClientOperationSucc=13,
+    EMainPlayerJumpCmd=14,
 }
 
 //用于携带消息包
@@ -31,6 +32,7 @@ pub enum MsgEnum {
     EntityPosUpdate(common::EntityPosUpdate),
     PutBlock(common::PutBlock),
     Rpl_PutBlockInPs(common::Rpl_PutBlockInPs),
+    MainPlayerJumpCmd(common::MainPlayerJumpCmd),
 }
 
 fn make_pack_head(pack_id: PackIds, pack_len: usize) -> [u8; 5] {
@@ -86,27 +88,44 @@ macro_rules! one_pack {
     return Some($msg_enum(r));
   }
 }
-
+fn get_pack_id_i32(id:PackIds) -> i32 {
+    return id as i32;
+}
 pub fn bytes_to_pack(msg_pack_id: i32, data_slice: &[u8])
                           -> Option<MsgEnum> {
     if msg_pack_id==PackIds::EChunkPack as i32 {
         one_pack!(common::ChunkPack,MsgEnum::ChunkPack,data_slice);
+
     } else if msg_pack_id==PackIds::EChunkEntityPack as i32{
         one_pack!(common::ChunkEntityPack,MsgEnum::ChunkEntityPack,data_slice);
+
     }else if msg_pack_id==PackIds::EClientFirstConfirm as i32{
         one_pack!(common::ClientFirstConfirm,MsgEnum::ClientFirstConfirm,data_slice);
+
     }else if msg_pack_id==PackIds::EEntityPos as i32{
         one_pack!(common::EntityPos,MsgEnum::EntityPos,data_slice);
+
     }else if msg_pack_id==PackIds::EPlayerBasic as i32{
         one_pack!(common::PlayerBasic,MsgEnum::PlayerBasic,data_slice);
+
     }else if msg_pack_id==PackIds::EMainPlayerMoveCmd as i32{
         one_pack!(common::MainPlayerMoveCmd,MsgEnum::MainPlayerMoveCmd,data_slice);
+
     }else if msg_pack_id==PackIds::ERpl_SpawnEntityInPs as i32{
         one_pack!(common::Rpl_SpawnEntityInPs,MsgEnum::Rpl_SpawnEntityInPs,data_slice);
+
     }else if msg_pack_id==PackIds::EEntityPosUpdate as i32{
         one_pack!(common::EntityPosUpdate,MsgEnum::EntityPosUpdate,data_slice);
+
     }else if msg_pack_id==PackIds::EPutBlock as i32{
         one_pack!(common::PutBlock,MsgEnum::PutBlock,data_slice);
+
+    }else if msg_pack_id==PackIds::ERpl_PutBlockInPs as i32{
+        one_pack!(common::Rpl_PutBlockInPs,MsgEnum::Rpl_PutBlockInPs,data_slice);
+
+    }else if msg_pack_id==PackIds::EMainPlayerJumpCmd as i32{
+        one_pack!(common::MainPlayerJumpCmd,MsgEnum::MainPlayerJumpCmd,data_slice);
     }
+
     return None;
 }

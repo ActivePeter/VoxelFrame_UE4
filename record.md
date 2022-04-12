@@ -1,5 +1,24 @@
 开发具体过程记录
 
+#### 2022/4/13
+
+#### 2022/4/12
+
+- mainplayer同步策略
+  - sync to server
+    - 玩家主动操作中，将对应数据更新到NetSyncData 组件中
+    - ecs系统每帧判断玩家是否做了主动操作，如果有，则将玩家当前状态发给服务器，
+      - 判断结束记得清空
+  - sync from server
+    - ps_check_entity_move
+      - part server会轮询entity是否发生位置变动，若发生，会加入到map中，并在帧结尾的ecs sys中一次性发给客户端
+    - 暂时全部直接赋值（传递来的数据是vf_坐标，赋值到ue需要转换）
+      - 目前的缺点，直接矫正造成的主角操纵不流畅
+    - todo
+      - 如果为mainplayer，
+        - 
+      - 如果为普通entity，直接赋值
+
 #### 2021/8/27-28
 
 - [x] 根据解析的数据创建chunk
@@ -10,7 +29,9 @@
 
   - [x] 客户端发送需要先解决一个线程间通信以及socket阻塞读取的问题
 
-    所以先实现一个简易的安全队列
+    ~~所以先实现一个简易的安全队列~~
+
+    (这部分取消了，ue自带队列实现了一对一，一对多)2022/4/13
 
     ```c++
     AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask,

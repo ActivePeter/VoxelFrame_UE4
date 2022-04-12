@@ -67,7 +67,7 @@ impl ClientManager{
     pub fn get_sender(&self,cid:ClientId)->ClientSender{
         return self.id2client.get(&(cid)).unwrap().sender.clone();
     }
-    fn add_new_client(&mut self, mut sender:ClientSender, client_type:ClientType) ->ClientId{
+    pub fn add_new_client(&mut self, mut sender:ClientSender, client_type:ClientType) ->ClientId{
         // sender.id=self.next_client_id;
         self.id2client.insert(self.next_client_id,ClientDescription{
             client_type,
@@ -83,7 +83,7 @@ impl ClientManager{
 
         return self.next_client_id-1;
     }
-    fn remove_client(&mut self,cid:ClientId){
+    pub fn remove_client(&mut self,cid:ClientId){
         let ctype=self.id2client.get(&cid).unwrap().client_type;
         if ctype==ClientType_GameServer{
             self.partserver_clients.remove(&cid);
@@ -234,44 +234,8 @@ pub async fn main_loop()
         println!("game main loop task spawned");
         loop {
             let msg=  msg_channel_rx.recv().await.unwrap();
-            match msg {
-                ClientMsgEnum::ClientCommonMsg(common_msg) => {
-
-                    match common_msg.msg_enum{
-                        MsgEnum::MainPlayerMoveCmd(cmd) => {
-                            if common_msg.client_type==ClientType::ClientType_Player {
-                                game_player::handle_MainPlayerMoveCmd(common_msg.client_id,
-                                    &mut context, cmd).await;
-                            }
-                        }
-                        MsgEnum::EntityPosUpdate(epu)=>{
-                            if common_msg.client_type==ClientType_GameServer{
-                                game_entity::update_entity_pos(&mut context,epu,
-                                                               false,0).await;
-                            }
-                        }
-                        MsgEnum::PutBlock(pb)=>{
-                            game_block::handle_PutBlock(
-                                &mut context,
-                                common_msg.client_type,common_msg.client_id,
-                                pb
-                            ).await;
-                        }
-                        _ => {
-                            async_task::match_client_rpl_msg(&mut context, common_msg).await;
-                        }
-                    }
-                }
-                ClientMsgEnum::ClientConnect(m) => {
-                    let id=
-                        context.client_manager.add_new_client(m.sender,m.client_type);
-                    m.response.send(id);
-                    game_flow::after_client_connect(&mut context, id).await;
-                }
-                ClientMsgEnum::ClientDisconnect(m) => {
-                    context.client_manager.remove_client(m.client_id);
-                }
-            }
+            game_pack_distribute::
+                distribute_client_common_msg(&mut context,msg).await;
                 // match msg {
                 //     ClientStateMsg::ClientConnect(s)=>{
                 //

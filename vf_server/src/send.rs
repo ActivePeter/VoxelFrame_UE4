@@ -16,7 +16,7 @@ pub mod to_part_server{
     use protobuf::SingularPtrField;
 
     pub async fn put_block(ctx: &mut game::Game,task_id:AsyncTaskId,
-                       cid: game::ClientId, pb: PutBlock){
+                        pb: PutBlock){
         //根据方块坐标获取partserver
         let ck
             =conv::point3i_2_chunkkey2(pb.x,pb.y,pb.z);
