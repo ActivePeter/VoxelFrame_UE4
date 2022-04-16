@@ -45,9 +45,15 @@
 
 [Details](./record.md)
 
-- 2022/2/6
+- 2022/4/16
 
-  - [ ] 服务端定时检测entity移动状态，并批量同步给对区块感兴趣的player
+  方块材质的动态加载，拼接到atlas，匹配block的uv setter
+
+  ![image-20220416194802420](https://hanbaoaaa.xyz/tuchuang/images/2022/04/16/image-20220416194802420.png)
+
+- 2022/2/6-4/1（期间在考研复试，还有毕设
+
+  - [x] 服务端定时检测entity移动状态，并批量同步给对区块感兴趣的player
 
 - 2022/2/5
 
