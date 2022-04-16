@@ -24,9 +24,12 @@ namespace VF
 #include "block_mesh/_BlockMesh_Base.h"
 #include "block_uv/_BlockUVSetter_Base.h"
 #include "VF_Base.h"
+#include "game/Chunk.h"
 
 namespace VF
 {
+	class GameContext;
+
 	namespace _Block
 	{
 		// #pragma once
@@ -52,6 +55,8 @@ namespace VF
 		//
 
 		///////////////////////////
+		using BlockDiscription = int;
+
 
 		class BlockManager;
 
@@ -104,24 +109,30 @@ namespace VF
 			}
 		};
 
-		class BlockManager
+		class BlockManager :public IVF_Obj
 		{
 		private:
 			/**
- * 以方块id的顺序存储方块信息，可以快速的随机访问
-*/
+			 * 以方块id的顺序存储方块信息，可以快速的随机访问
+			*/
 			std::vector<BlockTypeInfo> typeInfos;
 
+			// IVF_Obj interface ///////////////////////
 		public:
+			//初始化：override时需要调用父类
+			virtual void IVF_Obj_init(ContextId id) override;
+			virtual void IVF_Obj_begin() override;
+			virtual void IVF_Obj_end() override;
+
+
 			/**
 			 * block manager构造函数
 			*/
 			BlockManager();
-
 			/**
 			 * 添加block信息（在注册block时调用
 			*/
-			void addBlock(const BlockTypeInfo &Info)
+			void addBlock(const BlockTypeInfo& Info)
 			{
 				typeInfos.push_back(Info);
 			}
@@ -129,7 +140,7 @@ namespace VF
 			/**
 			 * 添加一个emptyblock（在注册block时调用
 			*/
-			void addEmptyBlock(const BlockTypeInfo &Info)
+			void addEmptyBlock(const BlockTypeInfo& Info)
 			{
 				typeInfos.push_back(Info);
 				//设置为空方块属性
@@ -138,11 +149,15 @@ namespace VF
 			/**
 			 * 根据blockId获取Info
 			*/
-			BlockTypeInfo &getInfo(int blockId)
+			BlockTypeInfo& getInfo(int blockId)
 			{
 				return typeInfos[blockId];
 			}
-			void registAll();
+
+			/**
+			 * 在材质文件加载完之后,被texture manager 调用
+			 */
+			void after_block_texture_loaded();
 		};
 
 		// /**************************************
@@ -153,10 +168,32 @@ namespace VF
 		//  *
 		//  * 网格是区块网格，所以要加上方块的坐标作为顶点的偏移
 		//  * ***************************************/
-		void pushOneFace2Chunk(const Type::Vec3F &chunkMeshPos, int blockx, int blocky, int blockz, _Block::BlockTypeInfo &info, _Block::FaceDirection dir,
-							   Type::Array<Type::Vec3F> &vertexPoses,
-							   Type::Array<int32> &indices);
-		//void pushOneFace2Mesh(int blockx, int blocky, int blockz, Info& Info, _Block::FaceDirection dir, _Graph::Mesh& mesh);
+		/*void pushOneFace2Chunk(const VFVec3F& chunkMeshPos, int blockx, int blocky, int blockz, _Block::BlockTypeInfo& info, _Block::FaceDirection dir,
+			VFArray<VFVec3F>& vertexPoses,
+			VFArray<int32>& indices, VFArray<FVector2D>& uvs, TextureManager& texture_man);*/
+			//void pushOneFace2Mesh(int blockx, int blocky, int blockz, Info& Info, _Block::FaceDirection dir, _Graph::Mesh& mesh);
+
+		struct BlockDataChanger
+		{
+			GameContext& ctx;
+			std::vector<ChunkKey> changed_chunks;
+			phmap::flat_hash_map<ChunkKey, char> cks;
+			BlockDataChanger(GameContext& ctx1) :ctx(ctx1)
+			{
+
+			}
+
+			BlockDiscription set_block_data(
+				int x, int y, int z,
+				BlockDiscription block_disc);
+			void update_chunk_mesh();
+		};
+
+		void change_one_block_and_send_2_server(
+			GameContext& ctx,
+			Chunk& chunk, _type::Vec3I chunk_block_pos,
+			BlockDiscription block
+		);
 
 	}
 }

@@ -21,6 +21,8 @@ namespace VF
 			int bottomIndex;
 
 		public:
+			BlockUVSetter_UP_Side_Bottom(int top_index, int side_index, int bottom_index)
+				:topIndex(top_index), sideIndex(side_index), bottomIndex(bottom_index) {}
 			//BlockUVSetter_UP_Side_Bottom(std::string top, std::string side, std::string bottom)
 			//{
 			//    topIndex = App::getInstance().graphPtr->_textureManagerPtr->registBlockFaceTexture(top);
@@ -35,28 +37,7 @@ namespace VF
 			////     bottomIndex = textureManager.registBlockFaceTexture("grass_bottom");
 			//// }
 			////重写父类
-			//void setVertexUVOnDir(_Block::FaceDirection dir, _Graph::Mesh &mesh)
-			//{
-			//    // printf("child is called\r\n");
-			//    auto size = mesh.vertices.size();
-			//    switch (dir)
-			//    {
-			//    case _Block::FaceDirection::X_Positive: //侧面
-			//    case _Block::FaceDirection::X_Negative:
-			//    case _Block::FaceDirection::Z_Negative:
-			//    case _Block::FaceDirection::Z_Positive:
-			//        setFaceUVsByTextureIndex(mesh, sideIndex);
-			//        //根据index 还有材质的总数，就可以算出材质具体的位置，然后对应顶点进行配置即可
-			//        /* code */
-			//        break;
-			//    case _Block::FaceDirection::Y_Negative: //底面
-			//        setFaceUVsByTextureIndex(mesh, bottomIndex);
-			//        break;
-			//    case _Block::FaceDirection::Y_Positive: //上面
-			//        setFaceUVsByTextureIndex(mesh, topIndex);
-			//        break;
-			//    }
-			//}
+			virtual void setVertexUVOnDir(TextureManager& texture_man, VFArray<FVector2D>& uvs, _Block::FaceDirection dir) override;
 		};
 	}
 }

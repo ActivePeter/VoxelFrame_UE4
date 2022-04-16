@@ -18,9 +18,7 @@ namespace VF
 			memset(&bindedTo, 0, sizeof(bindedTo));
 		}
 	};
-	struct MeshManager {
-		GameContext* context;
-
+	struct MeshManager :public IVF_Obj {
 		UProceduralMeshComponentWithBind* customMesh;
 
 		/*销毁后可再利用的网格插件*/
@@ -33,13 +31,22 @@ namespace VF
 
 		UProceduralMeshComponentWithBind* getMeshById(int id);
 
-		int createMeshAndGetId(std::weak_ptr<void> bindedTo, const FName& tag, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
-		void updateMeshWithId(int id, const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+		int createMeshAndGetId(
+			std::weak_ptr<void> bindedTo, const FName& tag,
+			MeshConstructData& construct_data);
+		void updateMeshWithId(int id,
+			MeshConstructData& construct_data);
 		void delMeshWithId(int id);
 
-		void init(GameContext* context1)
-		{
-			context = context1;
-		}
+		// IVF_Obj interface ///////////////////////
+	public:
+		//初始化：override时需要调用父类
+		virtual void IVF_Obj_init(ContextId id) override;
+		virtual void IVF_Obj_begin() override;
+		virtual void IVF_Obj_end() override;
+
+
+
+		void begin();
 	};
 }

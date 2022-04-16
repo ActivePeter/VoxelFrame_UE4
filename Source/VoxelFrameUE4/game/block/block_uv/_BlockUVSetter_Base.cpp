@@ -4,16 +4,18 @@ namespace VF
 	namespace _Block
 	{
 		//对应基础类型方块的网格设置uv
-		/*void BlockUVSetter_Base::setFaceUVsByTextureIndex(_Graph::Mesh& mesh, int textureIndex)
+		void BlockUVSetter_Base::setFaceUVsByTextureIndex(TextureManager& texture_man, VFArray<FVector2D>& uvs, int textureIndex)
 		{
-			float uvs[8];
-			auto size = mesh.vertices.size();
-			auto& tm = *App::getInstance().graphPtr->_textureManagerPtr;
-			tm.getBlockFaceUVsByTextureIndex(uvs, textureIndex);
-			mesh.vertices[size - 4].setUV(uvs[0], uvs[1]);
-			mesh.vertices[size - 3].setUV(uvs[2], uvs[3]);
-			mesh.vertices[size - 2].setUV(uvs[4], uvs[5]);
-			mesh.vertices[size - 1].setUV(uvs[6], uvs[7]);
-		}*/
+			auto rect = texture_man.get_uv_rect_of_block_face_index(textureIndex);
+			uvs.Push(FVector2D(rect.x1, rect.y1));
+			uvs.Push(FVector2D(rect.x1, rect.get_y2()));
+			uvs.Push(FVector2D(rect.get_x2(), rect.get_y2()));
+			uvs.Push(FVector2D(rect.get_x2(), rect.y1));
+
+			//uvs.Push(FVector2D(0, 0));
+			//uvs.Push(FVector2D(0, 0.5));
+			//uvs.Push(FVector2D(0.5, 0.5));
+			//uvs.Push(FVector2D(0.5, 0));
+		}
 	}
 }

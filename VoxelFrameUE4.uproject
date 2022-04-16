@@ -1,17 +1,17 @@
 {
-  "FileVersion": 3,
-  "EngineAssociation": "4.26",
-  "Category": "",
-  "Description": "",
-  "Modules": [
-    {
-      "Name": "VoxelFrameUE4",
-      "Type": "Runtime",
-      "LoadingPhase": "Default",
-      "AdditionalDependencies": [
-        "Engine",
-        "ProceduralMeshComponent"
-      ]
-    }
-  ]
+	"FileVersion": 3,
+	"EngineAssociation": "4.26",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "VoxelFrameUE4",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"ProceduralMeshComponent"
+			]
+		}
+	]
 }

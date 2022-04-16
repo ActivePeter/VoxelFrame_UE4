@@ -8,7 +8,7 @@ namespace VF
 #pragma once
 // #include "../enum.h"
 #include "../block.h"
-
+#include "game/texture_man.h"
 /////////////////////////////////////////
 namespace VF
 {
@@ -17,8 +17,8 @@ namespace VF
 		class BlockUVSetter_Base
 		{
 		public:
-			/*void setFaceUVsByTextureIndex(_Graph::Mesh& mesh, int textureIndex);
-			virtual void setVertexUVOnDir(_Block::FaceDirection dir, _Graph::Mesh& mesh) = 0;*/
+			void setFaceUVsByTextureIndex(TextureManager& texture_man, VFArray<FVector2D>& uvs, int textureIndex);
+			virtual void setVertexUVOnDir(TextureManager& texture_man, VFArray<FVector2D>& uvs, _Block::FaceDirection dir) = 0;
 		};
 	}
 }

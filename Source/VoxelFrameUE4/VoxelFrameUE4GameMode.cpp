@@ -2,7 +2,7 @@
 
 #include "VoxelFrameUE4GameMode.h"
 #include "VoxelFrameUE4HUD.h"
-#include "VoxelFrameUE4Character.h"
+#include "game/main_player_Character.h"
 #include "UObject/ConstructorHelpers.h"
 
 AVoxelFrameUE4GameMode::AVoxelFrameUE4GameMode()

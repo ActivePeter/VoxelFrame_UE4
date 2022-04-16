@@ -3,17 +3,16 @@
 #include "unordered_map"
 #include "memory"
 #include "VF_Base.h"
-
 #include "Chunk.h"
-
 #include "GameContext.h"
-
+//#include "base/SafeQuene.h"
 #include "parallel_hashmap/phmap.h"
+
 namespace VF
 {
-	class ChunkManager
+	class ChunkConstructThread;
+	class ChunkManager :public IVF_Obj
 	{
-		GameContext* context;
 		/**
 		 * 区块位置对应区块智能指针的map
 		 */
@@ -27,7 +26,7 @@ namespace VF
 		 */
 		std::vector<std::weak_ptr<Chunk>> chunks2Draw;
 
-		Type::Vec3I oldPlayerChunkPos;
+		_type::Vec3I oldPlayerChunkPos;
 
 
 
@@ -47,28 +46,57 @@ namespace VF
 			return isChunkInRange(ck.x(), ck.y(), ck.z(), centerX, centerY, centerZ);
 		}
 
+		void constructMeshForChunk(Chunk& chunk);
 	public:
+		//var
 		FCriticalSection chunkCookMutex;
-		std::list<std::weak_ptr<Chunk>> chunks2Cook;
+		std::list<std::shared_ptr<Chunk>> chunks2Cook;
+		//std::unique_ptr<ChunkConstructThread> chunkConstructThread;
+
+		//func
+		// IVF_Obj interface ///////////////////////
+	public:
+		//初始化：override时需要调用父类
+		virtual void IVF_Obj_init(ContextId id) override;
+		virtual void IVF_Obj_begin() override;
+		virtual void IVF_Obj_end() override;
+
 
 		ChunkManager();
-		void init(GameContext* context1)
-		{
-			context = context1;
-		}
-		void constructMeshForChunk(Chunk& chunk);
-		void asyncConstructMeshForChunk(std::weak_ptr<Chunk>& chunk2Draw);
-
+		void asyncConstructMeshForChunk(std::shared_ptr<Chunk>& chunk2Draw);
 		//输入须先转换为vf坐标
-		void checkPlayerChunkPosChange(const Type::Vec3F& curPlayerPos);
-
+		void checkPlayerChunkPosChange(const _type::Vec3F& curPlayerPos);
 		void cookOneChunk();
-
+		std::shared_ptr<Chunk>  create_chunk(std::string& chunk_data, const ChunkKey& ck);
 		//通过Key获取chunk，若不存在则创建chunk
-		std::weak_ptr<Chunk> getChunkOfKey(const ChunkKey& ck);
-
+		std::shared_ptr<Chunk> getChunkOfKey(const ChunkKey& ck);
+		std::shared_ptr<Chunk> getChunkOfKey_not_sure(const ChunkKey& ck);
 		void loop();
 	};
+
+	//class ChunkConstructThread :public FRunnable
+	//{
+	//public:
+	//	//  var
+	//	SafeQueue<std::weak_ptr<Chunk>> chunks2construct;
+	//	ChunkManager* chunkManager;
+	//	bool stopping = false;
+	//	//  func
+	//	ChunkConstructThread(ChunkManager* cm)
+	//	{
+	//		chunkManager = cm;
+	//	}
+	//	virtual bool Init() override { return true; }
+	//	virtual uint32 Run() override;
+
+	//	virtual void Stop() override
+	//	{
+	//		stopping = true;
+	//	}
+
+	//	virtual void Exit() override { }
+	//	~ChunkConstructThread() {}
+	//};
 }
 
 

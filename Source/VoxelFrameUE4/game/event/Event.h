@@ -1,7 +1,21 @@
-#pragma once
-#include <mutex>
 
+namespace VF
+{
+	namespace _Event
+	{
+		class IEvent;
+		class EventList;
+	}
+}
+
+#ifndef __Event_H_
+#define __Event_H_
 #include "VF_Base.h"
+namespace VF
+{
+	class GameContext;
+}
+
 namespace VF
 {
 	namespace _Event
@@ -9,7 +23,7 @@ namespace VF
 		class IEvent
 		{
 		public:
-			virtual void run() = 0;
+			virtual void run(GameContext& context) {};
 		};
 
 		class EventList
@@ -41,3 +55,4 @@ namespace VF
 		};
 	}
 }
+#endif

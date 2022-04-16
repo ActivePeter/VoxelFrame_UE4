@@ -1,14 +1,21 @@
-class BlockMesh_Base;
-#ifndef ___BLOCKMESH_BASE_H__
-#define ___BLOCKMESH_BASE_H__
+//class BlockMesh_Base;
+//#ifndef ___BLOCKMESH_BASE_H__
+//#define ___BLOCKMESH_BASE_H__
+#pragma once
 
 #include "../block.h"
 #include "VF_Base.h"
+#include "game/Chunk.h"
+#include "game/mesh.h"
+#include "game/texture_man.h"
 
 namespace VF
 {
 	namespace _Block
 	{
+		class BlockUVSetter_Base;
+		//void conv_block_vector_from_selfpos_2_ue_world_pos(FVector& selfpos, );
+		//void conv_block_vector_from_selfpos_2_ue_world_pos(FVector& selfpos, PositionInfoInChunk);
 		class BlockMesh_Base
 		{
 		public:
@@ -21,15 +28,15 @@ namespace VF
 			 * 获取方块所有的网格三角形(以vertex序列和index序列表示)
 			*/
 			//virtual void getBlockValidTriangles(std::vector<Type::Vec3F>& vertexPoses, _Graph::Indices& indices) = 0;
-
+			void conv_local_vertex_2_ue_world_pos(PositionInfoInChunk::OfIPos& block_p, VFVec3F& vertex);
 			/**
 			 * 获取某一面的顶点信息到序列里
 			 *  （相对方块自身的坐标
 			*/
 			virtual void pushOneFaceVerticesAndIndices_selfPos(
 				_Block::FaceDirection dir,
-				Type::Array<Type::Vec3F>& vertexPoses,
-				Type::Array<int32>& indices, unsigned int vertexIndexOffset) = 0;
+				MeshConstructData& mesh_construct, PositionInfoInChunk::OfIPos& block_p_in_chunk,
+				BlockUVSetter_Base& uv_setter, TextureManager& texture_man) = 0;
 
 			/**************************************
 			 * 方块基础信息1,判断某个方向是否有标准类型面
@@ -40,4 +47,4 @@ namespace VF
 	}
 }
 
-#endif // ___BLOCKMESH_BASE_H__
+//#endif // ___BLOCKMESH_BASE_H__

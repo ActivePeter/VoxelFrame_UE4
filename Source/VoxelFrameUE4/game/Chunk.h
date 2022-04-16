@@ -3,13 +3,14 @@
 #pragma once
 #include "VF_Base.h"
 #include "parallel_hashmap/phmap.h"
+#include "mesh.h"
 
 namespace VF
 {
 	//const int ChunkLoadRange;
 	struct ChunkKey
 	{
-		Type::Vec3I keyData;
+		_type::Vec3I keyData;
 		bool operator==(const ChunkKey& o) const
 		{
 			return keyData == o.keyData;
@@ -19,15 +20,15 @@ namespace VF
 			return phmap::HashState().combine(0, p.keyData.X, p.keyData.Y, p.keyData.Z);
 		}
 
-		inline int32 x()
+		inline int32 x() const
 		{
 			return keyData.X;
 		}
-		inline int32 y()
+		inline int32 y() const
 		{
 			return keyData.Y;
 		}
-		inline int32 z()
+		inline int32 z() const
 		{
 			return keyData.Z;
 		}
@@ -36,11 +37,15 @@ namespace VF
 			keyData = { x,y,z };
 		}
 		ChunkKey() {}
+
+		static ChunkKey from_ue_point(VFVec3F ue_p);
+		static ChunkKey from_vf_point(VFVec3F vf_p);
 	};
 	struct ChunkData
 	{
 		ChunkKey chunkKey;
-		char dataSet[VF_ChunkSize];
+		//char dataSet[VF_ChunkSize];
+		std::string dataSet;
 	};
 
 	/**
@@ -52,25 +57,13 @@ namespace VF
 		//about mesh
 		int meshId = -1;
 
-		/**
-		 * 顶点
-		 */
-		TArray<FVector> vertices;
+		MeshConstructData mesh_construct_data;
 
-		/**
-		 * 顶点索引三角形
-		 */
-		TArray<int32> triangles;
-
-		/**
-		 * 需要构造
-		 */
-		bool needConstruct = true;
 		void unbindMesh()
 		{
 			meshId = -1;
 		}
-		inline void getChunkWorldPos(Type::Vec3F& return_pos)
+		inline void getChunkWorldPos(_type::Vec3F& return_pos)
 		{
 			return_pos.X = chunkData.chunkKey.x() * (VF_ChunkWidth);
 			return_pos.Y = chunkData.chunkKey.y() * (VF_ChunkWidth);
@@ -90,7 +83,13 @@ namespace VF
 			assert(index < VF_ChunkSize);
 			return chunkData.dataSet[index];
 		}
-		Chunk(const ChunkKey& ck);
+		inline void call_after_edit()
+		{
+			mesh_construct_data.needConstruct = true;
+		}
+		Chunk(const ChunkKey& ck, std::string& chunk_data);
+		Chunk(const ChunkKey& ck) {}
+		Chunk() {}
 		//public:
 		//Chunk();
 		~Chunk();
@@ -98,40 +97,50 @@ namespace VF
 
 	namespace PositionInfoInChunk
 	{
-		template <typename VecType>
-		struct Result
+		//template <typename VecType>
+		struct OfIPos
 		{
 			ChunkKey chunkKey;
-			VecType p;
+			VFVec3I pos;//in chunk pos
+			OfIPos(ChunkKey& ck1, VFVec3I pos1) :chunkKey(ck1), pos(pos1) {}
+			static OfIPos from_vf_pos(const VFVec3I& pos);
 		};
-		template <typename VecType>
-		Result<VecType> fromVfPoint(const VecType& pos)
-		{
-			Result<VecType> r;
 
-			auto& chunkP = r.chunkKey.keyData;
-			{ //1. recalc chunk pos
-				if (pos.X >= 0) {
-					chunkP.X = (int)pos.X / (VF_ChunkWidth);
-				}
-				else {
-					chunkP.X = ((int)pos.X / (VF_ChunkWidth)) - 1;
-				}
-				if (pos.Y >= 0) {
-					chunkP.Y = (int)pos.Y / (VF_ChunkWidth);
-				}
-				else {
-					chunkP.Y = ((int)pos.Y / (VF_ChunkWidth)) - 1;
-				}
-				if (pos.Z >= 0) {
-					chunkP.Z = (int)pos.Z / (VF_ChunkWidth);
-				}
-				else {
-					chunkP.Z = ((int)pos.Z / (VF_ChunkWidth)) - 1;
-				}
-			}
-			r.p = pos - VecType(chunkP.X * VF_ChunkWidth, chunkP.Y * VF_ChunkWidth, chunkP.Z * VF_ChunkWidth);
-			return r;
-		}
+		struct OfFPos
+		{
+			ChunkKey chunkKey;
+			VFVec3F pos;
+			OfFPos(ChunkKey& ck1, VFVec3F pos1) :chunkKey(ck1), pos(pos1) {}
+			static OfFPos from_vf_pos(const VFVec3F& pos);
+		};
+		//template <typename VecType>
+		//Type<VecType> fromVfPoint(const VecType& pos)
+		//{
+		//	Result<VecType> r;
+
+		//	auto& chunkP = r.chunkKey.keyData;
+		//	{ //1. recalc chunk pos
+		//		if (pos.X >= 0) {
+		//			chunkP.X = (int)pos.X / (VF_ChunkWidth);
+		//		}
+		//		else {
+		//			chunkP.X = ((int)pos.X / (VF_ChunkWidth)) - 1;
+		//		}
+		//		if (pos.Y >= 0) {
+		//			chunkP.Y = (int)pos.Y / (VF_ChunkWidth);
+		//		}
+		//		else {
+		//			chunkP.Y = ((int)pos.Y / (VF_ChunkWidth)) - 1;
+		//		}
+		//		if (pos.Z >= 0) {
+		//			chunkP.Z = (int)pos.Z / (VF_ChunkWidth);
+		//		}
+		//		else {
+		//			chunkP.Z = ((int)pos.Z / (VF_ChunkWidth)) - 1;
+		//		}
+		//	}
+		//	r.p = pos - VecType(chunkP.X * VF_ChunkWidth, chunkP.Y * VF_ChunkWidth, chunkP.Z * VF_ChunkWidth);
+		//	return r;
+		//}
 	}
 }
