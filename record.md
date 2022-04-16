@@ -1,20 +1,70 @@
 开发具体过程记录
 
+#### 2022/4/15
+
+重构网格构建部分的代码，结果出bug了。找了大半天bug，发现是计算方块世界坐标那里错了
+
+
+
 #### 2022/4/13
+
+- todo
+
+  - 方块材质
+
+    - 1.读取图片文件
+
+      - [FFileHelper | Unreal Engine Documentation](https://docs.unrealengine.com/4.27/en-US/API/Runtime/Core/Misc/FFileHelper/)
+
+      - [ LoadFileToArray](https://docs.unrealengine.com/4.27/en-US/API/Runtime/Core/Misc/FFileHelper/LoadFileToArray/1/index.html)
+
+      - [FPaths | Unreal Engine Documentation](https://docs.unrealengine.com/4.27/en-US/API/Runtime/Core/Misc/FPaths/)
+
+      - 需要获取文件夹下的文件列表，通过FFileManagerGeneric
+
+        - ```c++
+          FFileManagerGeneric::Get().FindFiles(block_textures,
+          			*block_texture_dir, TEXT(".png"));
+          ```
+
+      - 文件命名
+
+        - 方块uv类型：目前有一种，UpSideDown
+        - Grass_Up.png Grass_Down.png Grass_Side.png
+
+    - 2.图片拼接stb_image
+
+      - 使用了一个cpp封装stbipp
+      - 
+
+  - 
 
 #### 2022/4/12
 
 - mainplayer同步策略
+
   - sync to server
+
     - 玩家主动操作中，将对应数据更新到NetSyncData 组件中
     - ecs系统每帧判断玩家是否做了主动操作，如果有，则将玩家当前状态发给服务器，
       - 判断结束记得清空
+
   - sync from server
+
     - ps_check_entity_move
+
       - part server会轮询entity是否发生位置变动，若发生，会加入到map中，并在帧结尾的ecs sys中一次性发给客户端
+
     - 暂时全部直接赋值（传递来的数据是vf_坐标，赋值到ue需要转换）
+
       - 目前的缺点，直接矫正造成的主角操纵不流畅
+
     - todo
+
+      参考文献：[How do multiplayer games sync their state? Part 1 | by Qing Wei Lim | Medium](https://medium.com/@qingweilim/how-do-multiplayer-games-sync-their-state-part-1-ab72d6a54043)
+
+      提到了reconcilation
+
       - 如果为mainplayer，
         - 
       - 如果为普通entity，直接赋值
