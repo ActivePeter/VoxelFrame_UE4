@@ -3376,6 +3376,189 @@ impl ::protobuf::reflect::ProtobufValue for ClientOperationSucc {
     }
 }
 
+#[derive(PartialEq,Clone,Default)]
+pub struct RemoveEntity {
+    // message fields
+    pub remove_type: RemoveEntityType,
+    pub entity_id: u32,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a RemoveEntity {
+    fn default() -> &'a RemoveEntity {
+        <RemoveEntity as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl RemoveEntity {
+    pub fn new() -> RemoveEntity {
+        ::std::default::Default::default()
+    }
+
+    // .RemoveEntityType remove_type = 1;
+
+
+    pub fn get_remove_type(&self) -> RemoveEntityType {
+        self.remove_type
+    }
+    pub fn clear_remove_type(&mut self) {
+        self.remove_type = RemoveEntityType::killed;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_remove_type(&mut self, v: RemoveEntityType) {
+        self.remove_type = v;
+    }
+
+    // uint32 entity_id = 2;
+
+
+    pub fn get_entity_id(&self) -> u32 {
+        self.entity_id
+    }
+    pub fn clear_entity_id(&mut self) {
+        self.entity_id = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_entity_id(&mut self, v: u32) {
+        self.entity_id = v;
+    }
+}
+
+impl ::protobuf::Message for RemoveEntity {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_proto3_enum_with_unknown_fields_into(wire_type, is, &mut self.remove_type, 1, &mut self.unknown_fields)?
+                },
+                2 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.entity_id = tmp;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if self.remove_type != RemoveEntityType::killed {
+            my_size += ::protobuf::rt::enum_size(1, self.remove_type);
+        }
+        if self.entity_id != 0 {
+            my_size += ::protobuf::rt::value_size(2, self.entity_id, ::protobuf::wire_format::WireTypeVarint);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if self.remove_type != RemoveEntityType::killed {
+            os.write_enum(1, ::protobuf::ProtobufEnum::value(&self.remove_type))?;
+        }
+        if self.entity_id != 0 {
+            os.write_uint32(2, self.entity_id)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> RemoveEntity {
+        RemoveEntity::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeEnum<RemoveEntityType>>(
+                "remove_type",
+                |m: &RemoveEntity| { &m.remove_type },
+                |m: &mut RemoveEntity| { &mut m.remove_type },
+            ));
+            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                "entity_id",
+                |m: &RemoveEntity| { &m.entity_id },
+                |m: &mut RemoveEntity| { &mut m.entity_id },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<RemoveEntity>(
+                "RemoveEntity",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static RemoveEntity {
+        static instance: ::protobuf::rt::LazyV2<RemoveEntity> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(RemoveEntity::new)
+    }
+}
+
+impl ::protobuf::Clear for RemoveEntity {
+    fn clear(&mut self) {
+        self.remove_type = RemoveEntityType::killed;
+        self.entity_id = 0;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for RemoveEntity {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for RemoveEntity {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
 #[derive(Clone,PartialEq,Eq,Debug,Hash)]
 pub enum ClientType {
     ClientType_GameServer = 0,
@@ -3476,6 +3659,59 @@ impl ::protobuf::reflect::ProtobufValue for EntityType {
     }
 }
 
+#[derive(Clone,PartialEq,Eq,Debug,Hash)]
+pub enum RemoveEntityType {
+    killed = 0,
+    disco = 1,
+    clear = 2,
+}
+
+impl ::protobuf::ProtobufEnum for RemoveEntityType {
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<RemoveEntityType> {
+        match value {
+            0 => ::std::option::Option::Some(RemoveEntityType::killed),
+            1 => ::std::option::Option::Some(RemoveEntityType::disco),
+            2 => ::std::option::Option::Some(RemoveEntityType::clear),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    fn values() -> &'static [Self] {
+        static values: &'static [RemoveEntityType] = &[
+            RemoveEntityType::killed,
+            RemoveEntityType::disco,
+            RemoveEntityType::clear,
+        ];
+        values
+    }
+
+    fn enum_descriptor_static() -> &'static ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            ::protobuf::reflect::EnumDescriptor::new_pb_name::<RemoveEntityType>("RemoveEntityType", file_descriptor_proto())
+        })
+    }
+}
+
+impl ::std::marker::Copy for RemoveEntityType {
+}
+
+impl ::std::default::Default for RemoveEntityType {
+    fn default() -> Self {
+        RemoveEntityType::killed
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for RemoveEntityType {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Enum(::protobuf::ProtobufEnum::descriptor(self))
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0ccommon.proto\"F\n\x12ClientFirstConfirm\x12.\n\x0bclient_type\x18\
     \x01\x20\x01(\x0e2\x0b.ClientTypeR\nclientTypeB\0:\0\"\xfa\x01\n\tEntity\
@@ -3515,10 +3751,14 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x18\x01\x20\x01(\rR\x06taskIdB\0\x12\x1b\n\x08put_succ\x18\x02\x20\x01(\
     \rR\x07putSuccB\0:\0\">\n\x15ClientOperationFailed\x12#\n\x0coperation_i\
     d\x18\x01\x20\x01(\rR\x0boperationIdB\0:\0\"<\n\x13ClientOperationSucc\
-    \x12#\n\x0coperation_id\x18\x01\x20\x01(\rR\x0boperationIdB\0:\0*@\n\nCl\
-    ientType\x12\x19\n\x15ClientType_GameServer\x10\0\x12\x15\n\x11ClientTyp\
-    e_Player\x10\x01\x1a\0*(\n\nEntityType\x12\n\n\x06T_Null\x10\0\x12\x0c\n\
-    \x08T_Player\x10\x01\x1a\0B\0b\x06proto3\
+    \x12#\n\x0coperation_id\x18\x01\x20\x01(\rR\x0boperationIdB\0:\0\"e\n\
+    \x0cRemoveEntity\x124\n\x0bremove_type\x18\x01\x20\x01(\x0e2\x11.RemoveE\
+    ntityTypeR\nremoveTypeB\0\x12\x1d\n\tentity_id\x18\x02\x20\x01(\rR\x08en\
+    tityIdB\0:\0*@\n\nClientType\x12\x19\n\x15ClientType_GameServer\x10\0\
+    \x12\x15\n\x11ClientType_Player\x10\x01\x1a\0*(\n\nEntityType\x12\n\n\
+    \x06T_Null\x10\0\x12\x0c\n\x08T_Player\x10\x01\x1a\0*6\n\x10RemoveEntity\
+    Type\x12\n\n\x06killed\x10\0\x12\t\n\x05disco\x10\x01\x12\t\n\x05clear\
+    \x10\x02\x1a\0B\0b\x06proto3\
 ";
 
 static file_descriptor_proto_lazy: ::protobuf::rt::LazyV2<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::rt::LazyV2::INIT;

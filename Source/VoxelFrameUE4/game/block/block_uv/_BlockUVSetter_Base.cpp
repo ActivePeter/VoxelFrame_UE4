@@ -1,7 +1,7 @@
 #include "_BlockUVSetter_Base.h"
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		//对应基础类型方块的网格设置uv
 		void BlockUVSetter_Base::setFaceUVsByTextureIndex(TextureManager& texture_man, VFArray<FVector2D>& uvs, int textureIndex)

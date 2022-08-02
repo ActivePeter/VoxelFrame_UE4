@@ -10,7 +10,7 @@ namespace VF
 		{
 			this->IOperation_do_act([&ctx, this]()
 				{
-					auto changer = _Block::BlockDataChanger(ctx);
+					auto changer = _block::BlockDataChanger(ctx);
 					this->from = changer
 						.set_block_data(
 							this->x, this->y, this->z,
@@ -25,7 +25,7 @@ namespace VF
 		{
 			this->IOperation_do_cancel([&ctx, this]()
 				{
-					_Block::BlockDataChanger(ctx)
+					_block::BlockDataChanger(ctx)
 						.set_block_data(
 							this->x, this->y, this->z,
 							this->from);

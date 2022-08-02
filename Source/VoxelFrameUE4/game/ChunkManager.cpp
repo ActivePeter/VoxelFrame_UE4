@@ -3,6 +3,22 @@
 
 namespace VF
 {
+	namespace _chunkman_ecs_sys
+	{
+		void _sys_common_update(ContextId& cid);
+		void regist_all(GameContext& ctx, ChunkManager& cman)
+		{
+			auto& ecs = ctx.ecs;
+			ecs.scene->addSys2Group(
+				ecs.commonUpdateSys, _sys_common_update
+			);
+		}
+
+		void _sys_common_update(ContextId& cid)
+		{
+			cid.get()->chunkManager->constructsome();
+		}
+	}
 	ChunkManager::ChunkManager()
 	{
 		oldPlayerChunkPos = VFVec3I(9999, -9999, 9999);
@@ -37,7 +53,10 @@ namespace VF
 	void ChunkManager::IVF_Obj_init(ContextId id) {
 		IVF_Obj::IVF_Obj_init(id);
 	}
-	void ChunkManager::IVF_Obj_begin() {}
+	void ChunkManager::IVF_Obj_begin()
+	{
+		_chunkman_ecs_sys::regist_all(*this->get_context(), *this);
+	}
 	void ChunkManager::IVF_Obj_end() {}
 	////////////////////////////////////
 
@@ -54,10 +73,10 @@ namespace VF
 		int blockx_p, int blocky_p, int blockz_p,
 		//   uint8_t &block,
 		//   uint8_t &block_p,
-		_Block::BlockTypeInfo& Info,
-		_Block::BlockTypeInfo& Info_p,
-		_Block::FaceDirection posDir,
-		_Block::FaceDirection negDir, Chunk& chunk)
+		_block::BlockTypeInfo& Info,
+		_block::BlockTypeInfo& Info_p,
+		_block::FaceDirection posDir,
+		_block::FaceDirection negDir, Chunk& chunk)
 	{
 
 		/*VFVec3F chunkWorldPos;
@@ -74,7 +93,7 @@ namespace VF
 				posDir, chunk.mesh_construct_data, block_pos,
 				*Info.blockUVSetter, texture_man
 			);
-			//_Block::pushOneFace2Chunk(chunkWorldPos, blockx, blocky, blockz, Info, posDir, chunk.vertices, chunk.triangles);
+			//_block::pushOneFace2Chunk(chunkWorldPos, blockx, blocky, blockz, Info, posDir, chunk.vertices, chunk.triangles);
 		}
 		//x为空 x+1为实,添加朝x负向的面
 		else if (Info.isEmptyBlock() &&
@@ -90,7 +109,7 @@ namespace VF
 					*Info_p.blockUVSetter, texture_man
 				);
 			}
-			//_Block::pushOneFace2Chunk(chunkWorldPos, blockx_p, blocky_p, blockz_p, Info_p, negDir, chunk.vertices, chunk.triangles);
+			//_block::pushOneFace2Chunk(chunkWorldPos, blockx_p, blocky_p, blockz_p, Info_p, negDir, chunk.vertices, chunk.triangles);
 		}
 	}
 
@@ -101,79 +120,135 @@ namespace VF
 		arr.Add(index2);
 		arr.Add(index3);
 	}*/
-
+	tl::optional<char> ChunkManager::try_read_blockdata_in_chunk(
+		_type::Vec3I&& p, Chunk& chunk)
+	{
+		if (chunk.block_pos_valid(p))
+		{
+			return chunk.readData(p.X, p.Y, p.Z);
+		}
+		return tl::nullopt;
+	}
 	void ChunkManager::constructMeshForChunk(Chunk& chunk)
 	{
-		if (!chunk.mesh_construct_data.needConstruct)
+		/*if (!chunk.mesh_construct_data.needConstruct)
 		{
 			return;
-		}
+		}*/
 		chunk.mesh_construct_data.before_construct();
 		//chunk.needConstruct = false;
+		auto ckkeyup_x = chunk.chunkData.chunkKey;
+		auto ckkeyup_y = chunk.chunkData.chunkKey;
+		auto ckkeyup_z = chunk.chunkData.chunkKey;
+		ckkeyup_x.keyData.X += 1;
+		ckkeyup_y.keyData.Y += 1;
+		ckkeyup_z.keyData.Z += 1;
+		auto chunkup_x = try_get_chunk_by_ck(ckkeyup_x);
+		auto chunkup_y = try_get_chunk_by_ck(ckkeyup_y);
+		auto chunkup_z = try_get_chunk_by_ck(ckkeyup_z);
 
-		//chunk.triangles.SetNum(0);
-		//chunk.vertices.SetNum(0);
-		//chunk.triangles
-			//vertices.clear();
-
-			//auto blockManager = App::getInstance().gamePtr->blockManager;
-		//遍历区块
-		//VF_LogWarning("construct chunk %d %d %d",
-		//	chunk.chunkData.chunkKey.x(),
-		//	chunk.chunkData.chunkKey.y(),
-		//	chunk.chunkData.chunkKey.z()
-		//);
-
-		for (int x = 0; x < VF_ChunkWidth - 1; x++)
+		auto wrap_one_dir = [&](int x_y_z, int x, int y, int z,
+			_type::Vec3I off,
+			tl::optional<Chunk&>& chunkup)->char
 		{
-			for (int y = 0; y < VF_ChunkWidth - 1; y++)
+			char _block_p = 0;
+			if (x_y_z == VF_ChunkWidth - 1)
 			{
-				for (int z = 0; z < VF_ChunkWidth - 1; z++)
+				//不在范围内+1不一定读到
+				if (chunkup)
 				{
-					//标准方块8个点序列对应的在区块中的索引
-					// uint32_t _8points[8] = {
-					//     getIndexByPos(x + 0, y + 0, z + 0),
-					//     getIndexByPos(x + 1, y + 0, z + 0),
-					//     getIndexByPos(x + 0, y + 1, z + 0),
-					//     getIndexByPos(x + 0, y + 0, z + 1),
-					//     getIndexByPos(x + 1, y + 1, z + 0),
-					//     getIndexByPos(x + 0, y + 1, z + 1),
-					//     getIndexByPos(x + 1, y + 0, z + 1),
-					//     getIndexByPos(x + 1, y + 1, z + 1),
-					// };
+					auto p = _type::Vec3I(x, y, z) + off;
+					p.X %= VF_ChunkWidth; p.Y %= VF_ChunkWidth; p.Z %= VF_ChunkWidth;
+					//在范围内+1必然读到
+					auto _res = this->try_read_blockdata_in_chunk(
+						std::move(p), *chunkup);
+					//VF_assert(_res);
+					if (_res)
+					{
+						_block_p = *_res;
+					}
+					else
+					{
+						VF_LogWarning("block_should be found %d %d %d", p.X, p.Y, p.Z);
+					}
+				}
+				else
+				{
+					_block_p = (char)_block::StaticBlockID::Empty;
+				}
+			}
+			else
+			{
+				auto p = _type::Vec3I(x, y, z) + off;
+				//在范围内+1必然读到
+				auto _res = try_read_blockdata_in_chunk(
+					_type::Vec3I(x, y, z) + off, chunk);
+				//VF_assert(_res);
+				if (_res)
+				{
+					_block_p = *_res;
+				}
+				else
+				{
+					VF_LogWarning("block_should be found2 %d %d %d", p.X, p.Y, p.Z);
+				}
+			}
+			return _block_p;
+		};
 
-					auto _block = chunk.readData(x, y, z);
-					auto& Info = get_context()->blockManager->getInfo(_block);
+		//边界需要判断边缘区块，若边缘区块不存在，后续区块载入时，提醒边缘区块更新
+		for (int x = 0; x < VF_ChunkWidth; x++)
+		{
+			for (int y = 0; y < VF_ChunkWidth; y++)
+			{
+				for (int z = 0; z < VF_ChunkWidth; z++)
+				{
+					{
+						char _block_p = wrap_one_dir(x, x, y, z, _type::Vec3I(1, 0, 0), chunkup_x);
 
-					auto _block_p = chunk.readData(x + 1, y, z);
-					auto& Info_p_x = get_context()->blockManager->getInfo(_block_p);
-					constructMeshInOneDim(
-						*get_context()->taxture_man,
-						x, y, z,
-						x + 1, y, z,
-						//   _block, _block_p,
-						Info, Info_p_x,
-						_Block::FaceDirection::X_Positive, _Block::FaceDirection::X_Negative, chunk);
+						auto _block = chunk.readData(x, y, z);
+						auto& Info = get_context()->blockManager->getInfo(_block);
+						//auto _block_p = chunk.readData(x + 1, y, z);
+						auto& Info_p_x = get_context()->blockManager->getInfo(_block_p);
+						constructMeshInOneDim(
+							*get_context()->taxture_man,
+							x, y, z,
+							x + 1, y, z,
+							//   _block, _block_p,
+							Info, Info_p_x,
+							_block::FaceDirection::X_Positive, _block::FaceDirection::X_Negative, chunk);
+					}
+					{
 
-					_block_p = chunk.readData(x, y + 1, z);
-					auto& Info_p_y = get_context()->blockManager->getInfo(_block_p);
-					constructMeshInOneDim(
-						*get_context()->taxture_man,
-						x, y, z,
-						x, y + 1, z,
-						//   _block, _block_p,
-						Info, Info_p_y,
-						_Block::FaceDirection::Y_Positive, _Block::FaceDirection::Y_Negative, chunk);
+						char _block_p = wrap_one_dir(y, x, y, z, _type::Vec3I(0, 1, 0), chunkup_y);
 
-					_block_p = chunk.readData(x, y, z + 1);
-					auto& Info_p_z = get_context()->blockManager->getInfo(_block_p);
-					constructMeshInOneDim(
-						*get_context()->taxture_man,
-						x, y, z,
-						x, y, z + 1,
-						//   _block, _block_p,
-						Info, Info_p_z,
-						_Block::FaceDirection::Z_Positive, _Block::FaceDirection::Z_Negative, chunk);
+						auto _block = chunk.readData(x, y, z);
+						auto& Info = get_context()->blockManager->getInfo(_block);
+						//_block_p = chunk.readData(x, y + 1, z);
+						auto& Info_p_y = get_context()->blockManager->getInfo(_block_p);
+						constructMeshInOneDim(
+							*get_context()->taxture_man,
+							x, y, z,
+							x, y + 1, z,
+							//   _block, _block_p,
+							Info, Info_p_y,
+							_block::FaceDirection::Y_Positive, _block::FaceDirection::Y_Negative, chunk);
+					}
+					{
+						char _block_p = wrap_one_dir(z, x, y, z, _type::Vec3I(0, 0, 1), chunkup_z);
+
+						auto _block = chunk.readData(x, y, z);
+						auto& Info = get_context()->blockManager->getInfo(_block);
+						//_block_p = chunk.readData(x, y, z + 1);
+						auto& Info_p_z = get_context()->blockManager->getInfo(_block_p);
+						constructMeshInOneDim(
+							*get_context()->taxture_man,
+							x, y, z,
+							x, y, z + 1,
+							//   _block, _block_p,
+							Info, Info_p_z,
+							_block::FaceDirection::Z_Positive, _block::FaceDirection::Z_Negative, chunk);
+					}
 				}
 			}
 		}
@@ -217,15 +292,65 @@ namespace VF
 
 
 	}
+
+
+	void ChunkManager::add_chunk_2_construct(const ChunkKey& ck)
+	{
+		auto chunk_ = try_get_chunk_by_ck(ck);
+		if (chunk_)
+		{
+			auto& chunk = *chunk_;
+			if (chunk.add_construct_disc)
+			{
+				(*chunk.add_construct_disc).ms = _util::timestamp();
+			}
+			else
+			{
+				chunk.add_construct_disc =
+					AddConstructDisc(_util::timestamp());
+			}
+
+			this->_chunks_2_construct.insert(ck);
+		}
+	}
+	void ChunkManager::constructsome()
+	{
+		std::vector<ChunkKey> removed(this->_chunks_2_construct.size());
+		//如果到时间，且没有正在构建，则调用asyncConstructMeshForChunk
+		for (auto& ck : this->_chunks_2_construct)
+		{
+			auto c_ = this->try_get_chunk_by_ck(ck);
+			if (c_)
+			{
+				auto& c = *c_;
+				if (c.add_construct_disc
+					//&& (*c.add_construct_disc).ms > 50 
+					&& !c.is_constructing)
+				{
+					auto cptr = try_get_chunkptr_by_ck(ck);
+					asyncConstructMeshForChunk(*cptr);
+					c.is_constructing = true;
+					c.add_construct_disc = tl::nullopt;
+					removed.push_back(ck);
+				}
+			}
+		}
+		for (auto& ck : removed)
+		{
+			this->_chunks_2_construct.erase(ck);
+		}
+	}
 	void ChunkManager::asyncConstructMeshForChunk(std::shared_ptr<Chunk>& chunk2Draw)
 	{
+
 		//chunkConstructThread->chunks2construct.en_queue(MoveTemp(chunk2Draw));
 		AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask,
 			[this, chunk2Draw]()
 			{
 				//VF_LogWarning("asyncConstructMeshForChunk");
-				assert(chunk2Draw.lock());
+				//assert(chunk2Draw.lock());
 				constructMeshForChunk(*chunk2Draw);
+				chunk2Draw->is_constructing = false;
 
 				chunkCookMutex.Lock();
 				chunks2Cook.emplace_back(chunk2Draw);
@@ -235,57 +360,6 @@ namespace VF
 	}
 	void ChunkManager::checkPlayerChunkPosChange(const VFVec3F& curPlayerPos)
 	{
-		//auto curPlayerChunkPos = PositionInfoInChunk::fromVfPoint(curPlayerPos).chunkKey.keyData;
-		//if (curPlayerChunkPos != oldPlayerChunkPos)
-		//{
-		//	for (int i = 0; i < chunks2Draw.size(); i++) {
-		//		auto chunk2draw = chunks2Draw[i].lock();
-		//		if (chunk2draw) {
-
-		//			//不在范围内,即旧区块,从graph的绘制列表中拿出
-		//			//并加入销毁列表
-		//			if (!isChunkInRange(chunk2draw->chunkData.chunkKey, curPlayerChunkPos.X, curPlayerChunkPos.Y, curPlayerChunkPos.Z)) {
-		//				/*App::getInstance().graphPtr->meshes2draw.erase(chunks2Draw[i].get());
-		//				chunksDestroyQuene.push_back(chunks2Draw[i]);*/
-		//				auto key = chunk2draw->chunkData.chunkKey;
-		//				//UE_LOG(LogTemp, Warning, TEXT("mesh del %d %d %d"), key.x(), key.y(), key.z());
-		//				context->meshManager->delMeshWithId(chunk2draw->meshId);
-		//				chunk2draw->unbindMesh();
-		//			}
-		//			else {
-		//				/*printf("%-2d %-2d %-2d,", player.chunkX - chunks2Draw[i]->key.x, player.chunkY - chunks2Draw[i]->key.y, player.chunkZ - chunks2Draw[i]->key.z);*/
-		//			}
-		//		}
-		//	}
-		//	//遍历球体范围的区块
-		//	for (int i = 0; i < inRangeChunksRelativePos.size(); i++) {
-		//		auto& cur = inRangeChunksRelativePos[i];
-		//		auto chunk2Draw = getChunkOfKey(
-		//			ChunkKey(
-		//				curPlayerChunkPos.X + cur.x(),
-		//				curPlayerChunkPos.Y + cur.y(),
-		//				curPlayerChunkPos.Z + cur.z()
-		//			)
-		//		);
-		//		chunks2Draw[i] = chunk2Draw;
-		//		//chunkPtr = chunk2Draw.get(;
-
-		//		//App::getInstance().graphPtr->meshes2draw.emplace(chunks2Draw[i].get());
-
-		//		asyncConstructMeshForChunk(chunk2Draw);
-
-		//		//threadPool2BuildChunkMeshes->enqueue(
-		//		//	[](std::shared_ptr<Chunk> chunkPtr) { // Chunk *chunkPtr)
-		//		//		// chunkPtr->dataMut.lock();
-		//		//		chunkPtr->constructMesh();
-		//		//		// chunkPtr->dataMut.unlock();
-		//		//	},
-		//		//	chunk2Draw);
-		//		//chunks2Draw[i]->constructMesh();
-		//	}
-
-		//}
-		//oldPlayerChunkPos = curPlayerChunkPos;
 	}
 
 	void ChunkManager::cookOneChunk()
@@ -331,8 +405,21 @@ namespace VF
 	{
 		auto a = std::make_shared < Chunk>(ck, chunk_data);
 		chunkKey2chunksMap[ck] = a;
+		ChunkKey keys[3];
+		//更新xyz负向区块
+		keys[0] = ck;
+		keys[0].keyData.X -= 1;
+		keys[1] = ck;
+		keys[1].keyData.Y -= 1;
+		keys[2] = ck;
+		keys[2].keyData.Z -= 1;
+		for (auto& k : keys)
+		{
+			add_chunk_2_construct(k);
+		}
 		//auto b = (std::weak_ptr<Chunk>)a;
-		asyncConstructMeshForChunk(a);
+		//asyncConstructMeshForChunk(a);
+		add_chunk_2_construct(ck);
 		return a;
 	}
 

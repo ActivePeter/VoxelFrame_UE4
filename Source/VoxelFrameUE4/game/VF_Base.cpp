@@ -56,6 +56,15 @@ namespace VF
 	}
 
 	namespace _util {
+		uint64_t timestamp()
+		{
+			{
+				FDateTime Time = FDateTime::Now();
+				//获取时间戳
+				return Time.ToUnixTimestamp();
+			}
+		}
+
 		bool is_rough_zero(const FVector& vector)
 		{
 			return vector.Size() < VF_RoughEpsilon;

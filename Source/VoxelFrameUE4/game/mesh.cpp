@@ -9,7 +9,7 @@ namespace VF
 			vertices.SetNum(0);
 			triangles.SetNum(0);
 			uvs.SetNum(0);
-			needConstruct = false;
+			//needConstruct = false;
 		}
 	}
 

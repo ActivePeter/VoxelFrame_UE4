@@ -2,7 +2,7 @@
 #define BlockEnums
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		enum class FaceDirection
 		{
@@ -13,6 +13,10 @@ namespace VF
 			Z_Positive,
 			Z_Negative,
 			End,
+		};
+		enum class StaticBlockID
+		{
+			Empty
 		};
 	}
 }
@@ -30,7 +34,7 @@ namespace VF
 {
 	class GameContext;
 
-	namespace _Block
+	namespace _block
 	{
 		// #pragma once
 
@@ -168,10 +172,10 @@ namespace VF
 		//  *
 		//  * 网格是区块网格，所以要加上方块的坐标作为顶点的偏移
 		//  * ***************************************/
-		/*void pushOneFace2Chunk(const VFVec3F& chunkMeshPos, int blockx, int blocky, int blockz, _Block::BlockTypeInfo& info, _Block::FaceDirection dir,
+		/*void pushOneFace2Chunk(const VFVec3F& chunkMeshPos, int blockx, int blocky, int blockz, _block::BlockTypeInfo& info, _block::FaceDirection dir,
 			VFArray<VFVec3F>& vertexPoses,
 			VFArray<int32>& indices, VFArray<FVector2D>& uvs, TextureManager& texture_man);*/
-			//void pushOneFace2Mesh(int blockx, int blocky, int blockz, Info& Info, _Block::FaceDirection dir, _Graph::Mesh& mesh);
+			//void pushOneFace2Mesh(int blockx, int blocky, int blockz, Info& Info, _block::FaceDirection dir, _Graph::Mesh& mesh);
 
 		struct BlockDataChanger
 		{

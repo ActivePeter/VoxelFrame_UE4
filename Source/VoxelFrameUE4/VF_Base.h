@@ -18,6 +18,7 @@
 #include "CoreMinimal.h"
 #include <cassert>
 #include <mutex>
+#include "tl/optional.hpp"
 
 #include "google/protobuf/message.h"
 #include "stbipp/Image.hpp"
@@ -98,11 +99,10 @@ namespace VF
 			Z,
 			No
 		};
-
-
 		BlockGridSide checkPointUEOnBlockGridSide(const _type::Vec3F& p);
 	}
 	namespace _util {
+		uint64_t timestamp();
 		bool is_rough_zero(const FVector& vector);
 		bool is_rough_zero(float vector);
 

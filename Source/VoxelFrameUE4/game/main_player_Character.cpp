@@ -17,6 +17,7 @@
 
 #include "./game/GameContext.h"
 #include "main_player.h"
+#include "vf_entity.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameContext.h"
 //#include "./game/ecs/Physic.h"
@@ -221,6 +222,7 @@ void AVoxelFrameUE4Character::SetupPlayerInputComponent(class UInputComponent* P
 }
 void AVoxelFrameUE4Character::OnRight()
 {
+
 	if (this->world->context->type == VF::ClientType::Player)
 	{
 		this->world->context->block_preview_manager->putBlock();
@@ -229,52 +231,58 @@ void AVoxelFrameUE4Character::OnRight()
 
 void AVoxelFrameUE4Character::OnFire()
 {
-	// try and fire a projectile
-	if (ProjectileClass != nullptr)
+	if (this->world->context->type == VF::ClientType::PartServer)
 	{
-		UWorld* const World = GetWorld();
-		if (World != nullptr)
-		{
-			if (bUsingMotionControllers)
-			{
-				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
-				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<AVoxelFrameUE4Projectile>(ProjectileClass, SpawnLocation, SpawnRotation);
-			}
-			else
-			{
-				const FRotator SpawnRotation = GetControlRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
-
-				//Set Spawn Collision Handling Override
-				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
-				// spawn the projectile at the muzzle
-				World->SpawnActor<AVoxelFrameUE4Projectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-
-				this->world->context->block_preview_manager->destroyBlock();
-			}
-		}
+		return;
 	}
 
-	// try and play the sound if specified
-	if (FireSound != nullptr)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
+	this->world->context->block_preview_manager->destroyBlock();
+	//// try and fire a projectile
+	//if (ProjectileClass != nullptr)
+	//{
+	//	UWorld* const World = GetWorld();
+	//	if (World != nullptr)
+	//	{
+	//		if (bUsingMotionControllers)
+	//		{
+	//			const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
+	//			const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
+	//			World->SpawnActor<AVoxelFrameUE4Projectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+	//		}
+	//		else
+	//		{
+	//			const FRotator SpawnRotation = GetControlRotation();
+	//			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+	//			const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 
-	// try and play a firing animation if specified
-	if (FireAnimation != nullptr)
-	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance != nullptr)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
+	//			//Set Spawn Collision Handling Override
+	//			FActorSpawnParameters ActorSpawnParams;
+	//			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+	//			// spawn the projectile at the muzzle
+	//			World->SpawnActor<AVoxelFrameUE4Projectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+
+	//		}
+	//	}
+	//}
+
+	//// try and play the sound if specified
+	//if (FireSound != nullptr)
+	//{
+	//	UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	//}
+
+	//// try and play a firing animation if specified
+	//if (FireAnimation != nullptr)
+	//{
+	//	// Get the animation object for the arms mesh
+	//	UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+	//	if (AnimInstance != nullptr)
+	//	{
+	//		AnimInstance->Montage_Play(FireAnimation, 1.f);
+	//	}
+	//}
 }
 
 void AVoxelFrameUE4Character::OnResetVR()
@@ -352,6 +360,10 @@ void AVoxelFrameUE4Character::MoveForward(float Value)
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), Value);
 
+		if (this->world->context->type == VF::ClientType::PartServer)
+		{
+			return;
+		}
 		VF::_main_player::NetSyncData* net_sync_data;
 		auto ok = this->world->context->ecs.scene->randomAccessEntity(this->ecsId, net_sync_data);
 		assert(ok);
@@ -369,6 +381,10 @@ void AVoxelFrameUE4Character::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), Value);
 
+		if (this->world->context->type == VF::ClientType::PartServer)
+		{
+			return;
+		}
 		VF::_main_player::NetSyncData* net_sync_data;
 		auto ok = this->world->context->ecs.scene->randomAccessEntity(this->ecsId, net_sync_data);
 		assert(ok);
@@ -400,10 +416,15 @@ void AVoxelFrameUE4Character::TurnAtRate(float Rate)
 
 void AVoxelFrameUE4Character::Turn(float val)
 {
+
 	if (fabsf(val) > VF_RoughEpsilon)
 	{
 		AddControllerYawInput(val);
 
+		if (this->world->context->type == VF::ClientType::PartServer)
+		{
+			return;
+		}
 		VF::_main_player::NetSyncData* net_sync_data;
 		auto ok = this->world->context->ecs.scene->randomAccessEntity(this->ecsId, net_sync_data);
 		assert(ok);
@@ -419,6 +440,10 @@ void AVoxelFrameUE4Character::Jump()
 	using VF::_main_player::NetSyncData;
 	Super::Jump();
 	NetSyncData* net_sync_data;
+	if (this->world->context->type == VF::ClientType::PartServer)
+	{
+		return;
+	}
 	auto ok = this->world->context->ecs.scene->randomAccessEntity(this->ecsId, net_sync_data);
 	assert(ok);
 	if (ok)
@@ -431,6 +456,10 @@ void AVoxelFrameUE4Character::StopJumping()
 	using VF::_main_player::NetSyncData;
 	Super::StopJumping();
 	NetSyncData* net_sync_data;
+	if (this->world->context->type == VF::ClientType::PartServer)
+	{
+		return;
+	}
 	auto ok = this->world->context->ecs.scene->randomAccessEntity(this->ecsId, net_sync_data);
 	assert(ok);
 	if (ok)

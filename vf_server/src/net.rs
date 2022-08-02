@@ -2,10 +2,10 @@ use crate::*;
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::net::TcpStream;
 use std::net::SocketAddr;
-use crate::game_player::Player;
+use game::game_player::Player;
 use tokio::sync::{mpsc, oneshot};
 use crate::protos::common::{ClientFirstConfirm, EntityPos, PlayerBasic, ChunkPack, ChunkEntityPack, ClientType};
-use crate::net_pack_convert::MsgEnum;
+use crate::net_pack_convert::{MsgEnum, PackIds};
 use crate::net::msg_pack_make::MsgPackMaker;
 use crate::protos::common::ClientType::{ClientType_Player, ClientType_GameServer};
 use crate::game::{ClientId, GameMainLoopChannels};
@@ -22,24 +22,30 @@ pub struct ClientDescription{
 
 //来自客户端的消息
 // 接收消息后转发给主循环的数据结构
+#[derive(Debug)]
 pub struct ClientMsg {
     pub client_type: ClientType,
     pub client_id: ClientId,
     pub msg_enum: MsgEnum,
 }
 
+#[derive(Debug)]
 pub enum ClientMsgEnum {
     ClientCommonMsg(ClientMsg),
     ClientConnect(ClientConnect),
     ClientDisconnect(ClientDisconnect),
 }
 
+
+#[derive(Debug)]
 pub struct ClientConnect {
     pub sender: ClientSender,
     pub client_type: ClientType,
     pub response: oneshot::Sender<ClientId>,
 }
 
+
+#[derive(Debug)]
 pub struct ClientDisconnect {
     pub client_id:ClientId,
 }
@@ -53,6 +59,11 @@ pub struct ClientSender{
     sender:mpsc::Sender<Vec<u8>>,
 }
 impl ClientSender{
+    pub async fn serialize_and_send<T: ::protobuf::Message>(
+        &self,proto_pack: T, pack_id: PackIds){
+        let bytes=net_pack_convert::pack_to_bytes(proto_pack,pack_id);
+        self.sender.send(bytes).await;
+    }
     pub async fn send(&self,vec:Vec<u8>){
         // println!("send cid {}",self.id);
         self.sender.send(vec).await;
@@ -91,8 +102,8 @@ pub fn start_rw_loop(
                     //模拟网络延迟
                     tokio::time::sleep(tokio::time::Duration::from_millis(200));
 
-                    wr.write_all(j.as_slice()).await;
-                    wr.flush().await;
+                    wr.write_all(j.as_slice()).await.unwrap();
+                    wr.flush().await.unwrap();
                 }
             }
             // => {
@@ -137,7 +148,7 @@ pub fn start_rw_loop(
         receive_handler.disconnect().await;
         println!("client disconnect,rec loop end");
     });
-    // return ClientSender::new(tx.clone());
+   // return ClientSender::new(tx.clone());
 }
 
 //接受消息输入到此，先使用packer进行解包
@@ -192,7 +203,9 @@ impl ReceiveHandlerKernel {
     }
     pub async fn disconnect(&mut self){
         match self.client_type {
-            None => {}
+            None => {
+                //未加载状态
+            }
             Some(_) => {
                 self.mainloop_chan.msg_channel_tx.send(ClientMsgEnum::ClientDisconnect(
                     ClientDisconnect{
@@ -225,7 +238,7 @@ impl ReceiveHandlerKernel {
                                 sender: self.client_sender.clone(),
                                 client_type: confirm.client_type,
                                 response: resp_tx,
-                            })).await;
+                            })).await.unwrap();
                         let res_client_id = resp_rx.await.unwrap();
                         println!("get client id {}",res_client_id);
                         // self.client_sender.id=res_client_id;
@@ -242,7 +255,7 @@ impl ReceiveHandlerKernel {
                         client_id: self.client_id,
                         msg_enum: msg,
                     })
-                ).await;
+                ).await.unwrap();
             }
         }
     }

@@ -24,6 +24,7 @@ namespace VF
 		EClientOperationFailed = 12,
 		EClientOperationSucc = 13,
 		EMainPlayerJumpCmd = 14,
+		ERemoveEntity = 15,
 	};
 
 	class PackContainer

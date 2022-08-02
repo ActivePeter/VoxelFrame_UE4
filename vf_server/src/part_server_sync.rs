@@ -1,9 +1,9 @@
 use std::collections::{HashSet, HashMap};
-use crate::game_chunk::ChunkKey;
 use crate::game::{ClientId, Game, ClientManager};
 use crate::send_packer;
 use crate::net::{ClientSender, ClientDescription};
 use tokio::sync::mpsc;
+use crate::game::game_chunk::ChunkKey;
 
 pub struct PartServerSync{
     pub free_chunks:HashSet<ChunkKey>,
@@ -28,11 +28,17 @@ impl PartServerSync{
             }
         }
     }
+    pub fn takeout_all_chunks2free(&mut self,ps:&PartServer){
+        for i in &ps.chunks{
+            self.free_chunks.insert((*i).clone());
+        }
+    }
 }
 
 pub fn get_part_server_sender_of_chunk(game:&mut Game,ck:ChunkKey)->Option<ClientSender>{
     match game.part_server_sync.get_part_server_cid_of_chunk(ck){
         None => {
+            println!("partserver not exist");
             return None;
         }
         Some(cid) => {
@@ -40,8 +46,20 @@ pub fn get_part_server_sender_of_chunk(game:&mut Game,ck:ChunkKey)->Option<Clien
         }
     }
 }
-
-pub async fn add_part_server(game:&mut Game, cid:ClientId){
+pub async fn on_partserver_connected(game:&mut Game,cid:ClientId){
+    add_part_server(game,cid).await;
+}
+pub async fn on_partserver_disconnect(game:&mut Game,cid:ClientId){
+    let mut none=None;
+    std::mem::swap(&mut game.part_server_sync.part_server,&mut none);
+    match none{
+        None => {}
+        Some(ps) => {
+            game.part_server_sync.takeout_all_chunks2free(&ps);
+        }
+    }
+}
+async fn add_part_server(game:&mut Game, cid:ClientId){
     let cm=&mut game.client_manager;
     let pss=&mut game.part_server_sync;
     // println!("aps");
@@ -81,7 +99,7 @@ pub async fn bind_all_free_chunks_2_part_server(game: &mut Game, send:ClientSend
 }
 
 pub async fn add_free_chunk(game:&mut Game, ck:ChunkKey){
-    println!("add_free_chunk");
+    // println!("add_free_chunk");
     let mut cid:ClientId=0;
     let mut has_part_server =false;
     match &mut game.part_server_sync.part_server {
@@ -96,7 +114,7 @@ pub async fn add_free_chunk(game:&mut Game, ck:ChunkKey){
         }
     }
     if(has_part_server){
-        println!("has server then send {}",cid);
+        // println!("has server then send {}",cid);
         //发送给partserver
         let sender=
             game.client_manager.get_sender(cid);

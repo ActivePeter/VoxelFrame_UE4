@@ -1,11 +1,18 @@
+pub mod game_chunk;
+pub(crate) mod game_player;
+pub(crate) mod game_flow;
+pub(crate) mod game_entity;
+pub(crate) mod game_block;
+pub(crate) mod game_pack_distribute;
+pub(crate) mod operation;
+
 pub use crate::*;
 use std::collections::{HashMap, HashSet};
-use crate::game_player_manager::PlayerManager;
 use tokio::net::TcpStream;
-use std::any::Any;
-use crate::game_player::{Player, PlayerId};
+// use std::any::Any;
+use game::game_player::{Player, PlayerId};
 use crate::conv::point3f_2_chunkkey;
-use crate::game_chunk::{ChunkKey, Chunk};
+use game::game_chunk::{ChunkKey, Chunk};
 use std::net::SocketAddr;
 use tokio::net::windows::named_pipe::PipeEnd::Client;
 // use std::borrow::{Borrow, BorrowMut};
@@ -13,14 +20,15 @@ use std::thread::{spawn, LocalKey};
 use tokio::sync::{mpsc, oneshot};
 use tokio::task;
 use crate::net::{ClientMsg, ClientMsgEnum, ClientDescription, ClientSender};
-use std::borrow::Borrow;
+// use std::borrow::Borrow;
 use crate::protos::common::ClientType;
 use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
 use crate::part_server_sync::PartServerSync;
-use crate::game_entity::{EntityId, EntityData};
+use game::game_entity::{EntityId, EntityData};
 use crate::net_pack_convert::MsgEnum;
 use crate::net_pack_convert::MsgEnum::MainPlayerMoveCmd;
 use crate::async_task::AsyncTaskManager;
+use crate::game::game_player::PlayerManager;
 
 pub type ClientId = usize;
 pub type ClientOperationId=u32;
@@ -91,6 +99,14 @@ impl ClientManager{
             self.player_clients.remove(&cid);
         }
         self.id2client.remove(&cid);
+    }
+    pub fn get_clienttype(&self,cid:ClientId)->Option<ClientType>{
+        match self.id2client.get(&cid){
+            None => {None}
+            Some(c) => {
+                Some(c.client_type)
+            }
+        }
     }
 }
 pub struct Game {
@@ -163,25 +179,28 @@ impl Game {
     //     // chunk.be_interested_by(player.player_id);
     // }
     //
-    // //若没有则进行初始化
-    //创建chunk同时要将其加入到part server sync中
+    /*
+        若没有则进行初始化
+        创建chunk同时要将其加入到part server sync中
+    */
+    // ->返回区块
     pub async fn chunk_get_mut(&mut self, chunk_key: &ChunkKey) -> &mut Chunk {
         let a=self.chunks.contains_key(chunk_key);
         // let chunk=self.chunks.get_mut(chunk_key);
         // match chunk {
         //     None => {
-            if(a){
-                return self.chunks.get_mut(chunk_key).unwrap();
-            }else{
+        if(a){
+            return self.chunks.get_mut(chunk_key).unwrap();
+        }else{
 
-                self.chunks.insert(chunk_key.clone(), game_chunk::Chunk::new_and_load(chunk_key));
-                // .add_free_chunk(chunk_key.clone());
-                part_server_sync::add_free_chunk(self,chunk_key.clone()).await;
-                return self.chunks.get_mut(chunk_key).unwrap();
-            }
-            // }
-            // Some(chunk) => {
-            // }
+            self.chunks.insert(chunk_key.clone(), game_chunk::Chunk::new_and_load(chunk_key));
+            // .add_free_chunk(chunk_key.clone());
+            part_server_sync::add_free_chunk(self,chunk_key.clone()).await;
+            return self.chunks.get_mut(chunk_key).unwrap();
+        }
+        // }
+        // Some(chunk) => {
+        // }
         // }
         // let chunk = self.chunks
         //     .entry(*chunk_key)
@@ -230,17 +249,19 @@ pub async fn main_loop()
     // local.spawn_local(async move {
     tokio::spawn(async move {
         let mut context =game::Game::create();
+        // let mut packhandlers=game_pack_distribute::create_packhandlers();
         // task::spawn_local(async move{
         println!("game main loop task spawned");
         loop {
             let msg=  msg_channel_rx.recv().await.unwrap();
+
             game_pack_distribute::
-                distribute_client_common_msg(&mut context,msg).await;
-                // match msg {
-                //     ClientStateMsg::ClientConnect(s)=>{
-                //
-                //     }
-                // }
+            distribute_client_common_msg(&mut context,msg).await;
+            // match msg {
+            //     ClientStateMsg::ClientConnect(s)=>{
+            //
+            //     }
+            // }
 
             // tokio::select! {
             //     // Some(client_sender) = new_player_channel_rx.recv() => {

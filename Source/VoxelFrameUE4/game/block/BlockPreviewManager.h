@@ -5,7 +5,7 @@
 
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 
 		class BlockPreviewManager :public IVF_Obj

@@ -18,6 +18,24 @@ namespace VF
 		init_ecs();
 	}
 	void EntityManager::IVF_Obj_end() {}
+
+	void EntityManager::remove_enity(bool cmd_from_server, ServerEntityId seid)
+	{
+		auto iter = this->server_eid_2_entity_ref.find(seid);
+		if (iter != this->server_eid_2_entity_ref.end())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("remove_enity %d"), seid);
+			auto er = iter->second;
+			get_context()->ecs.scene->deleteEntity(er.eid);
+			er.base_ptr->K2_DestroyActor();
+			this->server_eid_2_entity_ref.erase(iter);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("remove_enity not found"));
+		}
+	}
+
 	////////////////////////////////////
 
 
@@ -86,6 +104,7 @@ namespace VF
 		)
 
 	}
+
 #define __born_entity_switch(__EntityType__)\
 	case EntityType::__EntityType__:	\
 
@@ -95,6 +114,8 @@ namespace VF
 		EntityRef ref;
 		auto param = FActorSpawnParameters();
 		param.bNoFail = true;
+		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
 
 		//_base::conv_point_from_vf_2_ue(vf_pos);//conved to ue pos
 		vf_pos *= VF_WorldScale;
@@ -114,7 +135,7 @@ namespace VF
 					.addComponent((AVF_EntityBase*)ptr)
 					//.addEmptyComponent<EntityTag_Common>()
 					.addComponent(EntityMoveRecord(ptr->GetTransform().Rotator(), ptr->GetTransform().GetLocation()))
-					.addComponent(seid)
+					.addComponent(ServerEntityIdCotainer(seid))
 					.addComponent(EntitySyncPosData(ptr->GetTransform().Rotator(),
 						ptr->GetTransform().GetLocation()))
 					.entityId;
@@ -213,10 +234,10 @@ namespace VF
 
 		/*void sync_controlled_entity(ControlledEntityTag& tag) {
 		}*/
-		void pl_sync_entity(ContextId& id, AVF_EntityBase*& entity, ServerEntityId& seid,
+		void pl_sync_entity(ContextId& id, AVF_EntityBase*& entity, ServerEntityIdCotainer& seid,
 			EntitySyncPosData& espd)
 		{
-			if (seid == id.get()->main_player_server_eid)
+			if (seid.seid == id.get()->main_player_server_eid)
 			{//main player 策略
 
 			}
@@ -245,7 +266,7 @@ namespace VF
 
 		//todo 执行这个函数过程中记录下所有需要发送的entity.一次性发送
 		void ps_check_entity_move(
-			ContextId& id, AVF_EntityBase*& entity, ServerEntityId& seid,
+			ContextId& id, AVF_EntityBase*& entity, ServerEntityIdCotainer& seid,
 			EntityMoveRecord& move_rec)
 		{
 			//VF_LogWarning("ps_check_entity_move");
@@ -257,7 +278,7 @@ namespace VF
 				)
 			{
 				//VF_LogWarning("ps_check_entity_move %d", seid);
-				id.get()->entity_manager->queue_EntityPosUpdate.insert(seid);
+				id.get()->entity_manager->queue_EntityPosUpdate.insert(seid.seid);
 
 				move_rec.last_rotate = entity->GetTransform().Rotator();
 				move_rec.last_p = entity->GetTransform().GetLocation();

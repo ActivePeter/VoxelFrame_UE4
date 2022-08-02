@@ -79,8 +79,12 @@ namespace VF
 		//}
 		inline void pass_to_game(ContextId cid, const std::shared_ptr<google::protobuf::Message>& pack, PackIds pack_id)
 		{
+			if(!cid.get())
+			{
+				return;
+			}
 			cid.get()->
-				event_list.push(
+				event_list->push(
 					_Event::PackRecieveEvent::create(cid,
 						PackContainer(pack_id, pack)));
 		}
@@ -95,11 +99,12 @@ namespace VF
 					pass_to_game(cp, EChunkPack);*/
 				switch_pack(ChunkPack);
 				switch_pack(ChunkEntityPack);
+				switch_pack(RemoveEntity);
 
 				//default:
 					//VF_LogWarning("No matching pack id. %d", pack_id);
 			}
-			if (cid.get()->type == ClientType::PartServer)
+			if (cid.get()&&cid.get()->type == ClientType::PartServer)
 			{
 				switch (pack_id)
 				{

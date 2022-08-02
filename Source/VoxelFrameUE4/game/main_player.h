@@ -57,12 +57,12 @@ namespace VF
 		namespace _ecs_sys
 		{
 			//void free_player_raw_ptr(ControlMovement& movement);
-			void main_player_update(ContextId& cid, AVoxelFrameUE4Character*& player, NetSyncData& movement);
+			void main_player_update(ContextId& cid, ServerEntityIdCotainer& seid, AVoxelFrameUE4Character*& player, NetSyncData& movement);
 
 		}
 		namespace _main_player_update
 		{
-			void player_movement_sync(ContextId& cid, AVoxelFrameUE4Character*& player, NetSyncData& movement);
+			void player_movement_sync(ContextId& cid, ServerEntityIdCotainer& seid, AVoxelFrameUE4Character*& player, NetSyncData& movement);
 			void checkPlayerRay2Chunk(ContextId& cid, AVoxelFrameUE4Character*& player);
 		}
 	}

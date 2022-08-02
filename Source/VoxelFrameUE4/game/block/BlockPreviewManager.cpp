@@ -7,7 +7,7 @@
 
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		void BlockPreviewManager::IVF_Obj_init(ContextId ID)
 		{
@@ -55,7 +55,7 @@ namespace VF
 		{
 			if (targeting)
 			{
-				_Block::change_one_block_and_send_2_server(
+				_block::change_one_block_and_send_2_server(
 					*this->get_context(),
 					*this->chunkTargetBlockIn,
 					this->targetBlockChunkPos,
@@ -68,44 +68,13 @@ namespace VF
 		{
 			if (!blockPutPreviewer->IsHidden())
 			{
-				_Block::change_one_block_and_send_2_server(
+				_block::change_one_block_and_send_2_server(
 					*this->get_context(),
 					*this->chunkPutBlockIn,
 					this->putBlockChunkPos,
 					1
 				);
 
-				////auto positionInChunk = PositionInfoInChunk::fromVfPoint(blockWorldPos);
-				////chunkPutBlockIn->setData(1,
-				////	putBlockChunkPos.X,
-				////	putBlockChunkPos.Y,
-				////	putBlockChunkPos.Z);
-				////chunkTargetBlockIn->call_after_edit();
-				////GameContext::get_context(context_id)->chunkManager->asyncConstructMeshForChunk(chunkPutBlockIn);
-				//
-				//
-				//
-				//
-				////sync to net
-				//auto pb = std::make_shared<PutBlock>();
-				//auto block_world_pos = chunkPutBlockIn->chunkData.chunkKey.keyData * VF_ChunkSize
-				//	+ putBlockChunkPos;
-				//
-				//auto new_op = this->get_context()->operation_rec->
-				//	new_operation<_operation_rec::PutBlockOperation>(
-				//		block_world_pos.X,
-				//		block_world_pos.Y,
-				//		block_world_pos.Z,
-				//		1
-				//		);
-				//new_op.ref.act(*this->get_context());
-				//pb->set_block_id(1);
-				//pb->set_x(block_world_pos.X);
-				//pb->set_y(block_world_pos.Y);
-				//pb->set_z(block_world_pos.Z);
-				//pb->set_operation_id(new_op.id);
-				//PackContainer pc(PackIds::EPutBlock, pb);
-				//get_context()->networkManager->send(std::move(pc));
 			}
 		}
 	}

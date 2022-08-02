@@ -8,7 +8,7 @@
 //#include "app.h"
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		// void CommonBlockMesh::setFaceUVsByTextureIndex(Mesh &mesh, int textureIndex)
 		// {
@@ -29,7 +29,7 @@ namespace VF
 			// CommonBlockMeshs.resize(255);
 		}
 
-		//void pushOneFace2Chunk(const VFVec3F& chunkMeshPos, int blockx, int blocky, int blockz, _Block::BlockTypeInfo& info, _Block::FaceDirection dir,
+		//void pushOneFace2Chunk(const VFVec3F& chunkMeshPos, int blockx, int blocky, int blockz, _block::BlockTypeInfo& info, _block::FaceDirection dir,
 		//	VFArray<VFVec3F>& vertexPoses,
 		//	VFArray<int32>& indices, VFArray<FVector2D>& uvs, TextureManager& texture_man)
 		//{
@@ -59,6 +59,40 @@ namespace VF
 				x -= ck.x() * VF_ChunkWidth;
 				y -= ck.y() * VF_ChunkWidth;
 				z -= ck.z() * VF_ChunkWidth;
+
+				if (x == VF_ChunkWidth - 1)
+				{
+					auto ck1 = ck; ck1.keyData.X += 1;
+					this->cks[ck1] = 1;
+				}
+				else if (x == 0)
+				{
+					auto ck1 = ck; ck1.keyData.X -= 1;
+					this->cks[ck1] = 1;
+				}
+
+				if (y == VF_ChunkWidth - 1)
+				{
+					auto ck1 = ck; ck1.keyData.Y += 1;
+					this->cks[ck1] = 1;
+				}
+				else if (y == 0)
+				{
+					auto ck1 = ck; ck1.keyData.Y -= 1;
+					this->cks[ck1] = 1;
+				}
+
+				if (z == VF_ChunkWidth - 1)
+				{
+					auto ck1 = ck; ck1.keyData.Z += 1;
+					this->cks[ck1] = 1;
+				}
+				else if (z == 0)
+				{
+					auto ck1 = ck; ck1.keyData.Z -= 1;
+					this->cks[ck1] = 1;
+				}
+
 				auto chunk =
 					this->ctx.chunkManager->getChunkOfKey(ck);
 				//VF_assert(chunk);
@@ -77,12 +111,14 @@ namespace VF
 		{
 			for (auto& ck : this->cks)
 			{
-				auto chunk = this->ctx.chunkManager->getChunkOfKey(ck.first);
+				auto ckkey = ck.first;
+				ctx.chunkManager->add_chunk_2_construct(ckkey);
+				/*auto chunk = this->ctx.chunkManager->getChunkOfKey(ck.first);
 				if (chunk)
 				{
 					VF_LogWarning("update one chunk mesh");
 					ctx.chunkManager->asyncConstructMeshForChunk(chunk);
-				}
+				}*/
 			}
 			this->cks.clear();
 		}

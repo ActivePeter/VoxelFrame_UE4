@@ -2,7 +2,7 @@
 #include "game/conv.h"
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 
 		void BlockMesh_Base::conv_local_vertex_2_ue_world_pos(

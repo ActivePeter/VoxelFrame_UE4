@@ -3,7 +3,7 @@
 #include "_BlockMesh_Base.h"
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		class BlockMesh_Common : public BlockMesh_Base
 		{
@@ -13,11 +13,11 @@ namespace VF
 			//void getBlockValidTriangles(std::vector<_type::Vec3F>& vertexPoses, _Graph::Indices& indices) override;
 
 			void pushOneFaceVerticesAndIndices_selfPos(
-				_Block::FaceDirection dir,
+				_block::FaceDirection dir,
 				MeshConstructData& mesh_construct, PositionInfoInChunk::OfIPos& block_p_in_chunk,
 				BlockUVSetter_Base& uv_setter, TextureManager& texture_man) override;
 
-			bool hasStandardFace(_Block::FaceDirection dir) override
+			bool hasStandardFace(_block::FaceDirection dir) override
 			{
 				return true;
 			}
@@ -51,8 +51,8 @@ namespace VF
 			 * 这个函数包含方块每个面的顶点坐标顺序
 			 * 以便后续有特殊类型方块可以继承和覆盖
 			 * ***************************************/
-			 //void setFaceVertexPosOnDir(VFArray<_type::Vec3F>& vertexPoses, _Block::FaceDirection dir);
-			 // virtual void setVertexUVOnDir(_Block::FaceDirection dir, Mesh &mesh) {}
+			 //void setFaceVertexPosOnDir(VFArray<_type::Vec3F>& vertexPoses, _block::FaceDirection dir);
+			 // virtual void setVertexUVOnDir(_block::FaceDirection dir, Mesh &mesh) {}
 
 
 		};

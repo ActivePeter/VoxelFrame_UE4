@@ -29,7 +29,7 @@ namespace VF
 		struct AllCompPtr;
 	}
 
-	namespace _Block
+	namespace _block
 	{
 		class BlockManager;
 		class BlockPreviewManager;
@@ -43,6 +43,8 @@ namespace VF
 		paecs::SysGroup tick_end_sys;
 		paecs::SysGroup game_end_sys;
 		void init();
+
+
 	};
 
 	enum class ClientType
@@ -83,8 +85,8 @@ namespace VF
 
 		std::shared_ptr<ChunkManager> chunkManager;
 		std::shared_ptr<MeshManager> meshManager;
-		std::shared_ptr<_Block::BlockManager> blockManager;
-		std::shared_ptr<_Block::BlockPreviewManager> block_preview_manager;
+		std::shared_ptr<_block::BlockManager> blockManager;
+		std::shared_ptr<_block::BlockPreviewManager> block_preview_manager;
 		std::shared_ptr<NetworkManager> networkManager;
 		std::shared_ptr<EntityManager> entity_manager;
 		std::shared_ptr<PlayerOnly> player_only;
@@ -103,7 +105,7 @@ namespace VF
 		_main_player::AllCompPtr main_player_get_all_comps();
 
 		//std::list<std::shared_ptr<_Event::IEvent>> events;
-		_Event::EventList event_list;
+		std::shared_ptr<_Event::EventList>  event_list;
 		//SafeQueue<> rec_pack_queue;
 	private:
 		template <class VF_Obj_Type, class... ArgTypes>

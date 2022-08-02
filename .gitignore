@@ -3,3 +3,7 @@ VoxelFrameServerRust/target/
 VoxelFrameServerRust/.idea/
 VoxelFrameServerRust/.vs/
 vf_server/target/
+ue4.26.zip
+Source/LibHV/lib/co.lib
+Source/LibHV/lib/hv.dll
+Source/LibHV/lib/libuv.lib

@@ -12,6 +12,11 @@ namespace VF
 	class GameContext;
 
 	using ServerEntityId = uint32_t;
+	struct ServerEntityIdCotainer
+	{
+		ServerEntityId seid;
+		ServerEntityIdCotainer(ServerEntityId seid1) :seid(seid1) {}
+	};
 
 	//ecs tags
 	//struct ControlledEntityTag {};
@@ -39,7 +44,7 @@ namespace VF
 
 	struct MainPlayerSyncPosData
 	{
-		
+
 	};
 	//struct EntityDeadReckonData
 	//{
@@ -85,6 +90,7 @@ namespace VF
 		virtual void IVF_Obj_end() override;
 		//////////////////////////////////////////
 	public:
+		void remove_enity(bool cmd_from_server, ServerEntityId seid);
 		EntityRef born_entity(ServerEntityId seid, EntityType type, VFVec3F&& vf_pos);
 		void add_exist_entity(EntityRef ref);
 		void born_entities_in_chunk(
@@ -94,12 +100,12 @@ namespace VF
 	};
 	namespace _ecs_sys
 	{
-		void pl_sync_entity(ContextId& id, AVF_EntityBase*& entity, ServerEntityId& seid,
+		void pl_sync_entity(ContextId& id, AVF_EntityBase*& entity, ServerEntityIdCotainer& seid,
 			//EntityTag_Common& common,
 			EntitySyncPosData& espd);
 		void ps_send_all_in_queue_EntityPosUpdate(ContextId& id);
 		void ps_check_entity_move(
-			ContextId& id, AVF_EntityBase*& entity, ServerEntityId& seid,
+			ContextId& id, AVF_EntityBase*& entity, ServerEntityIdCotainer& seid,
 			EntityMoveRecord& move_rec
 			//,EntityTag_Common& common
 		);

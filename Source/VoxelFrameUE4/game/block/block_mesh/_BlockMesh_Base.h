@@ -11,7 +11,7 @@
 
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		class BlockUVSetter_Base;
 		//void conv_block_vector_from_selfpos_2_ue_world_pos(FVector& selfpos, );
@@ -34,7 +34,7 @@ namespace VF
 			 *  （相对方块自身的坐标
 			*/
 			virtual void pushOneFaceVerticesAndIndices_selfPos(
-				_Block::FaceDirection dir,
+				_block::FaceDirection dir,
 				MeshConstructData& mesh_construct, PositionInfoInChunk::OfIPos& block_p_in_chunk,
 				BlockUVSetter_Base& uv_setter, TextureManager& texture_man) = 0;
 
@@ -42,7 +42,7 @@ namespace VF
 			 * 方块基础信息1,判断某个方向是否有标准类型面
 			 * 以便后续有特殊类型方块可以继承和覆盖
 			 * ***************************************/
-			virtual bool hasStandardFace(_Block::FaceDirection dir) = 0;
+			virtual bool hasStandardFace(_block::FaceDirection dir) = 0;
 		};
 	}
 }

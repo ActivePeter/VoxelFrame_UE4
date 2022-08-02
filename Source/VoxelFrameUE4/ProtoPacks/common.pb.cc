@@ -100,6 +100,11 @@ class ClientOperationSuccDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<ClientOperationSucc>
       _instance;
 } _ClientOperationSucc_default_instance_;
+class RemoveEntityDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<RemoveEntity>
+      _instance;
+} _RemoveEntity_default_instance_;
 namespace protobuf_ProtoPacks_2fcommon_2eproto {
 void InitDefaultsClientFirstConfirmImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -421,8 +426,29 @@ void InitDefaultsClientOperationSucc() {
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsClientOperationSuccImpl);
 }
 
-::google::protobuf::Metadata file_level_metadata[15];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[2];
+void InitDefaultsRemoveEntityImpl() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
+  ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  {
+    void* ptr = &::_RemoveEntity_default_instance_;
+    new (ptr) ::RemoveEntity();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::RemoveEntity::InitAsDefaultInstance();
+}
+
+void InitDefaultsRemoveEntity() {
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
+  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsRemoveEntityImpl);
+}
+
+::google::protobuf::Metadata file_level_metadata[16];
+const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[3];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
@@ -543,6 +569,13 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ClientOperationSucc, operation_id_),
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::RemoveEntity, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::RemoveEntity, remove_type_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::RemoveEntity, entity_id_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::ClientFirstConfirm)},
@@ -560,6 +593,7 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 99, -1, sizeof(::Rpl_PutBlockInPs)},
   { 106, -1, sizeof(::ClientOperationFailed)},
   { 112, -1, sizeof(::ClientOperationSucc)},
+  { 118, -1, sizeof(::RemoveEntity)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -578,6 +612,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::_Rpl_PutBlockInPs_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_ClientOperationFailed_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_ClientOperationSucc_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::_RemoveEntity_default_instance_),
 };
 
 void protobuf_AssignDescriptors() {
@@ -596,7 +631,7 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 15);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 16);
 }
 
 void AddDescriptorsImpl() {
@@ -629,13 +664,16 @@ void AddDescriptorsImpl() {
       "InPs\022\017\n\007task_id\030\001 \001(\r\022\020\n\010put_succ\030\002 \001(\r\""
       "-\n\025ClientOperationFailed\022\024\n\014operation_id"
       "\030\001 \001(\r\"+\n\023ClientOperationSucc\022\024\n\014operati"
-      "on_id\030\001 \001(\r*>\n\nClientType\022\031\n\025ClientType_"
-      "GameServer\020\000\022\025\n\021ClientType_Player\020\001*&\n\nE"
-      "ntityType\022\n\n\006T_Null\020\000\022\014\n\010T_Player\020\001b\006pro"
-      "to3"
+      "on_id\030\001 \001(\r\"I\n\014RemoveEntity\022&\n\013remove_ty"
+      "pe\030\001 \001(\0162\021.RemoveEntityType\022\021\n\tentity_id"
+      "\030\002 \001(\r*>\n\nClientType\022\031\n\025ClientType_GameS"
+      "erver\020\000\022\025\n\021ClientType_Player\020\001*&\n\nEntity"
+      "Type\022\n\n\006T_Null\020\000\022\014\n\010T_Player\020\001*4\n\020Remove"
+      "EntityType\022\n\n\006killed\020\000\022\t\n\005disco\020\001\022\t\n\005cle"
+      "ar\020\002b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 1203);
+      descriptor, 1332);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "ProtoPacks/common.proto", &protobuf_RegisterTypes);
 }
@@ -673,6 +711,21 @@ bool EntityType_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::google::protobuf::EnumDescriptor* RemoveEntityType_descriptor() {
+  protobuf_ProtoPacks_2fcommon_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_ProtoPacks_2fcommon_2eproto::file_level_enum_descriptors[2];
+}
+bool RemoveEntityType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
       return true;
     default:
       return false;
@@ -5338,6 +5391,288 @@ void ClientOperationSucc::InternalSwap(ClientOperationSucc* other) {
 }
 
 ::google::protobuf::Metadata ClientOperationSucc::GetMetadata() const {
+  protobuf_ProtoPacks_2fcommon_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_ProtoPacks_2fcommon_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void RemoveEntity::InitAsDefaultInstance() {
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int RemoveEntity::kRemoveTypeFieldNumber;
+const int RemoveEntity::kEntityIdFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+RemoveEntity::RemoveEntity()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    ::protobuf_ProtoPacks_2fcommon_2eproto::InitDefaultsRemoveEntity();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:RemoveEntity)
+}
+RemoveEntity::RemoveEntity(const RemoveEntity& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _cached_size_(0) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::memcpy(&remove_type_, &from.remove_type_,
+    static_cast<size_t>(reinterpret_cast<char*>(&entity_id_) -
+    reinterpret_cast<char*>(&remove_type_)) + sizeof(entity_id_));
+  // @@protoc_insertion_point(copy_constructor:RemoveEntity)
+}
+
+void RemoveEntity::SharedCtor() {
+  ::memset(&remove_type_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&entity_id_) -
+      reinterpret_cast<char*>(&remove_type_)) + sizeof(entity_id_));
+  _cached_size_ = 0;
+}
+
+RemoveEntity::~RemoveEntity() {
+  // @@protoc_insertion_point(destructor:RemoveEntity)
+  SharedDtor();
+}
+
+void RemoveEntity::SharedDtor() {
+}
+
+void RemoveEntity::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* RemoveEntity::descriptor() {
+  ::protobuf_ProtoPacks_2fcommon_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_ProtoPacks_2fcommon_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const RemoveEntity& RemoveEntity::default_instance() {
+  ::protobuf_ProtoPacks_2fcommon_2eproto::InitDefaultsRemoveEntity();
+  return *internal_default_instance();
+}
+
+RemoveEntity* RemoveEntity::New(::google::protobuf::Arena* arena) const {
+  RemoveEntity* n = new RemoveEntity;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void RemoveEntity::Clear() {
+// @@protoc_insertion_point(message_clear_start:RemoveEntity)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&remove_type_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&entity_id_) -
+      reinterpret_cast<char*>(&remove_type_)) + sizeof(entity_id_));
+  _internal_metadata_.Clear();
+}
+
+bool RemoveEntity::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:RemoveEntity)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // .RemoveEntityType remove_type = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_remove_type(static_cast< ::RemoveEntityType >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // uint32 entity_id = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &entity_id_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:RemoveEntity)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:RemoveEntity)
+  return false;
+#undef DO_
+}
+
+void RemoveEntity::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:RemoveEntity)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .RemoveEntityType remove_type = 1;
+  if (this->remove_type() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      1, this->remove_type(), output);
+  }
+
+  // uint32 entity_id = 2;
+  if (this->entity_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->entity_id(), output);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:RemoveEntity)
+}
+
+::google::protobuf::uint8* RemoveEntity::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:RemoveEntity)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .RemoveEntityType remove_type = 1;
+  if (this->remove_type() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      1, this->remove_type(), target);
+  }
+
+  // uint32 entity_id = 2;
+  if (this->entity_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->entity_id(), target);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:RemoveEntity)
+  return target;
+}
+
+size_t RemoveEntity::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:RemoveEntity)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // .RemoveEntityType remove_type = 1;
+  if (this->remove_type() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->remove_type());
+  }
+
+  // uint32 entity_id = 2;
+  if (this->entity_id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->entity_id());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void RemoveEntity::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:RemoveEntity)
+  GOOGLE_DCHECK_NE(&from, this);
+  const RemoveEntity* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const RemoveEntity>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:RemoveEntity)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:RemoveEntity)
+    MergeFrom(*source);
+  }
+}
+
+void RemoveEntity::MergeFrom(const RemoveEntity& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:RemoveEntity)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.remove_type() != 0) {
+    set_remove_type(from.remove_type());
+  }
+  if (from.entity_id() != 0) {
+    set_entity_id(from.entity_id());
+  }
+}
+
+void RemoveEntity::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:RemoveEntity)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void RemoveEntity::CopyFrom(const RemoveEntity& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:RemoveEntity)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool RemoveEntity::IsInitialized() const {
+  return true;
+}
+
+void RemoveEntity::Swap(RemoveEntity* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void RemoveEntity::InternalSwap(RemoveEntity* other) {
+  using std::swap;
+  swap(remove_type_, other->remove_type_);
+  swap(entity_id_, other->entity_id_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata RemoveEntity::GetMetadata() const {
   protobuf_ProtoPacks_2fcommon_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_ProtoPacks_2fcommon_2eproto::file_level_metadata[kIndexInFileMessages];
 }

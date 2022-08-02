@@ -18,9 +18,11 @@ pub enum PackIds {
     EClientOperationFailed=12,
     EClientOperationSucc=13,
     EMainPlayerJumpCmd=14,
+    ERemoveEntity=15,
 }
 
 //用于携带消息包
+#[derive(Debug)]
 pub enum MsgEnum {
     ClientFirstConfirm(common::ClientFirstConfirm),
     EntityPos(common::EntityPos),
@@ -55,13 +57,31 @@ pub fn pack_to_bytes2<T: ::protobuf::Message>(proto_pack: &T, pack_id: PackIds) 
     // 流输出器
     let mut stream =
         CodedOutputStream::bytes(&mut final_vec[5..]);
-    proto_pack.write_to(&mut stream);
-    stream.flush();
+    proto_pack.write_to(&mut stream).unwrap();
+    stream.flush().unwrap();
     // println!("player basic packed bodylen:{0}"
     //          , msg_body_len);
     return final_vec;
 }
-
+pub fn packbox_to_bytes<T: ::protobuf::Message>(proto_pack: Box<T>, pack_id: PackIds) -> Vec<u8> {
+    //消息体 长度
+    let msg_body_len = proto_pack.compute_size() as usize;
+    //消息头
+    let msg_head = make_pack_head(
+        pack_id, msg_body_len);
+    //给拷贝准备好空间
+    let mut final_vec = msg_head.to_vec();
+    final_vec.resize(5 + msg_body_len, 0);
+    // let final_vec_slice=final_vec.as_mut_slice();
+    // 流输出器
+    let mut stream =
+        CodedOutputStream::bytes(&mut final_vec[5..]);
+    proto_pack.write_to(&mut stream).unwrap();
+    stream.flush().unwrap();
+    // println!("player basic packed bodylen:{0}"
+    //          , msg_body_len);
+    return final_vec;
+}
 pub fn pack_to_bytes<T: ::protobuf::Message>(proto_pack: T, pack_id: PackIds) -> Vec<u8> {
     //消息体 长度
     let msg_body_len = proto_pack.compute_size() as usize;
@@ -75,8 +95,8 @@ pub fn pack_to_bytes<T: ::protobuf::Message>(proto_pack: T, pack_id: PackIds) ->
     // 流输出器
     let mut stream =
         CodedOutputStream::bytes(&mut final_vec[5..]);
-    proto_pack.write_to(&mut stream);
-    stream.flush();
+    proto_pack.write_to(&mut stream).unwrap();
+    stream.flush().unwrap();
     // println!("player basic packed bodylen:{0}"
     //          , msg_body_len);
     return final_vec;
@@ -106,6 +126,7 @@ pub fn bytes_to_pack(msg_pack_id: i32, data_slice: &[u8])
         one_pack!(common::EntityPos,MsgEnum::EntityPos,data_slice);
 
     }else if msg_pack_id==PackIds::EPlayerBasic as i32{
+        // println!("EPlayerBasic");
         one_pack!(common::PlayerBasic,MsgEnum::PlayerBasic,data_slice);
 
     }else if msg_pack_id==PackIds::EMainPlayerMoveCmd as i32{

@@ -1,6 +1,6 @@
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		class BlockUVSetter_Base;
 	}
@@ -12,13 +12,13 @@ namespace VF
 /////////////////////////////////////////
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		class BlockUVSetter_Base
 		{
 		public:
 			void setFaceUVsByTextureIndex(TextureManager& texture_man, VFArray<FVector2D>& uvs, int textureIndex);
-			virtual void setVertexUVOnDir(TextureManager& texture_man, VFArray<FVector2D>& uvs, _Block::FaceDirection dir) = 0;
+			virtual void setVertexUVOnDir(TextureManager& texture_man, VFArray<FVector2D>& uvs, _block::FaceDirection dir) = 0;
 		};
 	}
 }

@@ -19,7 +19,8 @@ namespace VF
 				trans.SetRotation(r.Quaternion());
 				a.base_ptr->SetActorTransform(trans);
 
-				a.base_ptr->AddMovementInput(a.base_ptr->GetActorForwardVector(), mpmc->move_forward());
+				auto fo = mpmc->move_forward();
+				a.base_ptr->AddMovementInput(a.base_ptr->GetActorForwardVector(), fo);
 				a.base_ptr->AddMovementInput(a.base_ptr->GetActorRightVector(), mpmc->move_right());
 			}
 		}

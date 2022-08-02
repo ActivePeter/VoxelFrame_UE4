@@ -7,6 +7,11 @@
 
 namespace VF
 {
+	struct AddConstructDisc
+	{
+		uint64_t ms;
+		AddConstructDisc(uint64_t ms_) :ms(ms_) {}
+	};
 	//const int ChunkLoadRange;
 	struct ChunkKey
 	{
@@ -58,10 +63,17 @@ namespace VF
 		int meshId = -1;
 
 		MeshConstructData mesh_construct_data;
-
+		tl::optional<AddConstructDisc> add_construct_disc;
+		std::atomic_bool is_constructing = false;
 		void unbindMesh()
 		{
 			meshId = -1;
+		}
+		inline bool block_pos_valid(_type::Vec3I& p)
+		{
+			return p.X + p.Y * VF_ChunkWidth
+				+ p.Z * VF_ChunkWidth * VF_ChunkWidth
+				< VF_ChunkSize;
 		}
 		inline void getChunkWorldPos(_type::Vec3F& return_pos)
 		{
@@ -85,7 +97,7 @@ namespace VF
 		}
 		inline void call_after_edit()
 		{
-			mesh_construct_data.needConstruct = true;
+			//mesh_construct_data.needConstruct = true;
 		}
 		Chunk(const ChunkKey& ck, std::string& chunk_data);
 		Chunk(const ChunkKey& ck) {}

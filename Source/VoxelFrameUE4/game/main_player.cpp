@@ -20,6 +20,7 @@ namespace VF
 					.addComponent(static_cast<AVF_EntityBase*>(player))
 					.addComponent(player)
 					.addComponent(net_sync_data)
+					.addComponent(ServerEntityIdCotainer(0))
 					//.addComponent(EntitySyncPosData(player->GetTransform().Rotator(),
 					//	player->GetTransform().GetLocation()))
 					//.addEmptyComponent<EntityTag_Common>()
@@ -109,18 +110,18 @@ namespace VF
 		}
 		namespace _ecs_sys
 		{
-			void main_player_update(ContextId& cid, AVoxelFrameUE4Character*& player, NetSyncData& net_sync_data)
+			void main_player_update(ContextId& cid, ServerEntityIdCotainer& seid, AVoxelFrameUE4Character*& player, NetSyncData& net_sync_data)
 			{
 				using namespace _main_player_update;
 
-				player_movement_sync(cid, player, net_sync_data);
+				player_movement_sync(cid, seid, player, net_sync_data);
 				checkPlayerRay2Chunk(cid, player);
 			}
 
 		}
 		namespace _main_player_update {
 
-			void player_movement_sync(ContextId& cid, AVoxelFrameUE4Character*& player, NetSyncData& _net_sync_data)
+			void player_movement_sync(ContextId& cid, ServerEntityIdCotainer& seid, AVoxelFrameUE4Character*& player, NetSyncData& _net_sync_data)
 			{
 				NetSyncData net_sync_data;
 				std::swap(net_sync_data, _net_sync_data);//将空数据换入
@@ -134,6 +135,7 @@ namespace VF
 					mpmc->set_rotate_yaw(player->GetTransform().Rotator().Yaw);
 					mpmc->set_move_forward(net_sync_data.move_forward);
 					mpmc->set_move_right(net_sync_data.move_right);
+					mpmc->set_entity_id(seid.seid);
 					cid.get()->networkManager->send(
 						PackContainer(PackIds::EMainPlayerMoveCmd, mpmc));
 
@@ -149,10 +151,10 @@ namespace VF
 				{
 					auto jump_cmd = std::make_shared<MainPlayerJumpCmd>();
 					jump_cmd->set_start_or_end(net_sync_data.jump_cmd);
+					jump_cmd->set_entity_id(seid.seid);
 					cid.get()->networkManager->send(
 						PackContainer(PackIds::EMainPlayerJumpCmd, jump_cmd)
 					);
-
 				}
 			}
 			void checkPlayerRay2Chunk(ContextId& cid, AVoxelFrameUE4Character*& player)

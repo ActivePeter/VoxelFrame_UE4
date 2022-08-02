@@ -13,6 +13,7 @@ void pack_recv_handle(std::shared_ptr<Cmd_PutBlockInPs> pack, GameContext& conte
 void pack_recv_handle(std::shared_ptr<ClientOperationFailed> pack, GameContext& context);
 void pack_recv_handle(std::shared_ptr<ClientOperationSucc> pack, GameContext& context);
 void pack_recv_handle(std::shared_ptr<MainPlayerJumpCmd> pack, GameContext& context);
+void pack_recv_handle(std::shared_ptr<RemoveEntity> pack, GameContext& context);
 
 #define MACRO_pack_recv_distribute case EChunkPack:\
                 pack_recv_handle(std::static_pointer_cast<ChunkPack>(this->pack_container.proto_pack),context);\
@@ -46,5 +47,8 @@ case EClientOperationSucc:\
                 break;\
 case EMainPlayerJumpCmd:\
                 pack_recv_handle(std::static_pointer_cast<MainPlayerJumpCmd>(this->pack_container.proto_pack),context);\
+                break;\
+case ERemoveEntity:\
+                pack_recv_handle(std::static_pointer_cast<RemoveEntity>(this->pack_container.proto_pack),context);\
                 break;
 }

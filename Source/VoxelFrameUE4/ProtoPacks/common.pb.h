@@ -37,7 +37,7 @@ namespace protobuf_ProtoPacks_2fcommon_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[15];
+  static const ::google::protobuf::internal::ParseTable schema[16];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -73,6 +73,8 @@ void InitDefaultsClientOperationFailedImpl();
 void InitDefaultsClientOperationFailed();
 void InitDefaultsClientOperationSuccImpl();
 void InitDefaultsClientOperationSucc();
+void InitDefaultsRemoveEntityImpl();
+void InitDefaultsRemoveEntity();
 inline void InitDefaults() {
   InitDefaultsClientFirstConfirm();
   InitDefaultsEntityPos();
@@ -89,6 +91,7 @@ inline void InitDefaults() {
   InitDefaultsRpl_PutBlockInPs();
   InitDefaultsClientOperationFailed();
   InitDefaultsClientOperationSucc();
+  InitDefaultsRemoveEntity();
 }
 }  // namespace protobuf_ProtoPacks_2fcommon_2eproto
 class ChunkEntityPack;
@@ -130,6 +133,9 @@ extern PlayerBasicDefaultTypeInternal _PlayerBasic_default_instance_;
 class PutBlock;
 class PutBlockDefaultTypeInternal;
 extern PutBlockDefaultTypeInternal _PutBlock_default_instance_;
+class RemoveEntity;
+class RemoveEntityDefaultTypeInternal;
+extern RemoveEntityDefaultTypeInternal _RemoveEntity_default_instance_;
 class Rpl_PutBlockInPs;
 class Rpl_PutBlockInPsDefaultTypeInternal;
 extern Rpl_PutBlockInPsDefaultTypeInternal _Rpl_PutBlockInPs_default_instance_;
@@ -178,6 +184,28 @@ inline bool EntityType_Parse(
     const ::std::string& name, EntityType* value) {
   return ::google::protobuf::internal::ParseNamedEnum<EntityType>(
     EntityType_descriptor(), name, value);
+}
+enum RemoveEntityType {
+  killed = 0,
+  disco = 1,
+  clear = 2,
+  RemoveEntityType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
+  RemoveEntityType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
+};
+bool RemoveEntityType_IsValid(int value);
+const RemoveEntityType RemoveEntityType_MIN = killed;
+const RemoveEntityType RemoveEntityType_MAX = clear;
+const int RemoveEntityType_ARRAYSIZE = RemoveEntityType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* RemoveEntityType_descriptor();
+inline const ::std::string& RemoveEntityType_Name(RemoveEntityType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    RemoveEntityType_descriptor(), value);
+}
+inline bool RemoveEntityType_Parse(
+    const ::std::string& name, RemoveEntityType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<RemoveEntityType>(
+    RemoveEntityType_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -1889,6 +1917,112 @@ class ClientOperationSucc : public ::google::protobuf::Message /* @@protoc_inser
   friend struct ::protobuf_ProtoPacks_2fcommon_2eproto::TableStruct;
   friend void ::protobuf_ProtoPacks_2fcommon_2eproto::InitDefaultsClientOperationSuccImpl();
 };
+// -------------------------------------------------------------------
+
+class RemoveEntity : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:RemoveEntity) */ {
+ public:
+  RemoveEntity();
+  virtual ~RemoveEntity();
+
+  RemoveEntity(const RemoveEntity& from);
+
+  inline RemoveEntity& operator=(const RemoveEntity& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  RemoveEntity(RemoveEntity&& from) noexcept
+    : RemoveEntity() {
+    *this = ::std::move(from);
+  }
+
+  inline RemoveEntity& operator=(RemoveEntity&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RemoveEntity& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const RemoveEntity* internal_default_instance() {
+    return reinterpret_cast<const RemoveEntity*>(
+               &_RemoveEntity_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    15;
+
+  void Swap(RemoveEntity* other);
+  friend void swap(RemoveEntity& a, RemoveEntity& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline RemoveEntity* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  RemoveEntity* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void CopyFrom(const RemoveEntity& from);
+  void MergeFrom(const RemoveEntity& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const PROTOBUF_FINAL;
+  void InternalSwap(RemoveEntity* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .RemoveEntityType remove_type = 1;
+  void clear_remove_type();
+  static const int kRemoveTypeFieldNumber = 1;
+  ::RemoveEntityType remove_type() const;
+  void set_remove_type(::RemoveEntityType value);
+
+  // uint32 entity_id = 2;
+  void clear_entity_id();
+  static const int kEntityIdFieldNumber = 2;
+  ::google::protobuf::uint32 entity_id() const;
+  void set_entity_id(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:RemoveEntity)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  int remove_type_;
+  ::google::protobuf::uint32 entity_id_;
+  mutable int _cached_size_;
+  friend struct ::protobuf_ProtoPacks_2fcommon_2eproto::TableStruct;
+  friend void ::protobuf_ProtoPacks_2fcommon_2eproto::InitDefaultsRemoveEntityImpl();
+};
 // ===================================================================
 
 
@@ -2737,9 +2871,43 @@ inline void ClientOperationSucc::set_operation_id(::google::protobuf::uint32 val
   // @@protoc_insertion_point(field_set:ClientOperationSucc.operation_id)
 }
 
+// -------------------------------------------------------------------
+
+// RemoveEntity
+
+// .RemoveEntityType remove_type = 1;
+inline void RemoveEntity::clear_remove_type() {
+  remove_type_ = 0;
+}
+inline ::RemoveEntityType RemoveEntity::remove_type() const {
+  // @@protoc_insertion_point(field_get:RemoveEntity.remove_type)
+  return static_cast< ::RemoveEntityType >(remove_type_);
+}
+inline void RemoveEntity::set_remove_type(::RemoveEntityType value) {
+  
+  remove_type_ = value;
+  // @@protoc_insertion_point(field_set:RemoveEntity.remove_type)
+}
+
+// uint32 entity_id = 2;
+inline void RemoveEntity::clear_entity_id() {
+  entity_id_ = 0u;
+}
+inline ::google::protobuf::uint32 RemoveEntity::entity_id() const {
+  // @@protoc_insertion_point(field_get:RemoveEntity.entity_id)
+  return entity_id_;
+}
+inline void RemoveEntity::set_entity_id(::google::protobuf::uint32 value) {
+  
+  entity_id_ = value;
+  // @@protoc_insertion_point(field_set:RemoveEntity.entity_id)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -2784,6 +2952,11 @@ template <> struct is_proto_enum< ::EntityType> : ::google::protobuf::internal::
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::EntityType>() {
   return ::EntityType_descriptor();
+}
+template <> struct is_proto_enum< ::RemoveEntityType> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::RemoveEntityType>() {
+  return ::RemoveEntityType_descriptor();
 }
 
 }  // namespace protobuf

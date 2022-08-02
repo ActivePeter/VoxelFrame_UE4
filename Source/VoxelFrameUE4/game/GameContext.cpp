@@ -117,12 +117,12 @@ namespace VF
 				cid.id = this->context_id.id;
 			});
 
-
+		this->event_list = std::make_shared< _Event::EventList>();
 		chunkManager = make_obj<ChunkManager>();
 		meshManager = make_obj<MeshManager>();
-		blockManager = make_obj<_Block::BlockManager>();
+		blockManager = make_obj<_block::BlockManager>();
 		entity_manager = make_obj<EntityManager>();
-		block_preview_manager = make_obj<_Block::BlockPreviewManager>();
+		block_preview_manager = make_obj<_block::BlockPreviewManager>();
 		networkManager = make_obj<NetworkManager>();
 		operation_rec = make_obj<_operation_rec::OperationRec>();
 		taxture_man = make_obj<TextureManager>();
@@ -141,7 +141,7 @@ namespace VF
 		else if (type == ClientType::Player)
 		{
 			player_only = make_obj<PlayerOnly>();
-			//blockPreviewManager = std::make_unique<_Block::BlockPreviewManager>();
+			//blockPreviewManager = std::make_unique<_block::BlockPreviewManager>();
 		}
 
 		for (auto& i : vf_objs)
@@ -151,6 +151,7 @@ namespace VF
 	}
 	GameContext::~GameContext()
 	{
+		memset(context_pool, 0, sizeof(context_pool));
 		//remove_context(context_id);
 		//context = nullptr;
 	}

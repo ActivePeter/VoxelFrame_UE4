@@ -6,6 +6,13 @@ pub struct Point3i{
     pub y:i32,
     pub z:i32,
 }
+impl Point3i{
+    pub fn new(x:i32, y:i32, z:i32) -> Point3i {
+        return Point3i{
+            x,y,z
+        }
+    }
+}
 pub fn point3f_new()->Point3f{
     let mut p =Point3f::new();
     p.push(0.0);

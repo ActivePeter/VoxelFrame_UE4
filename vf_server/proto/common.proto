@@ -104,3 +104,13 @@ message ClientOperationFailed{
 message ClientOperationSucc{
   uint32 operation_id=1;
 }
+
+enum RemoveEntityType{
+  killed=0;
+  disco=1;
+  clear=2;
+}
+message RemoveEntity{
+  RemoveEntityType remove_type=1;
+  uint32 entity_id=2;
+}

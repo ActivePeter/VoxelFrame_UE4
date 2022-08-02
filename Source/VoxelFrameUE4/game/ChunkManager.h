@@ -25,7 +25,7 @@ namespace VF
 		 * 要被绘制的区块
 		 */
 		std::vector<std::weak_ptr<Chunk>> chunks2Draw;
-
+		phmap::flat_hash_set<ChunkKey> _chunks_2_construct;
 		_type::Vec3I oldPlayerChunkPos;
 
 
@@ -45,8 +45,27 @@ namespace VF
 		{
 			return isChunkInRange(ck.x(), ck.y(), ck.z(), centerX, centerY, centerZ);
 		}
-
+		tl::optional<std::shared_ptr<Chunk>&> try_get_chunkptr_by_ck(const ChunkKey& ck)
+		{
+			auto find = this->chunkKey2chunksMap.find(ck);
+			if (find == this->chunkKey2chunksMap.end())
+			{
+				return tl::nullopt;
+			}
+			return find->second;
+		}
+		tl::optional<Chunk&> try_get_chunk_by_ck(const ChunkKey& ck)
+		{
+			auto find = this->chunkKey2chunksMap.find(ck);
+			if (find == this->chunkKey2chunksMap.end())
+			{
+				return tl::nullopt;
+			}
+			return *find->second;
+		}
 		void constructMeshForChunk(Chunk& chunk);
+		tl::optional<char> try_read_blockdata_in_chunk(
+			_type::Vec3I&& p, Chunk& chunk);
 	public:
 		//var
 		FCriticalSection chunkCookMutex;
@@ -63,6 +82,8 @@ namespace VF
 
 
 		ChunkManager();
+		void constructsome();
+		void add_chunk_2_construct(const ChunkKey& ck);
 		void asyncConstructMeshForChunk(std::shared_ptr<Chunk>& chunk2Draw);
 		//输入须先转换为vf坐标
 		void checkPlayerChunkPosChange(const _type::Vec3F& curPlayerPos);

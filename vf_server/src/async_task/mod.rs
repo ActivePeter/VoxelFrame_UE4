@@ -1,21 +1,20 @@
 // pub mod async_task;
 pub mod entity;
-pub mod block;
+// pub mod block;
 
 use std::collections::HashMap;
-use crate::{protos, game_chunk, async_task, game};
+use crate::{protos, async_task, game};
 use crate::game::{Game, ClientId, ClientOperationId};
 use crate::conv;
 use crate::base_type::point3f_new2;
 use crate::part_server_sync;
 use crate::net_pack_convert;
 use crate::net_pack_convert::{PackIds, MsgEnum};
-use crate::game_player;
-use crate::game_entity;
 use crate::net_pack_convert::MsgEnum::EntityPos;
 use crate::net::ClientMsg;
 use crate::protos::common::ClientType::ClientType_GameServer;
 use crate::log;
+use crate::protos::common::PutBlock;
 
 
 pub type AsyncTaskId=u32;
@@ -49,28 +48,17 @@ impl AsyncTaskManager{
 }
 pub enum AsyncTask{
     ESpawnEntityInPs,
-    EPutBlockInPs(ClientId,ClientOperationId),
+    EPutBlockInPs(ClientId,ClientOperationId,Box<PutBlock>),
 
     FinishTaskFailed,
 }
 
-pub async fn match_client_rpl_msg(ctx:&mut game::Game,common_msg: ClientMsg){
-
-    match common_msg.msg_enum{
-        MsgEnum::Rpl_SpawnEntityInPs(rpl) => {
-            if common_msg.client_type==ClientType_GameServer{
-                async_task::entity::spawn_entity_in_ps_rpl(
-                    ctx,rpl).await;
-            }
-        }
-        MsgEnum::Rpl_PutBlockInPs(rpl)=>{
-            if common_msg.client_type==ClientType_GameServer{
-                async_task::block::put_block_in_ps_rpl(
-                    ctx,rpl).await;
-            }
-        }
-        _ => {}
-    }
-}
+// pub async fn match_client_rpl_msg(ctx:&mut game::Game,common_msg: ClientMsg){
+//
+//     match common_msg.msg_enum{
+//
+//         _ => {}
+//     }
+// }
 
 // pub use crate::async_task;

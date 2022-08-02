@@ -59,9 +59,9 @@ void AWorldActor::Tick(float DeltaTime)
 	time_sum += DeltaTime * 1000;
 	context->deltatime = DeltaTime;
 	//VF_LogWarning("AWorldActor::Tick");
-	while (context->event_list.size() > 0)
+	while (context->event_list->size() > 0)
 	{
-		auto a = context->event_list.pop();
+		auto a = context->event_list->pop();
 		a->run(*context);
 	}
 	/*for (auto& event : context->event_list)

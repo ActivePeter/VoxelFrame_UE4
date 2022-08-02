@@ -1,10 +1,10 @@
 #include "BlockMesh_Common.h"
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		//// 不同种类的网格信息，表达在不同文件里，比较清晰
-		//void BlockMesh_Common::setFaceVertexPosOnDir(VFArray<VFVec3F>& vertexPoses, _Block::FaceDirection dir)
+		//void BlockMesh_Common::setFaceVertexPosOnDir(VFArray<VFVec3F>& vertexPoses, _block::FaceDirection dir)
 		//{
 		//	
 		//}
@@ -80,34 +80,34 @@ namespace VF
 			}
 		}
 		void BlockMesh_Common::pushOneFaceVerticesAndIndices_selfPos(
-			_Block::FaceDirection dir,
+			_block::FaceDirection dir,
 			MeshConstructData& mesh_construct, PositionInfoInChunk::OfIPos& block_p,
 			BlockUVSetter_Base& uv_setter, TextureManager& texture_man)
 		{
 			// 8个点 对应8个索引
 			switch (dir)
 			{
-			case _Block::FaceDirection::X_Positive:
+			case _block::FaceDirection::X_Positive:
 				// 1 4 7 6
 				setFaceVertices(block_p, mesh_construct.vertices, 1, 4, 7, 6);
 				break;
-			case _Block::FaceDirection::X_Negative:
+			case _block::FaceDirection::X_Negative:
 				// 3 5 2 0
 				setFaceVertices(block_p, mesh_construct.vertices, 3, 5, 2, 0);
 				break;
-			case _Block::FaceDirection::Y_Positive:
+			case _block::FaceDirection::Y_Positive:
 				// 2 5 7 4
 				setFaceVertices(block_p, mesh_construct.vertices, 2, 5, 7, 4);
 				break;
-			case _Block::FaceDirection::Y_Negative:
+			case _block::FaceDirection::Y_Negative:
 				// 1 6 3 0
 				setFaceVertices(block_p, mesh_construct.vertices, 1, 6, 3, 0);
 				break;
-			case _Block::FaceDirection::Z_Positive:
+			case _block::FaceDirection::Z_Positive:
 				// 6 7 5 3
 				setFaceVertices(block_p, mesh_construct.vertices, 6, 7, 5, 3);
 				break;
-			case _Block::FaceDirection::Z_Negative:
+			case _block::FaceDirection::Z_Negative:
 				// 0 2 4 1
 				setFaceVertices(block_p, mesh_construct.vertices, 0, 2, 4, 1);
 				break;
@@ -131,9 +131,9 @@ namespace VF
 		////这个应该可以拿到Base去
 		//void BlockMesh_Common::getBlockValidTriangles(std::vector<VFVec3F>& vertexPoses, _Graph::Indices& indices)
 		//{
-		//	for (int a = 0; a < (int)(_Block::FaceDirection::End); a++)
+		//	for (int a = 0; a < (int)(_block::FaceDirection::End); a++)
 		//	{
-		//		this->pushOneFaceVerticesAndIndices_selfPos((_Block::FaceDirection)a, vertexPoses, indices, 0);
+		//		this->pushOneFaceVerticesAndIndices_selfPos((_block::FaceDirection)a, vertexPoses, indices, 0);
 		//	}
 		//}
 		//这个应该也可以拿到Base去

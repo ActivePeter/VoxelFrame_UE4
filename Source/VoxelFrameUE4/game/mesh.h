@@ -24,9 +24,9 @@ namespace VF
 		/**
 		 * 在修改chunk数据后置为true
 		 */
-		bool needConstruct = true;
+		 //bool needConstruct = true;
 
-		//MeshConstructData() {}
+		 //MeshConstructData() {}
 		void before_construct();
 	};
 }

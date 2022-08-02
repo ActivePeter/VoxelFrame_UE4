@@ -1,14 +1,14 @@
 use crate::*;
 use std::mem;
-use crate::game_chunk::Chunk;
 use protobuf::{Message, CodedOutputStream, RepeatedField};
 use byteorder::{LittleEndian, ByteOrder, BigEndian};
 use crate::game::Game;
 use std::collections::HashMap;
 use crate::protos::common::EntityPos;
 use crate::net_pack_convert::PackIds;
-use crate::game_entity::{EntityData, EntityId};
 use crate::protos::common;
+use crate::game::game_chunk::Chunk;
+use crate::game::game_entity::{EntityData, EntityId};
 
 mod util{
     use protobuf::{CodedOutputStream, RepeatedField};
@@ -101,6 +101,7 @@ pub fn pack_chunk_entity_pack(
         let mut i=0;
         for eid in chunk.entities.iter(){
             proto_pack.entity_pos[i].entity_id=*eid;
+            println!("pack_chunk_entity_pack add eid{}",*eid);
             let entity=entities.get(eid).unwrap();
             proto_pack.entity_pos[i].x=entity.position[0];
             proto_pack.entity_pos[i].y=entity.position[1];

@@ -4,7 +4,7 @@
 //////////////////////////////////
 namespace VF
 {
-	namespace _Block
+	namespace _block
 	{
 		//还可以在实例化的时候自动将自己的材质预先加入到要构建的材质列表中，并且记录自己的材质对应的索引
 		// 最后所有block加载完
@@ -37,7 +37,7 @@ namespace VF
 			////     bottomIndex = textureManager.registBlockFaceTexture("grass_bottom");
 			//// }
 			////重写父类
-			virtual void setVertexUVOnDir(TextureManager& texture_man, VFArray<FVector2D>& uvs, _Block::FaceDirection dir) override;
+			virtual void setVertexUVOnDir(TextureManager& texture_man, VFArray<FVector2D>& uvs, _block::FaceDirection dir) override;
 		};
 	}
 }
