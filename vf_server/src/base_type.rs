@@ -1,6 +1,17 @@
 use arrayvec::ArrayVec;
 
 pub type Point3f = ArrayVec<f32, 3>;
+pub struct Point2i{
+    pub x:i32,
+    pub y:i32
+}
+impl Point2i{
+    pub fn new(x:i32, y:i32) -> Point2i {
+        Point2i{
+            x,y
+        }
+    }
+}
 pub struct Point3i{
     pub x:i32,
     pub y:i32,

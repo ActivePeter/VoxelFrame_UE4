@@ -1,6 +1,6 @@
 use crate::*;
 use crate::base_type::{Point3f, Point3i};
-use crate::game::game_chunk::{ChunkKey, VF_CHUNK_SIZE, VF_CHUNK_WIDTH};
+use crate::game::chunk::{ChunkKey, VF_CHUNK_SIZE, VF_CHUNK_WIDTH};
 
 //三维的点转换为chunkkey
 pub fn point3f_2_chunkkey(p: &Point3f)->ChunkKey{

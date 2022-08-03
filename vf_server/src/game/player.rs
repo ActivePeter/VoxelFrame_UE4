@@ -1,9 +1,9 @@
 use crate::*;
 use tokio::sync::mpsc::Sender;
-use crate::game::{ClientId, Game, game_entity, game_chunk};
+use crate::game::{ClientId, Game, entity, chunk};
 use crate::protos::common;
 use crate::net_pack_convert::{PackIds, MsgEnum};
-use crate::game::game_entity::EntityId;
+use crate::game::entity::EntityId;
 use crate::protos::common::ClientType;
 use crate::net::{ClientMsgEnum, ClientMsg};
 use std::collections::HashMap;
@@ -117,7 +117,7 @@ impl PlayerConnectionHandler<'_> {
     pub async fn on_player_disconnect(&mut self,cid:ClientId){
         println!("on_player_disconnect");
         let p = (*self.ctx.player_manager.get_player_by_cid(cid)).clone();
-        game_entity::EntityOperator::new(self.ctx)
+        entity::EntityOperator::new(self.ctx)
             .remove_player_entity_in_game(&p).await;
 
         PlayerManOperator::new(self.ctx)
@@ -136,7 +136,7 @@ impl PlayerConnectionHandler<'_> {
         // entity=(game).spawn_entity_for_player(&player);
 
         //2.出生entity 这个过程是产生entity，
-        let player_entity_id =game_entity::entity_spawn(self.ctx);
+        let player_entity_id = entity::entity_spawn(self.ctx);
 
         //2.5产生完entity id 就与player绑定
         self.ctx.player_manager.set_player_entity_id(playerid,player_entity_id);
@@ -155,12 +155,12 @@ impl PlayerConnectionHandler<'_> {
 
         //4.将player id 和entity id 加入区块
         {
-            game_chunk::chunks_add_be_interested(self.ctx, playerid, player_entity_id).await;
-            game_chunk::chunk_add_player(self.ctx, playerid, player_entity_id).await;
+            chunk::chunks_add_be_interested(self.ctx, playerid, player_entity_id).await;
+            chunk::chunk_add_player(self.ctx, playerid, player_entity_id).await;
 
         }
 
-        game_entity::spawn_entity_in_ps(self.ctx, epos).await;
+        entity::spawn_entity_in_ps(self.ctx, epos).await;
 
 
         // println!("before add player -----------------------------------");

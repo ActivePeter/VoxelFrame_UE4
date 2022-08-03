@@ -20,7 +20,7 @@ mod put_block{
     use protobuf::SingularPtrField;
     use crate::net_pack_convert::PackIds;
     use crate::game::operation::OperationResult;
-    use crate::game::game_chunk::Chunk;
+    use crate::game::chunk::Chunk;
     use crate::base_type::{Point3i, point3f_new2};
 
 

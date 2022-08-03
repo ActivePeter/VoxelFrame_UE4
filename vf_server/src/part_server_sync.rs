@@ -3,7 +3,7 @@ use crate::game::{ClientId, Game, ClientManager};
 use crate::send_packer;
 use crate::net::{ClientSender, ClientDescription};
 use tokio::sync::mpsc;
-use crate::game::game_chunk::ChunkKey;
+use crate::game::chunk::ChunkKey;
 
 pub struct PartServerSync{
     pub free_chunks:HashSet<ChunkKey>,

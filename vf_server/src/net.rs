@@ -2,7 +2,7 @@ use crate::*;
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::net::TcpStream;
 use std::net::SocketAddr;
-use game::game_player::Player;
+use game::player::Player;
 use tokio::sync::{mpsc, oneshot};
 use crate::protos::common::{ClientFirstConfirm, EntityPos, PlayerBasic, ChunkPack, ChunkEntityPack, ClientType};
 use crate::net_pack_convert::{MsgEnum, PackIds};

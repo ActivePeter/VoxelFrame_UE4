@@ -1,16 +1,16 @@
 use crate::*;
-use crate::game::{Game, game_player, ClientId};
+use crate::game::{Game, player, ClientId};
 use crate::protos::common::{EntityType, ClientType};
 use std::collections::LinkedList;
 use crate::net_pack_convert::{pack_to_bytes, PackIds, pack_to_bytes2, MsgEnum};
 use protobuf::Clear;
-use crate::game::game_player::{PlayerId, Player};
+use crate::game::player::{PlayerId, Player};
 use crate::net::ClientMsg;
 use crate::protos::common::ClientType::ClientType_GameServer;
 use crate::async_task::AsyncTask;
 use crate::base_type::point3f_new2;
-use game::game_chunk;
-use crate::game::game_chunk::{chunks_add_be_interested, chunks_remove_be_interested, ChunkKey};
+use game::chunk;
+use crate::game::chunk::{chunks_add_be_interested, chunks_remove_be_interested, ChunkKey};
 
 //type
 pub type EntityId = u32;
@@ -37,7 +37,7 @@ pub fn entity_spawn(game: &mut Game) -> u32 {
             .or_insert(
                 EntityData {
                     entity_id: game.entity_cnt,
-                    position: base_type::point3f_new(),
+                    position: base_type::point3f_new2(0.0,300.0,0.0),
                     entity_type: EntityType::T_Player,
                 }
             );
@@ -89,9 +89,9 @@ pub async fn update_entity_pos(game: &mut Game, epu: protos::common::EntityPosUp
                 if isplayer {
                     if ck1!=ck {
                         let pid=game.player_manager.get_player_by_eid(a.entity_id).player_id;
-                        game_chunk::chunks_remove_be_interested(game, pid, ck1)
+                        chunk::chunks_remove_be_interested(game, pid, ck1)
                             .await;
-                        game_chunk::chunks_add_be_interested2(game,pid,ck)
+                        chunk::chunks_add_be_interested2(game, pid, ck)
                             .await;
                     }
                 }
@@ -191,7 +191,7 @@ async fn handle_spawn_entity_in_ps_rpl (game:&mut Game,rpl:protos::common::Rpl_S
 
 
             //todo: 出生点区块坐标可能变化，还未做相应的处理
-            game_player::send_player_basic_and_chunk(
+            player::send_player_basic_and_chunk(
                 game,pid.player_id,pid.entity_id).await;
 
         }else{
@@ -254,7 +254,7 @@ impl EntityOperator<'_> {
     pub async fn remove_player_entity_in_game(&mut self,p:&Player){
         println!("remove_player_entity_in_game");
         //2.移除chunk中的entity
-        game_chunk::ChunkOperator::new(self.ctx)
+        chunk::ChunkOperator::new(self.ctx)
             .remove_player(p).await;
         //1.移除数据中的entity
         self.remove_entity_indata(p.entity_id);

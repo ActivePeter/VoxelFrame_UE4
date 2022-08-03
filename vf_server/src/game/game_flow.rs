@@ -5,7 +5,7 @@ use crate::part_server_sync;
 
 mod _after_client_connect{
 
-    use crate::game::{ClientId, Game, ClientManager, game_entity, game_chunk};
+    use crate::game::{ClientId, Game, ClientManager, entity, chunk};
     use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
     use crate::{send};
     use crate::protos;

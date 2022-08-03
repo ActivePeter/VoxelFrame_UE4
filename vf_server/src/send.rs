@@ -1,7 +1,7 @@
 use crate::*;
-use crate::game::{Game, ClientManager,game_chunk};
-use crate::game::game_player::Player;
-use crate::game::game_entity::EntityData;
+use crate::game::{Game, ClientManager, chunk};
+use crate::game::player::Player;
+use crate::game::entity::EntityData;
 
 
 // pub mod to_player{

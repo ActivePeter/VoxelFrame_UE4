@@ -1,7 +1,7 @@
 use crate::game::{Game, ClientId};
 use crate::protos::common::ClientType::ClientType_Player;
 use crate::part_server_sync;
-use crate::game::game_player::PlayerConnectionHandler;
+use crate::game::player::PlayerConnectionHandler;
 
 pub struct NetClientOperator<'a>{
     ctx:&'a mut Game

@@ -3,9 +3,9 @@ use crate::net_pack_convert::MsgEnum;
 use crate::protos::common::ClientType;
 use crate::{async_task, part_server_sync};
 use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
-use crate::game::{Game, game_player, game_entity, game_block, game_flow};
+use crate::game::{Game, player, entity, block, game_flow};
 use crate::netclient;
-use crate::game::game_player::PlayerConnectionHandler;
+use crate::game::player::PlayerConnectionHandler;
 // use std::alloc::Global;
 
 // pub struct PackHandler{
@@ -26,9 +26,9 @@ pub async fn distribute_client_common_msg(context:&mut Game,msg:ClientMsgEnum){
 
     match msg {
         ClientMsgEnum::ClientCommonMsg(mut common_msg) => {
-            let mut continue_=game_player::handle_pack(context,&common_msg).await;
-            if continue_ { continue_ = game_entity::handle_pack(context, &common_msg).await }
-            if continue_ { continue_ = game_block::handle_pack(context,&common_msg).await }
+            let mut continue_= player::handle_pack(context, &common_msg).await;
+            if continue_ { continue_ = entity::handle_pack(context, &common_msg).await }
+            if continue_ { continue_ = block::handle_pack(context, &common_msg).await }
             // game_player::handle_pack(common_msg).await;
             // match common_msg.msg_enum{
             //     _ => {

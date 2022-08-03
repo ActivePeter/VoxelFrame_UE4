@@ -7,8 +7,8 @@ use std::collections::HashMap;
 use crate::protos::common::EntityPos;
 use crate::net_pack_convert::PackIds;
 use crate::protos::common;
-use crate::game::game_chunk::Chunk;
-use crate::game::game_entity::{EntityData, EntityId};
+use crate::game::chunk::Chunk;
+use crate::game::entity::{EntityData, EntityId};
 
 mod util{
     use protobuf::{CodedOutputStream, RepeatedField};

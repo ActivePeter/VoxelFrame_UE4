@@ -1,18 +1,19 @@
-pub mod game_chunk;
-pub(crate) mod game_player;
+pub mod chunk;
+pub(crate) mod player;
 pub(crate) mod game_flow;
-pub(crate) mod game_entity;
-pub(crate) mod game_block;
-pub(crate) mod game_pack_distribute;
+pub(crate) mod entity;
+pub(crate) mod block;
+pub(crate) mod pack_distribute;
 pub(crate) mod operation;
+mod chunk_terrain;
 
 pub use crate::*;
 use std::collections::{HashMap, HashSet};
 use tokio::net::TcpStream;
 // use std::any::Any;
-use game::game_player::{Player, PlayerId};
+use game::player::{Player, PlayerId};
 use crate::conv::point3f_2_chunkkey;
-use game::game_chunk::{ChunkKey, Chunk};
+use game::chunk::{ChunkKey, Chunk};
 use std::net::SocketAddr;
 use tokio::net::windows::named_pipe::PipeEnd::Client;
 // use std::borrow::{Borrow, BorrowMut};
@@ -24,11 +25,11 @@ use crate::net::{ClientMsg, ClientMsgEnum, ClientDescription, ClientSender};
 use crate::protos::common::ClientType;
 use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
 use crate::part_server_sync::PartServerSync;
-use game::game_entity::{EntityId, EntityData};
+use game::entity::{EntityId, EntityData};
 use crate::net_pack_convert::MsgEnum;
 use crate::net_pack_convert::MsgEnum::MainPlayerMoveCmd;
 use crate::async_task::AsyncTaskManager;
-use crate::game::game_player::PlayerManager;
+use crate::game::player::PlayerManager;
 
 pub type ClientId = usize;
 pub type ClientOperationId=u32;
@@ -114,7 +115,7 @@ pub struct Game {
 
     //游戏逻辑
     pub entity_cnt: u32,
-    pub chunks: HashMap<game_chunk::ChunkKey, game_chunk::Chunk>,
+    pub chunks: HashMap<chunk::ChunkKey, chunk::Chunk>,
     pub entities: HashMap<EntityId, EntityData>,
     // pub entities: HashMap<EntityId,<EntityData>>,
     pub player_manager: PlayerManager,
@@ -193,7 +194,7 @@ impl Game {
             return self.chunks.get_mut(chunk_key).unwrap();
         }else{
 
-            self.chunks.insert(chunk_key.clone(), game_chunk::Chunk::new_and_load(chunk_key));
+            self.chunks.insert(chunk_key.clone(), chunk::Chunk::new_and_load(chunk_key));
             // .add_free_chunk(chunk_key.clone());
             part_server_sync::add_free_chunk(self,chunk_key.clone()).await;
             return self.chunks.get_mut(chunk_key).unwrap();
@@ -255,7 +256,7 @@ pub async fn main_loop()
         loop {
             let msg=  msg_channel_rx.recv().await.unwrap();
 
-            game_pack_distribute::
+            pack_distribute::
             distribute_client_common_msg(&mut context,msg).await;
             // match msg {
             //     ClientStateMsg::ClientConnect(s)=>{
