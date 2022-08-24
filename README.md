@@ -5,7 +5,7 @@
 
   一个使用ue和rust编写的类似mc的游戏
 
-![image-20210609143052106](./resouce/perlinoise.png)
+![image-20210609143052106](./resouce/main.png)
 
 ## Organization（组织
 
