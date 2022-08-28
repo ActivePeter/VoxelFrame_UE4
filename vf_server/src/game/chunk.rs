@@ -8,6 +8,7 @@ use crate::net_pack_convert::PackIds;
 use crate::protos::common::RemoveEntityType;
 use crate::net::ClientSender;
 use crate::base_type::Point3i;
+use std::collections::hash_map::RandomState;
 
 
 pub const VF_CHUNK_LOAD_RADIUS: i32 = (4);
@@ -20,6 +21,14 @@ pub struct ChunkKey {
     pub y: i32,
     pub z: i32,
 }
+pub enum Side{
+    YPlus1,
+    YMinus1,
+    XPlus1,
+    XMinus1,
+    ZPlus1,
+    ZMinus1,
+}
 impl ChunkKey{
     pub fn plus(self, ck: ChunkKey) -> ChunkKey {
         return ChunkKey {
@@ -28,8 +37,27 @@ impl ChunkKey{
             z: self.z + ck.z,
         };
     }
+    pub fn new(x:i32,y:i32,z:i32)->ChunkKey{
+        ChunkKey{
+            x,
+            y,
+            z
+        }
+    }
     pub fn is_in_range(&self) -> bool {
         return self.x * self.x + self.y * self.y + self.z * self.z < VF_CHUNK_LOAD_RADIUS * VF_CHUNK_LOAD_RADIUS;
+    }
+    pub fn get_beside(&self, side:Side) -> ChunkKey {
+        let mut ck =self.clone();
+        match side{
+            Side::YPlus1 => {ck.y+=1;}
+            Side::YMinus1 => {ck.y-=1;}
+            Side::XPlus1 => {ck.x+=1;}
+            Side::XMinus1 => {ck.x-=1;}
+            Side::ZPlus1 => {ck.z+=1;}
+            Side::ZMinus1 => {ck.z-=1;}
+        }
+        ck
     }
 }
 pub struct Chunk {
@@ -43,7 +71,7 @@ pub struct Chunk {
 }
 
 impl Chunk{
-    pub fn new_and_load(key: &ChunkKey) -> Chunk {
+    pub fn new_and_load(map: &mut HashMap<ChunkKey, Chunk>, key: &ChunkKey) -> Chunk {
         let mut v = Vec::new();
         v.resize(VF_CHUNK_SIZE as usize, 0);
 
@@ -56,7 +84,7 @@ impl Chunk{
             part_server_cid:None,
             entity_update: Default::default()
         };
-        chunk_terrain::init_chunk_data(&mut chunk);
+        chunk_terrain::init_chunk_data(map,&mut chunk);
         // chunk.load();
         return chunk;
     }

@@ -4,8 +4,10 @@ use rand_seeder::rand_core::RngCore;         // for next_u32
 use rand_pcg::Pcg64;
 use std::f32::consts::PI;
 use crate::game::chunk;
-use crate::game::chunk::VF_CHUNK_WIDTH;
-use crate::conv;            // or whatever you like
+use crate::game::chunk::{VF_CHUNK_WIDTH, Chunk, ChunkKey};
+use crate::conv;
+use std::collections::HashMap;
+use std::collections::hash_map::RandomState;            // or whatever you like
 
 struct RandWithSeed{
     seed:String
@@ -36,7 +38,7 @@ impl RandWithSeed{
         glam::Vec2::new(f32::cos(rand_rad),f32::sin(rand_rad))
     }
 }
-pub fn init_chunk_data(c: &mut chunk::Chunk){
+pub fn init_chunk_data(map: &mut HashMap<ChunkKey, Chunk>, c: &mut chunk::Chunk){
     for x in 0..VF_CHUNK_WIDTH {
         for z in 0..VF_CHUNK_WIDTH {
             let gx=x+c.chunk_key.x*VF_CHUNK_WIDTH;
@@ -61,7 +63,40 @@ pub fn init_chunk_data(c: &mut chunk::Chunk){
             }
         }
     }
+    let mut cp =ChunkProccessor{
+        map,
+        c
+    };
+    cp.add_river();
 }
+
+
+struct ChunkBlockBoxIter{
+        
+}
+
+
+struct ChunkProccessor<'a> {
+    map: &'a mut HashMap<ChunkKey, Chunk>,
+    c: &'a mut chunk::Chunk
+}
+
+impl<'a> ChunkProccessor<'a>{
+    pub fn add_river(&mut self){
+        // const RIVER_HEIGHT: i32 =10;
+        // //判断周围区块已有水方块
+        // //1.若有，则从该处开始flood fill
+
+        // fn
+        // self.c.chunk_key.get_beside(chunk::Side::XMinus1);
+        // //2.若没有，则根据概率决定这个区块中小于坐标的位置是否有水，有则进行flood fill
+        // // ,直到所有满足河流高度block格子都经过了flood fill判断
+
+
+    }
+}
+
+
 mod noise_algrithm{
     use crate::game::chunk_terrain::RandWithSeed;
 

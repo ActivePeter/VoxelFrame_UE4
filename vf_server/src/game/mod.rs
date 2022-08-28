@@ -193,8 +193,8 @@ impl Game {
         if(a){
             return self.chunks.get_mut(chunk_key).unwrap();
         }else{
-
-            self.chunks.insert(chunk_key.clone(), chunk::Chunk::new_and_load(chunk_key));
+            let ck=chunk::Chunk::new_and_load(&mut self.chunks, chunk_key);
+            self.chunks.insert(chunk_key.clone(),ck );
             // .add_free_chunk(chunk_key.clone());
             part_server_sync::add_free_chunk(self,chunk_key.clone()).await;
             return self.chunks.get_mut(chunk_key).unwrap();
