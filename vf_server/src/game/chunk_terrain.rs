@@ -178,7 +178,7 @@ impl<'a> ChunkProccessor<'a> {
                 loop {//y
                     let (_,index)=piter.with_globalp_and_index();
                     if ycnt==3{
-                        self.c.chunk_data[index as usize]=0;
+                        self.c.chunk_data[index as usize]=2;
                     }else{
                         let b=self.c.chunk_data[index as usize];
                         if b!=0{
