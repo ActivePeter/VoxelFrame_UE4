@@ -59,6 +59,9 @@ impl ChunkKey{
         }
         ck
     }
+    pub fn get_world_pos(&self)->glam::IVec3{
+        glam::IVec3::new(self.x*VF_CHUNK_WIDTH,self.y*VF_CHUNK_WIDTH,self.z*VF_CHUNK_WIDTH)
+    }
 }
 pub struct Chunk {
     pub chunk_key: ChunkKey,
