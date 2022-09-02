@@ -56,7 +56,7 @@ pub fn init_chunk_data(map: &mut HashMap<ChunkKey, Chunk>, c: &mut chunk::Chunk)
                 gz as f32
                     // /10.0
                     / VF_CHUNK_WIDTH as f32,
-            ) * 20.0) as i32;
+            ) * 20.0) as i32+20;
 
             for y in 0..VF_CHUNK_WIDTH {
                 if y + gyoff < divide_y {
@@ -72,8 +72,8 @@ pub fn init_chunk_data(map: &mut HashMap<ChunkKey, Chunk>, c: &mut chunk::Chunk)
         c,
     };
     cp
-        .add_river()
         .gen_rocks()
+        .add_river()
     ;
 }
 
@@ -204,6 +204,38 @@ impl<'a> ChunkProccessor<'a> {
         self
     }
     pub fn add_river(&mut self) -> &mut ChunkProccessor<'a> {
+        const RIVER_HEIGHT:i32=14;
+
+        let chunkbeginp=self.c.chunk_key.get_world_pos();
+        if RIVER_HEIGHT>chunkbeginp.y&&RIVER_HEIGHT<chunkbeginp.y+VF_CHUNK_WIDTH{
+            let mut piter =ChunkBlockBoxIter::new(self.c.chunk_key.clone(),
+                                                  IVec3::new(VF_CHUNK_WIDTH - 1, RIVER_HEIGHT-chunkbeginp.y, VF_CHUNK_WIDTH - 1),
+                                                  IVec3::new(0, 0, 0),
+            );
+            loop{//x
+                loop{//z
+                    let mut ycnt=0;
+                    loop {//y
+                        let (_,index)=piter.with_globalp_and_index();
+                        if self.c.chunk_data[index as usize]==0{
+                            self.c.chunk_data[index as usize]=2;
+                        }
+                        if !piter.plus_y(-1){
+                            piter.reset_y();
+                            break;
+                        }
+                    }
+                    if !piter.plus_z(-1){
+                        piter.reset_z();
+                        break;
+                    }
+                }
+                if !piter.plus_x(-1){
+                    piter.reset_x();
+                    break;
+                }
+            }
+        }
         // const RIVER_HEIGHT: i32 =10;
         // //判断周围区块已有水方块
         // //1.若有，则从该处开始flood fill
