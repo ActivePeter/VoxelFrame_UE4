@@ -22,7 +22,7 @@
 ## Engine Version
 
 - ue4.26
-- [ue部分比较大，不在仓库里](http://s5.nsloop.com:28204/down/yhAcWzkNuT0T)
+- [ue部分比较大，只有源码在仓库里，完整获取链接](http://s5.nsloop.com:28204/down/yhAcWzkNuT0T)
 
 ## Related Projects（相关项目
 

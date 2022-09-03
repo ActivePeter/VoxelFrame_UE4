@@ -1,5 +1,11 @@
 开发具体过程记录
 
+## 2022/9/3
+
+学了下unreal 的slate ui 库，还不错, 把chunk贴图显示到了界面上
+
+![X`FNCK_9XNE1UR920RQA_WT.png](https://s2.loli.net/2022/09/03/279DFMTvXlQ1Epu.png)
+
 ## 2022/9/2
 
 ![image.png](https://s2.loli.net/2022/09/02/PWAdxymFrGpTMzl.png)
