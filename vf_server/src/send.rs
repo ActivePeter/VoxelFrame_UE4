@@ -30,7 +30,6 @@ pub async fn player_interested_chunk_block_data(
 ) {
     //计算玩家区块
     let p_ck = conv::point3f_2_chunkkey(&entity.position);
-
     iter_relative_chunk_key_in_interest_range!(
         r_ck,
         {
