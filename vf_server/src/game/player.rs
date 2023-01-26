@@ -6,6 +6,7 @@ use crate::net_pack_convert::{PackIds, MsgEnum};
 use crate::game::entity::EntityId;
 use crate::protos::common::ClientType;
 use crate::net::{ClientMsgEnum, ClientMsg};
+use crate::event::player_event;
 use std::collections::HashMap;
 
 pub type PlayerId = i32;
@@ -201,8 +202,7 @@ pub async fn handle_pack(context:&mut Game,msg:& ClientMsg) -> bool {
         => {
             if msg.client_type==ClientType::ClientType_Player{
                 let cpcmd=cmd.clone();
-                handle_MainPlayerMoveCmd(msg.client_id,
-                                                      context, cpcmd).await;
+                player_event::cmd_move::call(msg.client_id, context, cpcmd).await;
 
             }
             // println!("MainPlayerMoveCmd");
@@ -211,8 +211,8 @@ pub async fn handle_pack(context:&mut Game,msg:& ClientMsg) -> bool {
         MsgEnum::MainPlayerJumpCmd(cmd)=> {
             if msg.client_type==ClientType::ClientType_Player {
                 let cpcmd = cmd.clone();
-                handle_MainPlayerJumpCmd(msg.client_id,
-                                         context, cpcmd).await;
+                player_event::cmd_jump::call(msg.client_id,
+                                             context, cpcmd).await;
             }
 
             // println!("MainPlayerJumpCmd");
@@ -225,49 +225,4 @@ pub async fn handle_pack(context:&mut Game,msg:& ClientMsg) -> bool {
     }
 }
 
-async fn handle_MainPlayerMoveCmd(cid:ClientId,game:&mut Game,pmcmd:common::MainPlayerMoveCmd){
-
-    //TODO 这里1。2是假的，目前是one server 模式
-    //0.验证pack 有效性
-    if(pmcmd.entity_id!=game.player_manager.get_player_by_cid(cid).entity_id){
-        println!("wrong cmd eid {} {}",pmcmd.entity_id,game.player_manager.get_player_by_cid(cid).entity_id);
-        return;
-    }
-    //1.找到player所在区块，
-    let ck=conv::point3f_2_chunkkey(&game.entities.get(&pmcmd.entity_id).unwrap().position);
-    //2.确认区块是那个服务端控制的
-    let cidop=game.part_server_sync.get_part_server_cid_of_chunk(ck);
-
-    //3.转发
-    match cidop {
-        None => {}
-        Some(cid) => {
-            game.client_manager.get_sender(cid).send(
-                net_pack_convert::pack_to_bytes(pmcmd,PackIds::EMainPlayerMoveCmd)
-            ).await;
-        }
-    }
-}
-async fn handle_MainPlayerJumpCmd(cid:ClientId,game:&mut Game,pmcmd:common::MainPlayerJumpCmd){
-    //TODO 这里1。2是假的，目前是one server 模式
-    //0.验证pack 有效性
-    if(pmcmd.entity_id!=game.player_manager.get_player_by_cid(cid).entity_id){
-        println!("wrong cmd eid {} {}",pmcmd.entity_id,game.player_manager.get_player_by_cid(cid).entity_id);
-        return;
-    }
-    //1.找到player所在区块，
-    let ck=conv::point3f_2_chunkkey(&game.entities.get(&pmcmd.entity_id).unwrap().position);
-    //2.确认区块是那个服务端控制的
-    let cidop=game.part_server_sync.get_part_server_cid_of_chunk(ck);
-
-    //3.转发
-    match cidop {
-        None => {}
-        Some(cid) => {
-            game.client_manager.get_sender(cid).send(
-                net_pack_convert::pack_to_bytes(pmcmd,PackIds::EMainPlayerJumpCmd)
-            ).await;
-        }
-    }
-}
 

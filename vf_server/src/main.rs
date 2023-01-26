@@ -1,4 +1,7 @@
 #![feature(linked_list_remove)]
+#![feature(generic_associated_types)]
+#![feature(type_alias_impl_trait)]
+
 
 // mod game;
 #[macro_use]
@@ -17,6 +20,8 @@ mod async_task;
 mod log;
 mod game;
 pub mod netclient;
+mod net_event;
+mod event;
 // mod base_func;
 
 // use std::net::TcpListener;

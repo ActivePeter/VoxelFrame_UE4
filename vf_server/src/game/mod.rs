@@ -1,6 +1,5 @@
 pub mod chunk;
 pub(crate) mod player;
-pub(crate) mod game_flow;
 pub(crate) mod entity;
 pub(crate) mod block;
 pub(crate) mod pack_distribute;
@@ -17,7 +16,7 @@ use game::chunk::{ChunkKey, Chunk};
 use std::net::SocketAddr;
 use tokio::net::windows::named_pipe::PipeEnd::Client;
 // use std::borrow::{Borrow, BorrowMut};
-use std::thread::{spawn, LocalKey};
+use std::thread::{spawn, LocalKey, sleep};
 use tokio::sync::{mpsc, oneshot};
 use tokio::task;
 use crate::net::{ClientMsg, ClientMsgEnum, ClientDescription, ClientSender};
@@ -30,6 +29,10 @@ use crate::net_pack_convert::MsgEnum;
 use crate::net_pack_convert::MsgEnum::MainPlayerMoveCmd;
 use crate::async_task::AsyncTaskManager;
 use crate::game::player::PlayerManager;
+use tokio::time::Duration;
+use std::sync::atomic::AtomicI32;
+use std::sync::atomic::Ordering::{Relaxed, Release, Acquire};
+use crate::event::chunk_event;
 
 pub type ClientId = usize;
 pub type ClientOperationId=u32;
@@ -144,8 +147,9 @@ impl Game {
             async_task_manager: AsyncTaskManager::create(),
         }
     }
+    pub(crate) fn tick(&mut self){
 
-
+    }
     pub fn entity_get(&self, entity_id: &EntityId) -> Option<&EntityData> {
         return self.entities.get(entity_id);
     }
@@ -243,8 +247,18 @@ pub async fn main_loop()
 
 
     let game_channels = GameMainLoopChannels {
-        msg_channel_tx,
+        msg_channel_tx:msg_channel_tx.clone(),
     };
+    let tick_task_tx=msg_channel_tx;
+    let tickcnt=Arc::new(AtomicI32::new(0));
+    {
+        let tickcnt=tickcnt.clone();
+        tokio::spawn(async move{
+            tickcnt.store(1,Release);
+            tick_task_tx.send(ClientMsgEnum::Tick).await.unwrap();
+            sleep(Duration::from_millis(20));
+        });
+    }
     //
     // let mut game = game::Game::create();
     // local.spawn_local(async move {
@@ -255,26 +269,21 @@ pub async fn main_loop()
         println!("game main loop task spawned");
         loop {
             let msg=  msg_channel_rx.recv().await.unwrap();
-
-            pack_distribute::
-            distribute_client_common_msg(&mut context,msg).await;
-            // match msg {
-            //     ClientStateMsg::ClientConnect(s)=>{
-            //
-            //     }
-            // }
-
-            // tokio::select! {
-            //     // Some(client_sender) = new_player_channel_rx.recv() => {
-            //     //     println!("new player in msg rx");
-            //     //     // game.spawn_player(client_sender).await;
-            //     // },
-            //
-            //     Some(msg)=msg_channel_rx.recv()=>{
-            //         println!("client msg to game loop")
-            //     },
-            //     else => break,
-            // }
+            if let ClientMsgEnum::Tick=msg{
+                tickcnt.store(0,Release);
+                chunk_event::sync_all_change_to_clients::call();
+                for i in 0..50{
+                    context.tick();
+                    //新的超时
+                    if tickcnt.load(Acquire)==1{
+                        println!("too slow, ticks havent done, left {}",50-i);
+                        break;
+                    }
+                }
+            }else{
+                pack_distribute::
+                distribute_client_common_msg(&mut context,msg).await;
+            }
         }
         println!("game main loop task end");
         // });
