@@ -19,6 +19,7 @@ pub enum PackIds {
     EClientOperationSucc=13,
     EMainPlayerJumpCmd=14,
     ERemoveEntity=15,
+    EPlayerRequestChunks=16,
 }
 
 //用于携带消息包
@@ -35,6 +36,7 @@ pub enum MsgEnum {
     PutBlock(common::PutBlock),
     Rpl_PutBlockInPs(common::Rpl_PutBlockInPs),
     MainPlayerJumpCmd(common::MainPlayerJumpCmd),
+    PlayerRequestChunks(common::PlayerRequestChunks),
 }
 
 fn make_pack_head(pack_id: PackIds, pack_len: usize) -> [u8; 5] {
@@ -104,8 +106,14 @@ pub fn pack_to_bytes<T: ::protobuf::Message>(proto_pack: T, pack_id: PackIds) ->
 
 macro_rules! one_pack {
   ($msg:ty,$msg_enum:expr,$data_slice:ident ) => {
-    let r:$msg = Message::parse_from_bytes($data_slice).unwrap();
-    return Some($msg_enum(r));
+
+    let a:ProtobufResult<$msg>=Message::parse_from_bytes($data_slice);
+      match a{
+        Ok(v)=>{return Some($msg_enum(v));}
+        Err(e)=>{panic!("{}, {}",e,$data_slice.len())}
+    }
+    // let r= Message::parse_from_bytes($data_slice).unwrap();
+
   }
 }
 fn get_pack_id_i32(id:PackIds) -> i32 {
@@ -146,6 +154,9 @@ pub fn bytes_to_pack(msg_pack_id: i32, data_slice: &[u8])
 
     }else if msg_pack_id==PackIds::EMainPlayerJumpCmd as i32{
         one_pack!(common::MainPlayerJumpCmd,MsgEnum::MainPlayerJumpCmd,data_slice);
+
+    }else if msg_pack_id==PackIds::EPlayerRequestChunks as i32{
+        one_pack!(common::PlayerRequestChunks,MsgEnum::PlayerRequestChunks,data_slice);
     }
 
     return None;

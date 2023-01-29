@@ -1,0 +1,3 @@
+[submodule "vf_server/pa_queue_and_chan"]
+	path = vf_server/pa_queue_and_chan
+	url = https://github.com/ActivePeter/pa_queue_and_chan.git
