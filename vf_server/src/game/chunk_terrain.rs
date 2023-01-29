@@ -9,9 +9,10 @@ use crate::conv;
 use std::collections::HashMap;
 use std::collections::hash_map::RandomState;
 use std::cmp::{min, max};
-use glam::IVec3;            // or whatever you like
+use glam::IVec3;
+use crate::game::block::block_type::{BlockAir, Block, BlockWater, BlockRock, BlockGrass, BlockDirt};            // or whatever you like
 
-struct RandWithSeed {
+pub(crate) struct RandWithSeed {
     seed: String,
 }
 
@@ -22,6 +23,7 @@ impl RandWithSeed {
         }
     }
     //最终映射到(0,1)
+    //两个数即为随机步进次数
     pub fn rand2f_range0_1f(&self, a: f32, b: f32) -> f32 {
         let mut rng: Pcg64 = Seeder::from("this is seed").make_rng();
         let u64_ = unsafe {
@@ -59,10 +61,12 @@ pub fn init_chunk_data(map: &mut HashMap<ChunkKey, Chunk>, c: &mut chunk::Chunk)
             ) * 20.0) as i32+20;
 
             for y in 0..VF_CHUNK_WIDTH {
-                if y + gyoff < divide_y {
-                    c.chunk_data[conv::p_int_2_index_in_chunk(x, y, z)] = 1;
+                if y + gyoff == divide_y-1{
+                    c.chunk_data[conv::p_int_2_index_in_chunk(x, y, z)] = BlockGrass::block_type_id();
+                }else if y + gyoff < divide_y {
+                    c.chunk_data[conv::p_int_2_index_in_chunk(x, y, z)] = BlockDirt::block_type_id();
                 } else {
-                    c.chunk_data[conv::p_int_2_index_in_chunk(x, y, z)] = 0;
+                    c.chunk_data[conv::p_int_2_index_in_chunk(x, y, z)] = BlockAir::block_type_id();
                 }
             }
         }
@@ -78,7 +82,7 @@ pub fn init_chunk_data(map: &mut HashMap<ChunkKey, Chunk>, c: &mut chunk::Chunk)
 }
 
 //用于遍历一个区块中的方块坐标
-struct ChunkBlockBoxIter {
+pub(crate) struct ChunkBlockBoxIter {
     chunkkey: ChunkKey,
     pos_begin: glam::IVec3,
     //相对区块的坐标最小
@@ -157,6 +161,7 @@ impl ChunkBlockBoxIter {
         false
     }
     pub fn with_globalp_and_index(&mut self) -> (glam::IVec3, usize) {
+        // println!("with_globalp_and_index {} {} {}",self.cur_pos.x, self.cur_pos.y, self.cur_pos.z);
         (self.chunkkey.get_world_pos()+self.cur_pos, conv::p_int_2_index_in_chunk(self.cur_pos.x, self.cur_pos.y, self.cur_pos.z))
     }
 }
@@ -178,10 +183,10 @@ impl<'a> ChunkProccessor<'a> {
                 loop {//y
                     let (_,index)=piter.with_globalp_and_index();
                     if ycnt==3{
-                        self.c.chunk_data[index as usize]=2;
+                        self.c.chunk_data[index as usize]=BlockRock::block_type_id();
                     }else{
                         let b=self.c.chunk_data[index as usize];
-                        if b!=0{
+                        if b!=BlockAir::block_type_id(){
                             ycnt+=1;
                         }
                     }
@@ -217,8 +222,8 @@ impl<'a> ChunkProccessor<'a> {
                     let mut ycnt=0;
                     loop {//y
                         let (_,index)=piter.with_globalp_and_index();
-                        if self.c.chunk_data[index as usize]==0{
-                            self.c.chunk_data[index as usize]=3;
+                        if self.c.chunk_data[index as usize]==BlockAir::block_type_id() as u8{
+                            self.c.chunk_data[index as usize]=BlockWater::block_type_id() as u8;
                         }
                         if !piter.plus_y(-1){
                             piter.reset_y();

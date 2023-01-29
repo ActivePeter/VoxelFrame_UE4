@@ -1,5 +1,5 @@
 use crate::net::{ClientMsgEnum, ClientMsg};
-use crate::net_pack_convert::MsgEnum;
+use crate::net_pack::MsgEnum;
 use crate::protos::common::ClientType;
 use crate::{async_task, part_server_sync, log};
 use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
@@ -30,27 +30,32 @@ pub async fn distribute_client_common_msg(context:&mut Game,msg:ClientMsgEnum){
         ClientMsgEnum::ClientCommonMsg(mut msg) => {
             let mut continue_= player::handle_pack(context, &msg).await;
             // if continue_ { continue_ = entity::handle_pack(context, &common_msg).await }
-            match &msg.msg_enum {
-
+            let clientid=msg.client_id;
+            match msg.msg_enum {
+                MsgEnum::PlayerRequestChunks(request)=>{
+                    if msg.client_type==ClientType_Player{
+                        player_event::request_chunks::call(clientid,context,request).await;
+                    }
+                }
                 /// entity
                 MsgEnum::EntityPosUpdate(epu)=>{
 
                     // println!("EntityPosUpdate From PartServer");
                     if msg.client_type==ClientType_GameServer{
-                        chunk_event::entity_pos_update::call(context, epu.clone(),
+                        chunk_event::entity_pos_update::call(context, epu,
                                                                 false, 0).await;
                     }
 
-                    false
+                    // false
                 }
                 MsgEnum::Rpl_SpawnEntityInPs(rpl) => {
                     // println!("Rpl_SpawnEntityInPs");
                     if msg.client_type==ClientType_GameServer{
-                        chunk_event::entity_spawned::call(context, rpl.clone()).await;
+                        chunk_event::entity_spawned::call(context, rpl).await;
                         // handle_spawn_entity_in_ps_rpl(
                         //     ).await;
                     }
-                    false
+                    // false
                 }
 
                 MsgEnum::PutBlock(pb)=>{
@@ -59,20 +64,20 @@ pub async fn distribute_client_common_msg(context:&mut Game,msg:ClientMsgEnum){
 
                         //来自player，需要请求partserver putblock
                         player_event::cmd_put_block::call(context,msg.client_id,
-                                                          pb.clone()).await;
+                                                          pb).await;
                     }else{ println!("{} handle_PutBlock",log::get_info_type_str(log::InfoType::WrongMsgSource)) }
-                    false
+                    // false
                 }
                 MsgEnum::Rpl_PutBlockInPs(rpl)=>{
                     if msg.client_type==ClientType_GameServer{
-                        player_event::cmd_put_block::reply(context,rpl.clone()).await;
+                        player_event::cmd_put_block::reply(context,rpl).await;
                         // put_block::put_block_in_ps_rpl(
                         //    ).await;
                     }
-                    false
+                    // false
                 }
                 _ => {
-                    true
+                    // true
                 }
             };
             // if continue_ { continue_ = block::handle_pack(context, &common_msg).await }
@@ -85,7 +90,7 @@ pub async fn distribute_client_common_msg(context:&mut Game,msg:ClientMsgEnum){
         }
         ClientMsgEnum::ClientConnect(m) => {
             let id=
-                context.client_manager.add_new_client(m.sender,m.client_type);
+                context._client_manager.borrow_mut().add_new_client(m.sender, m.client_type);
             m.response.send(id).unwrap();
             if m.client_type==ClientType_GameServer{
                 // println!("ClientType_GameServer");

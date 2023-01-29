@@ -8,9 +8,9 @@ use crate::game::{Game, ClientId, ClientOperationId};
 use crate::conv;
 use crate::base_type::point3f_new2;
 use crate::part_server_sync;
-use crate::net_pack_convert;
-use crate::net_pack_convert::{PackIds, MsgEnum};
-use crate::net_pack_convert::MsgEnum::EntityPos;
+use crate::net_pack;
+use crate::net_pack::{PackIds, MsgEnum};
+use crate::net_pack::MsgEnum::EntityPos;
 use crate::net::ClientMsg;
 use crate::protos::common::ClientType::ClientType_GameServer;
 use crate::log;
@@ -23,7 +23,7 @@ pub struct AsyncTaskManager{
     next_id:AsyncTaskId,
 }
 impl AsyncTaskManager{
-    pub fn create() -> AsyncTaskManager {
+    pub fn new() -> AsyncTaskManager {
         AsyncTaskManager{
             id2wait_rpl_task: Default::default(),
             next_id:0,

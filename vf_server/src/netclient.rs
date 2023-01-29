@@ -14,7 +14,7 @@ impl NetClientOperator<'_> {
     }
     pub async fn on_client_disconnect(&mut self,cid:ClientId){
         println!("on_client_disconnect");
-        let ctype=self.ctx.client_manager.get_clienttype(cid).unwrap();
+        let ctype=self.ctx.client_man_ref().get_clienttype(cid).unwrap();
         if ctype==ClientType_Player {
             PlayerConnectionHandler::new(self.ctx).on_player_disconnect(cid).await;
 

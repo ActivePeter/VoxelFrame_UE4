@@ -1,7 +1,8 @@
 use byteorder::{LittleEndian, ByteOrder, BigEndian};
 use crate::protos::common;
 use protobuf::{CodedOutputStream, parse_from_bytes, Message, ProtobufResult, ProtobufError};
-
+pub(crate) type PackPriority=i32;
+#[derive(Clone)]
 pub enum PackIds {
     EChunkPack = 0,
     EPlayerBasic = 1,
@@ -20,6 +21,33 @@ pub enum PackIds {
     EMainPlayerJumpCmd=14,
     ERemoveEntity=15,
     EPlayerRequestChunks=16,
+}
+impl PackIds{
+    pub(crate) fn default_priority(&self) -> PackPriority {
+        let high=1;
+        let common=10;
+        let low=20;
+        // the bigger, the later
+        match self{
+            PackIds::EChunkPack => {low}
+            PackIds::EPlayerBasic => {common}
+            PackIds::EChunkEntityPack => {common}
+            PackIds::EClientFirstConfirm => {common}
+            PackIds::EEntityPos => {high}
+            PackIds::EMainPlayerMoveCmd => {high}
+            PackIds::ECmd_SpawnEntityInPs => {high}
+            PackIds::ERpl_SpawnEntityInPs => {high}
+            PackIds::EEntityPosUpdate => {high}
+            PackIds::EPutBlock => {common}
+            PackIds::ECmd_PutBlockInPs => {common}
+            PackIds::ERpl_PutBlockInPs => {common}
+            PackIds::EClientOperationFailed => {common}
+            PackIds::EClientOperationSucc => {common}
+            PackIds::EMainPlayerJumpCmd => {high}
+            PackIds::ERemoveEntity => {common}
+            PackIds::EPlayerRequestChunks => {common}
+        }
+    }
 }
 
 //用于携带消息包

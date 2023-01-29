@@ -114,3 +114,13 @@ message RemoveEntity{
   RemoveEntityType remove_type=1;
   uint32 entity_id=2;
 }
+
+message ProtoChunkKey{
+  int32 x=1;
+  int32 y=2;
+  int32 z=3;
+}
+// request by player.
+message PlayerRequestChunks{
+  repeated ProtoChunkKey chunk_keys=1;
+}

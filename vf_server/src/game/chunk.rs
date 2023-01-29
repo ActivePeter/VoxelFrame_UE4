@@ -1,19 +1,28 @@
 use crate::*;
-use std::collections::{LinkedList, HashMap};
+use std::collections::{LinkedList, HashMap, HashSet};
 use game::{Game, ClientId, player, chunk,chunk_terrain};
 use crate::conv::point3f_2_chunkkey;
 use crate::game::entity::{EntityId, EntityData};
 use crate::game::player::{PlayerId, Player};
-use crate::net_pack_convert::PackIds;
-use crate::protos::common::RemoveEntityType;
+use crate::net_pack::PackIds;
+use crate::protos::common::{RemoveEntityType, ProtoChunkKey};
 use crate::net::ClientSender;
-use crate::base_type::Point3i;
 use std::collections::hash_map::RandomState;
+use crate::game::block::block_type::{BlockTypeId, BlockAir, Block};
+use glam::IVec3;
+use crate::game::chunk_terrain::ChunkBlockBoxIter;
 
 
 pub const VF_CHUNK_LOAD_RADIUS: i32 = (4);
 pub const VF_CHUNK_WIDTH: i32 = (32);
 pub const VF_CHUNK_SIZE: i32 = (VF_CHUNK_WIDTH * VF_CHUNK_WIDTH * VF_CHUNK_WIDTH);
+
+
+impl Game{
+    fn chunk_relate__get_ground_chunk(&self,chunkx:i32,chunky:i32){
+
+    }
+}
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub struct ChunkKey {
@@ -36,6 +45,9 @@ impl ChunkKey{
             y: self.y + ck.y,
             z: self.z + ck.z,
         };
+    }
+    pub fn from_proto_chunkkey(proto:&ProtoChunkKey) -> ChunkKey {
+        ChunkKey::new(proto.x,proto.y,proto.z)
     }
     pub fn new(x:i32,y:i32,z:i32)->ChunkKey{
         ChunkKey{
@@ -63,6 +75,11 @@ impl ChunkKey{
         glam::IVec3::new(self.x*VF_CHUNK_WIDTH,self.y*VF_CHUNK_WIDTH,self.z*VF_CHUNK_WIDTH)
     }
 }
+#[derive(Eq, PartialEq)]
+pub enum ChunkLoadStage{
+    Pre,
+    End
+}
 pub struct Chunk {
     pub chunk_key: ChunkKey,
     pub chunk_data: Vec<u8>,
@@ -71,6 +88,7 @@ pub struct Chunk {
     pub entity_update: protos::common::EntityPosUpdate,
     pub be_interested_by: LinkedList<player::PlayerId>,
     pub part_server_cid:Option<ClientId>,
+    pub load_stage:ChunkLoadStage
 }
 
 impl Chunk{
@@ -85,7 +103,8 @@ impl Chunk{
             entities: Default::default(),
             be_interested_by: Default::default(),
             part_server_cid:None,
-            entity_update: Default::default()
+            entity_update: Default::default(),
+            load_stage: ChunkLoadStage::Pre
         };
         chunk_terrain::init_chunk_data(map,&mut chunk);
         // chunk.load();
@@ -104,11 +123,21 @@ impl Chunk{
             }
         }
     }
-    pub fn set_block_at(&mut self,p:Point3i,block:u8){
+    pub fn set_block_at(&mut self, p:&IVec3, block:u8){
         if conv::p_int_2_index_in_chunk(p.x, p.y, p.z)<self.chunk_data.len() {
             self.chunk_data[conv::p_int_2_index_in_chunk(p.x,p.y,p.z)]=block;
         }
     }
+    pub(crate) fn not_air_cnt(&self) -> i32 {
+        let mut cnt=0;
+        for c in &self.chunk_data{
+            if *c!=BlockAir::block_type_id(){
+                cnt+=1;
+            }
+        }
+        cnt
+    }
+
     pub fn add_be_interested_by(&mut self, pid:PlayerId){
         if !self.be_interested_by.contains(&pid) {
             self.be_interested_by.push_back(pid);
@@ -184,6 +213,41 @@ impl Chunk{
             println!("del player not found");
         }
     }
+
+    /// get block by index
+    pub(crate) fn block_get_at_idx(&self, idx:usize) -> BlockTypeId {
+        self.chunk_data[idx]
+    }
+
+    ///return floar y
+    pub(crate) fn find_floor(&self, mut x:i32, mut z:i32) ->Option<(i32, BlockTypeId)>{
+        let ck=conv::point3i_2_chunkkey2(x,0,z);
+
+        if self.chunk_key.x!=ck.x||self.chunk_key.z!=ck.z{
+            // println!("none");
+            return None;
+        }
+
+        x=x-ck.x*VF_CHUNK_SIZE;
+        z=z-ck.z*VF_CHUNK_SIZE;
+
+        let mut piter =ChunkBlockBoxIter::new(self.chunk_key.clone(),
+                                              IVec3::new(x, VF_CHUNK_WIDTH - 1, z),
+                                              IVec3::new(x, 0, z),
+        );
+        let mut last_is_air =false;
+        loop {//y
+            let (pos,index)=piter.with_globalp_and_index();
+            let curtype=self.block_get_at_idx(index);
+            if curtype==BlockAir::block_type_id(){
+                last_is_air=true;
+            }else if last_is_air{
+                return Some((pos.y,curtype));
+            }
+            if !piter.plus_y(-1){ piter.reset_y();break; }
+        }
+        None
+    }
 }
 // pub struct ChunkManager{
 //     pub chunks: HashMap<chunk::ChunkKey, chunk::Chunk>,
@@ -217,16 +281,17 @@ pub async fn chunk_add_player(game:&mut Game,
     //1.根据位置计算chunk_key
     let chunk_key = point3f_2_chunkkey(&entity.position);
     //2.获取区块
-    let chunk = game.chunk_get_mut(&chunk_key).await;
+    let chunk = game.chunk_get_mut_loaded(&chunk_key).await;
     //3.entity
     chunk.entities.push_back(player_entity_id);
     //4.player
     chunk.players.push_back(playerid);
 }
 pub async fn chunks_remove_be_interested(
-    game:&mut Game,
+    game:&Game,
     playerid: PlayerId,
-    center_ck:ChunkKey
+    center_ck:ChunkKey,
+    // collect:&mut HashSet<ChunkKey>
 ) {
     let p_ck = center_ck;
 
@@ -234,15 +299,18 @@ pub async fn chunks_remove_be_interested(
             relate_ck,
             {
                 let ck=p_ck.plus(relate_ck);
-                let chunk=game.chunk_get_mut(&ck).await;
+                // collect.insert(ck);
+                let chunk=game.chunk_get_mut_loaded(&ck).await;
                 chunk.del_be_interested_by(playerid);
             }
         )
 }
 pub async fn chunks_add_be_interested2(
-    game:&mut Game,
+    game:&Game,
     playerid: PlayerId,
-    center_ck:ChunkKey
+    center_ck:ChunkKey,
+    // old:HashSet<ChunkKey>,
+    // collect_new:&mut HashSet<ChunkKey>
 ) {
     let p_ck = center_ck;
 
@@ -250,7 +318,10 @@ pub async fn chunks_add_be_interested2(
             relate_ck,
             {
                 let ck=p_ck.plus(relate_ck);
-                let chunk=game.chunk_get_mut(&ck).await;
+                // if! old.contains(&ck){
+                //     // collect_new.insert(ck);
+                // }
+                let chunk=game.chunk_get_mut_loaded(&ck).await;
                 chunk.add_be_interested_by(playerid);
             }
         )
@@ -267,17 +338,17 @@ pub async fn chunks_add_be_interested(
             relate_ck,
             {
                 let ck=p_ck.plus(relate_ck);
-                let chunk=game.chunk_get_mut(&ck).await;
+                let chunk=game.chunk_get_mut_loaded(&ck).await;
                 chunk.add_be_interested_by(playerid);
             }
         )
 }
 
 pub struct ChunkOperator<'a>{
-    ctx:&'a mut Game
+    ctx:&'a Game
 }
 impl ChunkOperator<'_> {
-    pub fn new(ctx:& mut Game) -> ChunkOperator {
+    pub fn new(ctx:&Game) -> ChunkOperator {
         ChunkOperator{
             ctx,
         }
@@ -290,7 +361,7 @@ impl ChunkOperator<'_> {
             relate_ck,
             {
                 let ck=p_ck.plus(relate_ck);
-                let chunk=self.ctx.chunk_get_mut(&ck).await;
+                let chunk=self.ctx.chunk_get_mut_loaded(&ck).await;
                 chunk.del_be_interested_by(p.player_id);
             }
         )
@@ -306,31 +377,31 @@ impl ChunkOperator<'_> {
         let chunk_key = point3f_2_chunkkey(&entity.position);
         {
             //3.获取区块
-            let chunk = self.ctx.chunk_get_mut(&chunk_key).await;
+            let chunk = self.ctx.chunk_get_mut_loaded(&chunk_key).await;
             //4.移除数据
             chunk.del_player(true, p);
         }
         let chunk = self.ctx.chunk_get(&chunk_key).unwrap();
 
         //5.给感兴趣的单位发送
-        let v=game::entity::pack_serialize_remove_entity(
+        let (v,priority)=game::entity::pack_serialize_remove_entity(
             p.entity_id,RemoveEntityType::disco
         );
         for pid in &chunk.be_interested_by{
-            let _p=self.ctx.player_manager.playerid_2_player.get(pid).unwrap();
+            let _p=self.ctx.player_man_ref().playerid_2_player.get(pid).unwrap();
             // self.ctx.client_manager.get_player_sender(p)
             //     .serialize_and_send(protos::common::Remove,PackIds);
-            self.ctx.client_manager.get_player_sender(_p)
-                .send(v.clone()).await
+            self.ctx.client_man_ref().get_player_sender(_p)
+                .send(v.clone(),priority).await
         }
         //6.给partsever发送
         let ps=part_server_sync::get_part_server_sender_of_chunk(
             self.ctx,chunk_key
-        );
+        ).await;
         match ps{
             None => {}
             Some(pss) => {
-                pss.send(v.clone()).await;
+                pss.send(v.clone(),priority).await;
             }
         }
         // self.ctx.client_manager.get_sender()

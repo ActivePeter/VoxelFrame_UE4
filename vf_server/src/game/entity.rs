@@ -2,7 +2,7 @@ use crate::*;
 use crate::game::{Game, player, ClientId};
 use crate::protos::common::{EntityType, ClientType};
 use std::collections::LinkedList;
-use crate::net_pack_convert::{pack_to_bytes, PackIds, pack_to_bytes2, MsgEnum};
+use crate::net_pack::{pack_to_bytes, PackIds, pack_to_bytes2, MsgEnum, PackPriority};
 use protobuf::Clear;
 use crate::game::player::{PlayerId, Player};
 use crate::net::ClientMsg;
@@ -33,28 +33,28 @@ impl EntityData {
 //entity related operations
 pub fn entity_spawn(game: &mut Game) -> u32 {
     let entity =
-        game.entities.entry(game.entity_cnt)
+        game.entities_mut().entry(*game.next_entity_id_ref())
             .or_insert(
                 EntityData {
-                    entity_id: game.entity_cnt,
+                    entity_id: *game.next_entity_id_ref(),
                     position: base_type::point3f_new2(0.0,300.0,0.0),
                     entity_type: EntityType::T_Player,
                 }
             );
     // let entity=
 
-    let entity_id = game.entity_cnt;
-    game.entity_cnt += 1;
+    let entity_id = *game.next_entity_id_ref();
+    *game.next_entity_id_mut() += 1;
 
     return entity_id;
 }
 
 // pub fn entity_spawn_cont(game: &mut Game) {}
-pub async fn entity_move_change_chunk(ctx:&mut Game,from:ChunkKey,to:ChunkKey,eid:EntityId,isplayer:bool){
+pub async fn entity_move_change_chunk(ctx:&Game,from:ChunkKey,to:ChunkKey,eid:EntityId,isplayer:bool){
 
-    let pid=ctx.player_manager.get_player_by_eid(eid).player_id;
+    let pid=ctx._player_manager.borrow().get_player_by_eid(eid).player_id;
     {
-        let chunk = ctx.chunk_get_mut(&from).await;
+        let chunk = ctx.chunk_get_mut_loaded(&from).await;
         chunk.del_entity(eid);
 
         if isplayer {
@@ -62,7 +62,7 @@ pub async fn entity_move_change_chunk(ctx:&mut Game,from:ChunkKey,to:ChunkKey,ei
         }
     }
     {
-        let chunk = ctx.chunk_get_mut(&to).await;
+        let chunk = ctx.chunk_get_mut_loaded(&to).await;
         chunk.entities.push_back(eid);
         if isplayer {
             chunk.players.push_back(pid);
@@ -79,60 +79,40 @@ pub async fn entity_move_change_chunk(ctx:&mut Game,from:ChunkKey,to:ChunkKey,ei
 pub async fn spawn_entity_in_ps(
     game:&mut Game,
     epos:protobuf::SingularPtrField<protos::common::EntityPos>){
-    let task_id=game.async_task_manager
-        .add_task(AsyncTask::ESpawnEntityInPs);
+    let task_id=game._async_task_manager.borrow_mut().add_task(AsyncTask::ESpawnEntityInPs);
     let ck;
     {
         let epos_ref=epos.as_ref().unwrap();
         ck=conv::point3f_2_chunkkey(&point3f_new2(epos_ref.x,epos_ref.y,epos_ref.z));
     }
-    let sender=part_server_sync::get_part_server_sender_of_chunk(game,ck).unwrap();
+    let sender=part_server_sync::get_part_server_sender_of_chunk(game,ck).await.unwrap();
     let mut cmd=protos::common::Cmd_SpawnEntityInPs::new();
     cmd.task_id=task_id;
     println!("spawn_entity_in_ps_cmd{}",cmd.task_id);
     cmd.entity_pos=epos;
-    let vec=
-        net_pack_convert::pack_to_bytes(
-            cmd,
-            PackIds::ECmd_SpawnEntityInPs);
     // println!("send ECmd_SpawnEntityInPs");
-    sender.send(vec).await;
+    sender.send(net_pack::pack_to_bytes(
+        cmd,
+        PackIds::ECmd_SpawnEntityInPs),PackIds::ECmd_SpawnEntityInPs.default_priority()).await;
     // sender.send()
 }
-// async fn handle_spawn_entity_in_ps_rpl (game:&mut Game,rpl:protos::common::Rpl_SpawnEntityInPs){
-//
-//
-//     // }
-//
-// }
-
-// pub async fn handle_pack(context:&mut Game,msg:& ClientMsg) -> bool {
-//
-//     // println!("handle_pack entity");
-//     return match &msg.msg_enum {
-//
-//         _ => {
-//             true
-//         }
-//     }
-// }
-pub fn pack_serialize_remove_entity(eid:EntityId,remove_type:protos::common::RemoveEntityType) -> Vec<u8> {
+pub fn pack_serialize_remove_entity(eid:EntityId, remove_type:protos::common::RemoveEntityType) -> (Vec<u8>, PackPriority) {
     let mut pack =protos::common::RemoveEntity::new();
     pack.entity_id=eid;
     pack.remove_type=remove_type;
-    net_pack_convert::pack_to_bytes(pack,PackIds::ERemoveEntity)
+    (net_pack::pack_to_bytes(pack, PackIds::ERemoveEntity),PackIds::ERemoveEntity.default_priority())
 }
 pub struct EntityOperator<'a>{
-    ctx:&'a mut Game
+    ctx:&'a Game
 }
 impl EntityOperator<'_> {
-    pub fn new(ctx:& mut Game) -> EntityOperator {
+    pub fn new(ctx:&Game) -> EntityOperator {
         EntityOperator{
             ctx,
         }
     }
     fn remove_entity_indata(&mut self,eid:EntityId){
-        self.ctx.entities.remove(&eid);
+        self.ctx.entities_mut().remove(&eid);
     }
     // async fn send2all_remove_entity_in_game(&mut self,eid)
     pub async fn remove_player_entity_in_game(&mut self,p:&Player){

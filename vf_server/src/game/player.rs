@@ -2,7 +2,7 @@ use crate::*;
 use tokio::sync::mpsc::Sender;
 use crate::game::{ClientId, Game, entity, chunk};
 use crate::protos::common;
-use crate::net_pack_convert::{PackIds, MsgEnum};
+use crate::net_pack::{PackIds, MsgEnum};
 use crate::game::entity::EntityId;
 use crate::protos::common::ClientType;
 use crate::net::{ClientMsgEnum, ClientMsg};
@@ -11,7 +11,7 @@ use std::collections::HashMap;
 
 pub type PlayerId = i32;
 
-#[derive(Clone)]
+// #[derive(Clone)]
 pub struct Player {
     pub player_id:PlayerId,
     pub entity_id: EntityId,
@@ -87,21 +87,21 @@ impl PlayerManager{
     }
 }
 pub struct PlayerManOperator<'a>{
-    ctx:&'a mut Game
+    ctx:&'a Game
 }
 impl PlayerManOperator<'_> {
-    pub fn new(ctx:& mut Game) -> PlayerManOperator {
+    pub fn new(ctx:& Game) -> PlayerManOperator {
         PlayerManOperator{
             ctx,
         }
     }
     fn remove_player_in_data(&mut self,pid:PlayerId){
-        let r=self.ctx.player_manager.playerid_2_player.remove(&pid);
+        let r=self.ctx.player_man_mut().playerid_2_player.remove(&pid);
         match r{
             None => {}
             Some(p) => {
-                self.ctx.player_manager.clientid_2_playerid.remove(&p.client_id);
-                self.ctx.player_manager.entityid_2_playerid.remove(&p.entity_id);
+                self.ctx.player_man_mut().clientid_2_playerid.remove(&p.client_id);
+                self.ctx.player_man_mut().entityid_2_playerid.remove(&p.entity_id);
             }
         }
 
@@ -117,9 +117,9 @@ impl PlayerConnectionHandler<'_> {
     }
     pub async fn on_player_disconnect(&mut self,cid:ClientId){
         println!("on_player_disconnect");
-        let p = (*self.ctx.player_manager.get_player_by_cid(cid)).clone();
+        let p = (self.ctx.player_man_ref().get_player_by_cid(cid));
         entity::EntityOperator::new(self.ctx)
-            .remove_player_entity_in_game(&p).await;
+            .remove_player_entity_in_game(p).await;
 
         PlayerManOperator::new(self.ctx)
             .remove_player_in_data(p.player_id);
@@ -131,7 +131,7 @@ impl PlayerConnectionHandler<'_> {
 
         // //1.获取player码以及绑定tcp
         let playerid =
-            (self.ctx).player_manager.create_player_and_bind_client(cid);
+            (self.ctx)._player_manager.borrow_mut().create_player_and_bind_client(cid);
         //
         //
         // entity=(game).spawn_entity_for_player(&player);
@@ -140,7 +140,7 @@ impl PlayerConnectionHandler<'_> {
         let player_entity_id = entity::entity_spawn(self.ctx);
 
         //2.5产生完entity id 就与player绑定
-        self.ctx.player_manager.set_player_entity_id(playerid,player_entity_id);
+        self.ctx._player_manager.borrow_mut().set_player_entity_id(playerid, player_entity_id);
 
         //3.ps 创建entity
         let mut epos =protobuf::SingularPtrField::some( protos::common::EntityPos::new());
@@ -181,18 +181,17 @@ impl PlayerConnectionHandler<'_> {
 
 pub async fn send_player_basic_and_chunk(game:&Game,playerid:PlayerId,player_entity_id:EntityId){
     {
-        let player=
-            game.player_manager.playerid_2_player.get(&playerid).unwrap();
+        let player= game.player_man_ref().playerid_2_player.get(&playerid).unwrap();
         let entity=game.entity_get(&player_entity_id).unwrap();
         // 1.player基本信息（player_entity_id
-        send::player_basic(&game.client_manager, player, entity).await;
+        net_send::player_basic(game.client_man_ref(), player, entity).await;
         // 2.区块地形
-        send::player_interested_chunk_block_data(&game.client_manager,
-                                                 player,entity,game
+        net_send::player_interested_chunk_block_data(game.client_man_ref(),
+                                                     player, entity, game
         ).await;
         // 3.感兴趣区块的entity数据
-        send::player_interested_chunk_entity_data(&game.client_manager,
-                                                  player,entity,game
+        net_send::player_interested_chunk_entity_data(game.client_man_ref(),
+                                                      player, entity, game
         ).await;
     }
 }

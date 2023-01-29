@@ -5,12 +5,14 @@ use std::net::SocketAddr;
 use game::player::Player;
 use tokio::sync::{mpsc, oneshot};
 use crate::protos::common::{ClientFirstConfirm, EntityPos, PlayerBasic, ChunkPack, ChunkEntityPack, ClientType};
-use crate::net_pack_convert::{MsgEnum, PackIds};
+use crate::net_pack::{MsgEnum, PackIds};
 use crate::net::msg_pack_make::MsgPackMaker;
 use crate::protos::common::ClientType::{ClientType_Player, ClientType_GameServer};
 use crate::game::{ClientId, GameMainLoopChannels};
 // use std::alloc::Global;
 use tokio::io::AsyncWriteExt;
+use pa_queue_and_chan::priotity_async_mpsc_chan::Sender as PrioritySender;
+use pa_queue_and_chan::priotity_async_mpsc_chan::Receiver as PriorityReceiver;
 
 //当前文件，表示读写循环
 
@@ -57,17 +59,19 @@ pub struct ClientDisconnect {
 #[derive(Clone, Debug)]
 pub struct ClientSender{
     // pub id:ClientId,
-    sender:mpsc::Sender<Vec<u8>>,
+    sender:PrioritySender<Vec<u8>,i32>,
 }
 impl ClientSender{
     pub async fn serialize_and_send<T: ::protobuf::Message>(
         &self,proto_pack: T, pack_id: PackIds){
-        let bytes=net_pack_convert::pack_to_bytes(proto_pack,pack_id);
-        self.sender.send(bytes).await;
+        let bytes= net_pack::pack_to_bytes(proto_pack, pack_id.clone());
+        // self.sender.send(bytes).await;
+        self.sender.send_sync(bytes,pack_id.default_priority());
     }
-    pub async fn send(&self,vec:Vec<u8>){
+    pub async fn send(&self,vec:Vec<u8>,priority:i32){
         // println!("send cid {}",self.id);
-        self.sender.send(vec).await;
+        // self.sender.send(vec).await.unwrap();
+        self.sender.send_sync(vec,priority);
     }
 }
 // pub type ClientSender = mpsc::Sender<Vec<u8>>;
@@ -82,8 +86,11 @@ pub fn start_rw_loop(
 
     //服务端通过这个通道给客户端发消息
     // 消息数据为bytes，即在主循环中就进行封包
-    let (net_tx, mut net_rx): (mpsc::Sender<Vec<u8>>, mpsc::Receiver<Vec<u8>>) =
-        mpsc::channel(100);
+
+    let (net_tx,net_rx): (PrioritySender<Vec<u8>,i32>, PriorityReceiver<Vec<u8>,i32>)
+        =pa_queue_and_chan::priotity_async_mpsc_chan::new();
+    // let (net_tx, mut net_rx): (mpsc::Sender<Vec<u8>>, mpsc::Receiver<Vec<u8>>) =
+    //     mpsc::channel(100);
     // tokio::spawn(async move{
     //     while let Some(i) = rx.recv().await {
     //         println!("got = {}", i);
@@ -101,7 +108,7 @@ pub fn start_rw_loop(
                     // println!("one send msg {}",addr2);
 
                     //模拟网络延迟
-                    tokio::time::sleep(tokio::time::Duration::from_millis(200));
+                    // tokio::time::sleep(tokio::time::Duration::from_millis(200));
 
                     wr.write_all(j.as_slice()).await.unwrap();
                     wr.flush().await.unwrap();
@@ -264,7 +271,7 @@ impl ReceiveHandlerKernel {
 
 mod msg_pack_make {
     use byteorder::{LittleEndian, BigEndian, ByteOrder};
-    use crate::net_pack_convert::{MsgEnum, bytes_to_pack};
+    use crate::net_pack::{MsgEnum, bytes_to_pack};
     use crate::net::{ReceiveHandlerKernel};
     use tokio::macros::support::Future;
 
@@ -301,7 +308,8 @@ mod msg_pack_make {
             let mut handled_offset = 0;
 
             while handled_offset < _byte_cnt {
-                let byte_cnt_left = _byte_cnt - handled_offset;
+                // println!("loop");
+                let mut byte_cnt_left = _byte_cnt - handled_offset;
                 //头本次还是未收全
                 if self.head_rec_cnt < MSG_PACK_HEAD_SIZE {
                     if byte_cnt_left + (self.head_rec_cnt as usize) < MSG_PACK_HEAD_SIZE as usize {
@@ -310,6 +318,7 @@ mod msg_pack_make {
                                 = buffset[handled_offset + i];
                         }
                         self.head_rec_cnt += byte_cnt_left as u8;
+                        return;
                     }//头本次收全
                     else {
                         let cpylen = MSG_PACK_HEAD_SIZE - self.head_rec_cnt;
@@ -324,17 +333,23 @@ mod msg_pack_make {
                         if (self.pack_head.pack_len > self.body_buff.len() as u32) {
                             self.body_buff.resize(self.pack_head.pack_len as usize, 0);
                         }
+                        // println!("one pack head ok {}",_byte_cnt);
                         // continue;
+                        // body len might be zero, directly update byte_cnt_left
                     }
                 }
-
+                byte_cnt_left = _byte_cnt - handled_offset;
                 // 1.剩余数据小于需要读的字节数量(不够
-                if byte_cnt_left <
-                    (self.pack_head.pack_len - self.body_rec_cnt) as usize {
+                if byte_cnt_left <//此次接收的
+                    (self.pack_head.pack_len - self.body_rec_cnt) as usize {//总长-已接收的=还需要接收的
+                    // write and add up handled
+                    // println!("pack not complete");
                     self.write_data_2_body(&buffset[handled_offset..], byte_cnt_left);
                     return;
                 } else {
+                    // println!("one pack ok");
                     //完成读包
+                    // left_data_cnt
                     let len = self.pack_head.pack_len - self.body_rec_cnt;
                     self.write_data_2_body(&buffset[handled_offset..], len as usize);
                     handled_offset += len as usize;
@@ -364,6 +379,7 @@ mod msg_pack_make {
                 self.body_buff[self.body_rec_cnt as usize + i] =
                     buffset[i];
             }
+            self.body_rec_cnt+=byte_cnt_left as u32;
         }
         fn calc_pack_head(&mut self) {
             self.pack_head.pack_id = self.head_buff[0];

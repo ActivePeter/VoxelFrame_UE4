@@ -11,7 +11,7 @@ pub struct PartServerSync{
     pub part_server:Option<PartServer>,
 }
 impl PartServerSync{
-    pub fn create() -> PartServerSync {
+    pub fn new() -> PartServerSync {
         PartServerSync{
             free_chunks:Default::default(),
             part_server:None,
@@ -35,41 +35,39 @@ impl PartServerSync{
     }
 }
 
-pub fn get_part_server_sender_of_chunk(game:&mut Game,ck:ChunkKey)->Option<ClientSender>{
-    match game.part_server_sync.get_part_server_cid_of_chunk(ck){
+pub async fn get_part_server_sender_of_chunk(game:&Game,ck:ChunkKey)->Option<ClientSender>{
+    match game.part_server_ref().get_part_server_cid_of_chunk(ck){
         None => {
             println!("partserver not exist");
             return None;
         }
         Some(cid) => {
-            return Some(game.client_manager.get_sender(cid));
+            return Some(game.client_man_ref().get_sender(cid));
         }
     }
 }
-pub async fn on_partserver_connected(game:&mut Game,cid:ClientId){
+pub async fn on_partserver_connected(game:&Game,cid:ClientId){
     add_part_server(game,cid).await;
 }
-pub async fn on_partserver_disconnect(game:&mut Game,cid:ClientId){
+pub async fn on_partserver_disconnect(game:&Game,cid:ClientId){
     let mut none=None;
-    std::mem::swap(&mut game.part_server_sync.part_server,&mut none);
+    std::mem::swap(&mut game.part_server_mut().part_server,&mut none);
     match none{
         None => {}
         Some(ps) => {
-            game.part_server_sync.takeout_all_chunks2free(&ps);
+            game.part_server_mut().takeout_all_chunks2free(&ps);
         }
     }
 }
-async fn add_part_server(game:&mut Game, cid:ClientId){
-    let cm=&mut game.client_manager;
-    let pss=&mut game.part_server_sync;
+async fn add_part_server(game:&Game, cid:ClientId){
     // println!("aps");
-    match &pss.part_server{
+    match &game.part_server_ref().part_server{
         None => {
-            pss.part_server=Some(PartServer{
+            game.part_server_mut().part_server=Some(PartServer{
                 client_id: cid,
                 chunks: Default::default()
             });
-            let sender=cm.get_sender(cid);
+            let sender=game.client_man_ref().get_sender(cid);
             bind_all_free_chunks_2_part_server(game,sender).await;
         }
         Some(_) => {
@@ -78,34 +76,34 @@ async fn add_part_server(game:&mut Game, cid:ClientId){
     }
 }
 
-pub async fn bind_all_free_chunks_2_part_server(game: &mut Game, send:ClientSender){
+pub async fn bind_all_free_chunks_2_part_server(game: &Game, send:ClientSender){
     // println!("safc");
     // let cm=&mut game.client_manager;
-    if(!game.part_server_sync.free_chunks.is_empty()){
+    if !game.part_server_ref().free_chunks.is_empty() {
             // game.part_server_sync.free_chunks.retain(|&k| ->bool{
             //     send_packer::pack_chunk_pack(game.chunk_get(&k).unwrap());
             //     return false;
             // })
 
-        for i in &game.part_server_sync.free_chunks{
-            game.part_server_sync.part_server.as_mut().unwrap().chunks.insert(i.clone());
-            let pack=send_packer::pack_chunk_pack(game.chunk_get(i).unwrap());
+        for i in &game.part_server_ref().free_chunks{
+            game.part_server_mut().part_server.as_mut().unwrap().chunks.insert(i.clone());
+            let (pack,p)=send_packer::pack_chunk_pack(game.chunk_get(i).unwrap());
             //发送
-            send.send(pack).await;
+            send.send(pack,p).await;
             // game.part_server_sync.free_chunks.remove(&i);
         }
-        game.part_server_sync.free_chunks.clear();
+        game.part_server_mut().free_chunks.clear();
     }
 }
 
-pub async fn add_free_chunk(game:&mut Game, ck:ChunkKey){
+pub async fn add_free_chunk(game:&Game, ck:ChunkKey){
     // println!("add_free_chunk");
     let mut cid:ClientId=0;
     let mut has_part_server =false;
-    match &mut game.part_server_sync.part_server {
+    match &mut game.part_server_mut().part_server {
         None => {
             println!("currently no part server to take");
-            game.part_server_sync.free_chunks.insert(ck);
+            game.part_server_mut().free_chunks.insert(ck);
         }
         Some( ps) => {
             ps.chunks.insert(ck);
@@ -117,9 +115,10 @@ pub async fn add_free_chunk(game:&mut Game, ck:ChunkKey){
         // println!("has server then send {}",cid);
         //发送给partserver
         let sender=
-            game.client_manager.get_sender(cid);
-        sender.send(send_packer::pack_chunk_pack(
-            game.chunk_get(&ck).unwrap())).await;
+            game.client_man_ref().get_sender(cid);
+        let (pack,p)=send_packer::pack_chunk_pack(
+            game.chunk_get(&ck).unwrap());
+        sender.send(pack,p).await;
     }
 }
 

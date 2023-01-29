@@ -4,13 +4,13 @@ use crate::game::operation::OperationResult;
 use crate::protos::common::{Rpl_PutBlockInPs, PutBlock};
 use crate::game::part_server_sync;
 use protobuf::SingularPtrField;
-use crate::net_pack_convert::PackIds;
+use crate::net_pack::PackIds;
 use crate::event::chunk_event;
 
 pub(crate) async fn call(
     ctx: &mut game::Game,
     cid: game::ClientId, pb: PutBlock) {
-        let task_id=ctx.async_task_manager.add_task(
+        let task_id=ctx.async_task_man_mut().add_task(
             AsyncTask::EPutBlockInPs(cid,pb.get_operation_id(),Box::new(pb.clone()))
         );
 
@@ -18,7 +18,7 @@ pub(crate) async fn call(
         let ck
             =conv::point3i_2_chunkkey2(pb.x,pb.y,pb.z);
         let sender=part_server_sync::
-        get_part_server_sender_of_chunk(ctx,ck).unwrap();
+        get_part_server_sender_of_chunk(ctx,ck).await.unwrap();
 
         //制作pack
         let mut pack =protos::common::Cmd_PutBlockInPs::new();
@@ -32,7 +32,7 @@ pub(crate) async fn call(
 pub(crate) async fn reply(ctx: &mut game::Game, rpl: Rpl_PutBlockInPs){
     {
 
-        let task=ctx.async_task_manager.finish_task(rpl.task_id);
+        let task=ctx.async_task_man_mut().finish_task(rpl.task_id);
         match task{
             AsyncTask::EPutBlockInPs(cid,opid,pb) => {
                 if rpl.put_succ==0 {
