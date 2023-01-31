@@ -7,7 +7,7 @@
 
 
 
-![image-20210609143052106](./resouce/main.png)
+![](https://s3.bmp.ovh/imgs/2023/01/31/d94e9ddb0c27a298.png)
 
 ## Organization（组织
 
