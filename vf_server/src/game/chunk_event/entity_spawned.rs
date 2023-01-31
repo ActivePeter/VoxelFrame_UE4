@@ -1,7 +1,7 @@
 use crate::game::{Game, player, chunk};
 use crate::async_task::AsyncTask;
 use crate::{protos, conv};
-use crate::game::entity::{entity_move_change_chunk};
+// use crate::game::entity::{entity_move_change_chunk};
 use crate::game::player::PlayerId;
 use std::collections::LinkedList;
 use crate::protos::common::EntityType;
@@ -22,7 +22,7 @@ pub(crate) async fn call(game:&mut Game,rpl:protos::common::Rpl_SpawnEntityInPs)
     // if entitypos.t==protos::common::EntityType::T_Player {
     //player 生成完成
     if entitypos.t==protos::common::EntityType::T_Player {
-        let player=game.player_man_ref().get_player_by_eid(entitypos.entity_id).clone();
+        let player=game.player_man_ref().get_player_by_eid_unwrap(entitypos.entity_id).clone();
 
         //  3.update chunk
         let mut epu =protos::common::EntityPosUpdate::new();

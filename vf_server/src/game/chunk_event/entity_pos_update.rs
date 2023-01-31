@@ -2,7 +2,7 @@ use crate::game::{Game, chunk};
 use crate::{protos, conv};
 use crate::game::player::PlayerId;
 use std::collections::{LinkedList, HashSet};
-use crate::game::entity::entity_move_change_chunk;
+// use crate::game::entity::entity_move_change_chunk;
 use crate::protos::common::EntityType;
 use crate::net_pack::{PackIds, pack_to_bytes2};
 use protobuf::Clear;
@@ -27,7 +27,7 @@ pub(crate) async fn call(game: &Game, epu: protos::common::EntityPosUpdate,
                 let isplayer=game_entity.entity_type==EntityType::T_Player;
                 if isplayer {
                     if ck1!=ck {
-                        let pid=game.player_man_ref().get_player_by_eid(a.entity_id).player_id;
+                        let pid=game.player_man_ref().get_player_by_eid_unwrap(a.entity_id).player_id;
                         // let mut collect_old=HashSet::new();
                         // let mut collect_news =HashSet::new();
                         chunk::chunks_remove_be_interested(game, pid, ck1)
@@ -43,8 +43,8 @@ pub(crate) async fn call(game: &Game, epu: protos::common::EntityPosUpdate,
                 }
                 //实体区块变更
                 if ck1!=ck {
-                    entity_move_change_chunk(
-                        game,ck1,ck,a.entity_id,isplayer).await;
+                    // entity_move_change_chunk(
+                    //     game,ck1,ck,a.entity_id,isplayer).await;
                     let chunk = game.chunk_get_mut_loaded(&ck1).await;
                     chunk.entity_update.entity_pos.push(a.clone());
                     changed_chunks.push_back(ck1);

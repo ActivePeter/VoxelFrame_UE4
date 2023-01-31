@@ -1,9 +1,10 @@
 use std::collections::{HashSet, HashMap};
-use crate::game::{ClientId, Game, ClientManager};
-use crate::send_packer;
+use crate::game::{ClientId, Game};
+use crate::net_send_packer;
 use crate::net::{ClientSender, ClientDescription};
 use tokio::sync::mpsc;
 use crate::game::chunk::ChunkKey;
+use crate::game::chunk_send::SendChunkTask;
 
 pub struct PartServerSync{
     pub free_chunks:HashSet<ChunkKey>,
@@ -67,8 +68,7 @@ async fn add_part_server(game:&Game, cid:ClientId){
                 client_id: cid,
                 chunks: Default::default()
             });
-            let sender=game.client_man_ref().get_sender(cid);
-            bind_all_free_chunks_2_part_server(game,sender).await;
+            bind_all_free_chunks_2_part_server(game,cid).await;
         }
         Some(_) => {
             println!("currently only support one part server")
@@ -76,7 +76,8 @@ async fn add_part_server(game:&Game, cid:ClientId){
     }
 }
 
-pub async fn bind_all_free_chunks_2_part_server(game: &Game, send:ClientSender){
+pub async fn bind_all_free_chunks_2_part_server(game: &Game,cid:ClientId){
+    let sender=game.client_man_ref().get_sender(cid);
     // println!("safc");
     // let cm=&mut game.client_manager;
     if !game.part_server_ref().free_chunks.is_empty() {
@@ -87,9 +88,12 @@ pub async fn bind_all_free_chunks_2_part_server(game: &Game, send:ClientSender){
 
         for i in &game.part_server_ref().free_chunks{
             game.part_server_mut().part_server.as_mut().unwrap().chunks.insert(i.clone());
-            let (pack,p)=send_packer::pack_chunk_pack(game.chunk_get(i).unwrap());
+            let (pack,p)= net_send_packer::pack_chunk_pack(game.chunk_get(i).unwrap());
+            game._chunk_sender.send(SendChunkTask::new(
+                pack,i.clone(),cid,sender.clone()
+            )).await;
             //发送
-            send.send(pack,p).await;
+            // send.send(pack,p).await;
             // game.part_server_sync.free_chunks.remove(&i);
         }
         game.part_server_mut().free_chunks.clear();
@@ -111,14 +115,17 @@ pub async fn add_free_chunk(game:&Game, ck:ChunkKey){
             has_part_server=true;
         }
     }
-    if(has_part_server){
+    if has_part_server {
         // println!("has server then send {}",cid);
         //发送给partserver
         let sender=
             game.client_man_ref().get_sender(cid);
-        let (pack,p)=send_packer::pack_chunk_pack(
+        let (pack,p)= net_send_packer::pack_chunk_pack(
             game.chunk_get(&ck).unwrap());
-        sender.send(pack,p).await;
+        // sender.send(pack,p).await;
+        game._chunk_sender.send(SendChunkTask::new(
+            pack,ck,cid,sender
+        )).await;
     }
 }
 

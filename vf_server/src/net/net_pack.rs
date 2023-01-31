@@ -21,6 +21,7 @@ pub enum PackIds {
     EMainPlayerJumpCmd=14,
     ERemoveEntity=15,
     EPlayerRequestChunks=16,
+    EPlayerPosUpdate=17,
 }
 impl PackIds{
     pub(crate) fn default_priority(&self) -> PackPriority {
@@ -46,6 +47,7 @@ impl PackIds{
             PackIds::EMainPlayerJumpCmd => {high}
             PackIds::ERemoveEntity => {common}
             PackIds::EPlayerRequestChunks => {common}
+            PackIds::EPlayerPosUpdate => {high}
         }
     }
 }
@@ -65,6 +67,7 @@ pub enum MsgEnum {
     Rpl_PutBlockInPs(common::Rpl_PutBlockInPs),
     MainPlayerJumpCmd(common::MainPlayerJumpCmd),
     PlayerRequestChunks(common::PlayerRequestChunks),
+    PlayerPosUpdate(common::PlayerPosUpdate)
 }
 
 fn make_pack_head(pack_id: PackIds, pack_len: usize) -> [u8; 5] {
@@ -185,6 +188,8 @@ pub fn bytes_to_pack(msg_pack_id: i32, data_slice: &[u8])
 
     }else if msg_pack_id==PackIds::EPlayerRequestChunks as i32{
         one_pack!(common::PlayerRequestChunks,MsgEnum::PlayerRequestChunks,data_slice);
+    }else if msg_pack_id==PackIds::EPlayerPosUpdate as i32{
+        one_pack!(common::PlayerPosUpdate,MsgEnum::PlayerPosUpdate,data_slice);
     }
 
     return None;

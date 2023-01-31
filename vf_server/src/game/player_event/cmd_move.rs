@@ -6,6 +6,7 @@ use crate::protos::common;
 pub(crate) async fn call(cid:ClientId, game:&mut Game, pmcmd:common::MainPlayerMoveCmd) {
 
     //TODO 这里1。2是假的，目前是one server 模式
+
     //0.验证pack 有效性
     if pmcmd.entity_id!=game.player_man_ref().get_player_by_cid(cid).entity_id {
         println!("wrong cmd eid {} {}",pmcmd.entity_id,game.player_man_ref().get_player_by_cid(cid).entity_id);
