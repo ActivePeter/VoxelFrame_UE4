@@ -1,7 +1,10 @@
-use crate::{net_pack, conv};
-use crate::net_pack::PackIds;
+use crate::*;
+use crate::{ conv};
+use net::net_pack::PackIds;
 use crate::game::{ClientId, Game};
 use crate::protos::common;
+use net::net_pack;
+use crate::net::net_send_packer::pack_to_bytes;
 
 pub(crate) async fn call(cid:ClientId, game:&mut Game, pmcmd:common::MainPlayerMoveCmd) {
 
@@ -22,7 +25,7 @@ pub(crate) async fn call(cid:ClientId, game:&mut Game, pmcmd:common::MainPlayerM
         None => {}
         Some(cid) => {
             game.client_man_ref().get_sender(cid).send(
-                net_pack::pack_to_bytes(
+                pack_to_bytes(
                     pmcmd,PackIds::EMainPlayerMoveCmd),PackIds::EMainPlayerMoveCmd.default_priority()
             ).await;
         }

@@ -1,6 +1,6 @@
 use std::collections::{HashSet, HashMap};
 use crate::game::{ClientId, Game};
-use crate::net_send_packer;
+use crate::net::net_send_packer;
 use crate::net::{ClientSender, ClientDescription};
 use tokio::sync::mpsc;
 use crate::game::chunk::ChunkKey;

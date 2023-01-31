@@ -3,12 +3,13 @@ use crate::game::{Game, chunk};
 use crate::game::player::{Player, PlayerId};
 use crate::game::entity::EntityData;
 use crate::game::chunk::ChunkKey;
-use crate::net_pack::PackIds;
+use crate::net::net_pack::PackIds;
 use crate::game::chunk_send::SendChunkTask;
 use std::collections::HashSet;
-use crate::net::ClientSender;
+use crate::net::{ClientSender, net_send_packer};
 use std::collections::linked_list::Iter;
-use crate::net_client::ClientManager;
+use crate::net::net_client::ClientManager;
+use crate::net;
 
 
 pub(crate) struct SenderIter<'a>{
@@ -35,6 +36,7 @@ impl<'a> Iterator for SenderIter<'a>{
             if self.builder.except_list.contains(v){
                 continue;
             }
+            // println!("send to interested player: {}",v);
             return Some(&self.game.client_man_ref().get_player_sender(
                 self.game.player_man_mut().get_player_mut(v).unwrap()
             ));

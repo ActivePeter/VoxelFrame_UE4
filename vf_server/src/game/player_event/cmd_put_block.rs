@@ -2,10 +2,10 @@ use crate::async_task::AsyncTask;
 use crate::{game, conv, protos};
 use crate::game::operation::OperationResult;
 use crate::protos::common::{Rpl_PutBlockInPs, PutBlock};
-use crate::game::part_server_sync;
+use crate::net::part_server_sync;
 use protobuf::SingularPtrField;
-use crate::net_pack::PackIds;
-use crate::event::chunk_event;
+use crate::net::net_pack::PackIds;
+use crate::game::chunk_event;
 
 pub(crate) async fn call(
     ctx: &mut game::Game,

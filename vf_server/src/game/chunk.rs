@@ -4,9 +4,9 @@ use game::{Game, ClientId, player, chunk,chunk_terrain};
 use crate::conv::point3f_2_chunkkey;
 use crate::game::entity::{EntityId, EntityData};
 use crate::game::player::{PlayerId, Player};
-use crate::net_pack::PackIds;
+use crate::net::net_pack::PackIds;
 use crate::protos::common::{RemoveEntityType, ProtoChunkKey};
-use crate::net::ClientSender;
+use crate::net::{ClientSender, part_server_sync};
 use std::collections::hash_map::RandomState;
 use crate::game::block::block_type::{BlockTypeId, BlockAir, Block};
 use glam::IVec3;
@@ -83,7 +83,6 @@ pub enum ChunkLoadStage{
 pub struct Chunk {
     pub chunk_key: ChunkKey,
     pub chunk_data: Vec<u8>,
-    pub players: LinkedList<player::PlayerId>,
     pub entities: LinkedList<EntityId>,
     pub entity_update: protos::common::EntityPosUpdate,
     pub be_interested_by: LinkedList<player::PlayerId>,
@@ -99,7 +98,7 @@ impl Chunk{
         let mut chunk =Chunk {
             chunk_data: v,
             chunk_key: key.clone(),
-            players: Default::default(),
+            // players: Default::default(),
             entities: Default::default(),
             be_interested_by: Default::default(),
             part_server_cid:None,
@@ -176,43 +175,46 @@ impl Chunk{
             println!("del entity not found");
         }
     }
-    pub fn del_player_only(&mut self,pid:PlayerId){
-        let mut index:usize =0 ;
-        let mut found=false;
-        for p in self.players.iter() {
-            if *p==pid{
-                found=true;
-                break;
-            }
-            index+=1;
-        }
-        if found {
-            self.players.remove(index);
-            // self.be_interested_by.push_back(pid);
-        }else{
-            println!("del player2 not found");
-        }
+    pub fn add_entity(&mut self,eid:EntityId){
+        self.entities.push_back(eid);
     }
-    pub fn del_player(&mut self,del_entity:bool,p1:&Player){
-        if(del_entity){
-            self.del_entity(p1.entity_id);
-        }
-        let mut index:usize =0 ;
-        let mut found=false;
-        for p in self.players.iter() {
-            if *p==p1.player_id{
-                found=true;
-                break;
-            }
-            index+=1;
-        }
-        if found {
-            self.players.remove(index);
-            // self.be_interested_by.push_back(pid);
-        }else{
-            println!("del player not found");
-        }
-    }
+    // pub fn del_player_only(&mut self,pid:PlayerId){
+    //     let mut index:usize =0 ;
+    //     let mut found=false;
+    //     for p in self.players.iter() {
+    //         if *p==pid{
+    //             found=true;
+    //             break;
+    //         }
+    //         index+=1;
+    //     }
+    //     if found {
+    //         self.players.remove(index);
+    //         // self.be_interested_by.push_back(pid);
+    //     }else{
+    //         println!("del player2 not found");
+    //     }
+    // }
+    // pub fn del_player(&mut self,del_entity:bool,p1:&Player){
+    //     if(del_entity){
+    //         self.del_entity(p1.entity_id);
+    //     }
+    //     let mut index:usize =0 ;
+    //     let mut found=false;
+    //     for p in self.players.iter() {
+    //         if *p==p1.player_id{
+    //             found=true;
+    //             break;
+    //         }
+    //         index+=1;
+    //     }
+    //     if found {
+    //         self.players.remove(index);
+    //         // self.be_interested_by.push_back(pid);
+    //     }else{
+    //         println!("del player not found");
+    //     }
+    // }
 
     /// get block by index
     pub(crate) fn block_get_at_idx(&self, idx:usize) -> BlockTypeId {
@@ -273,20 +275,20 @@ macro_rules! iter_relative_chunk_key_in_interest_range {
 }
 //chunk related operations
 //chunk 加入玩家
-pub async fn chunk_add_player(game:&mut Game,
-                    playerid: PlayerId,
-                    player_entity_id: EntityId,
-) {
-    let entity = game.entity_get(&player_entity_id).unwrap();
-    //1.根据位置计算chunk_key
-    let chunk_key = point3f_2_chunkkey(&entity.position);
-    //2.获取区块
-    let chunk = game.chunk_get_mut_loaded(&chunk_key).await;
-    //3.entity
-    chunk.entities.push_back(player_entity_id);
-    //4.player
-    chunk.players.push_back(playerid);
-}
+// pub async fn chunk_add_player(game:&mut Game,
+//                     playerid: PlayerId,
+//                     player_entity_id: EntityId,
+// ) {
+//     let entity = game.entity_get(&player_entity_id).unwrap();
+//     //1.根据位置计算chunk_key
+//     let chunk_key = point3f_2_chunkkey(&entity.position);
+//     //2.获取区块
+//     let chunk = game.chunk_get_mut_loaded(&chunk_key).await;
+//     //3.entity
+//     chunk.entities.push_back(player_entity_id);
+//     //4.player
+//     chunk.players.push_back(playerid);
+// }
 pub async fn chunks_remove_be_interested(
     game:&Game,
     playerid: PlayerId,
@@ -327,17 +329,14 @@ pub async fn chunks_add_be_interested2(
         )
 }
 pub async fn chunks_add_be_interested(
-    game:&mut Game,
+    game:&Game,
     playerid: PlayerId,
-    player_entity_id: EntityId,
+    ck_player_at: &ChunkKey,
 ) {
-    let entity = game.entity_get(&player_entity_id).unwrap();
-    let p_ck = point3f_2_chunkkey(&entity.position);
-
     iter_relative_chunk_key_in_interest_range!(
             relate_ck,
             {
-                let ck=p_ck.plus(relate_ck);
+                let ck=ck_player_at.plus(relate_ck);
                 let chunk=game.chunk_get_mut_loaded(&ck).await;
                 chunk.add_be_interested_by(playerid);
             }
@@ -372,38 +371,42 @@ impl ChunkOperator<'_> {
         {//1.移除原本被其感兴趣的区块中的感兴趣信息
             self.chunks_remove_interested(p).await;
         }
-        let entity = self.ctx.entity_get(&p.entity_id).unwrap();
-        //2.根据位置计算chunk_key
-        let chunk_key = point3f_2_chunkkey(&entity.position);
-        {
-            //3.获取区块
-            let chunk = self.ctx.chunk_get_mut_loaded(&chunk_key).await;
-            //4.移除数据
-            chunk.del_player(true, p);
-        }
-        let chunk = self.ctx.chunk_get(&chunk_key).unwrap();
-
-        //5.给感兴趣的单位发送
-        let (v,priority)=game::entity::pack_serialize_remove_entity(
-            p.entity_id,RemoveEntityType::disco
-        );
-        for pid in &chunk.be_interested_by{
-            let _p=self.ctx.player_man_ref().playerid_2_player.get(pid).unwrap();
-            // self.ctx.client_manager.get_player_sender(p)
-            //     .serialize_and_send(protos::common::Remove,PackIds);
-            self.ctx.client_man_ref().get_player_sender(_p)
-                .send(v.clone(),priority).await
-        }
-        //6.给partsever发送
-        let ps=part_server_sync::get_part_server_sender_of_chunk(
-            self.ctx,chunk_key
-        ).await;
-        match ps{
-            None => {}
-            Some(pss) => {
-                pss.send(v.clone(),priority).await;
+        let mut entity = self.ctx.entities_mut().remove(&p.entity_id).unwrap();
+        if let Some(chunkkey)=entity.chunkkey.take(){
+            //2.根据位置计算chunk_key
+            {
+                //3.获取区块
+                let chunk = self.ctx.chunk_get_mut_loaded(&chunkkey).await;
+                //4.移除数据
+                chunk.del_entity(p.entity_id);
             }
+            let chunk = self.ctx.chunk_get(&chunkkey).unwrap();
+
+            //5.给感兴趣的单位发送
+            let (v,priority)=game::entity::pack_serialize_remove_entity(
+                p.entity_id,RemoveEntityType::disco
+            );
+
+            //6.remove broadcast
+            // for pid in &chunk.be_interested_by{
+            //     let _p=self.ctx.player_man_ref().playerid_2_player.get(pid).unwrap();
+            //     // self.ctx.client_manager.get_player_sender(p)
+            //     //     .serialize_and_send(protos::common::Remove,PackIds);
+            //     self.ctx.client_man_ref().get_player_sender(_p)
+            //         .send(v.clone(),priority).await
+            // }
+            // //6.给partsever发送
+            // let ps=part_server_sync::get_part_server_sender_of_chunk(
+            //     self.ctx,chunk_key
+            // ).await;
+            // match ps{
+            //     None => {}
+            //     Some(pss) => {
+            //         pss.send(v.clone(),priority).await;
+            //     }
+            // }
         }
+
         // self.ctx.client_manager.get_sender()
     }
     // async fn send_change_2_interested_player(){

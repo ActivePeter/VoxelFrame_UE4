@@ -1,16 +1,13 @@
-// pub mod async_task;
-pub mod entity;
-// pub mod block;
 
 use std::collections::HashMap;
 use crate::{protos, async_task, game};
 use crate::game::{Game, ClientId, ClientOperationId};
 use crate::conv;
 use crate::base_type::point3f_new2;
-use crate::part_server_sync;
-use crate::net_pack;
-use crate::net_pack::{PackIds, MsgEnum};
-use crate::net_pack::MsgEnum::EntityPos;
+use crate::net::part_server_sync;
+use crate::net::net_pack;
+use crate::net::net_pack::{PackIds, MsgEnum};
+use crate::net::net_pack::MsgEnum::EntityPos;
 use crate::net::ClientMsg;
 use crate::protos::common::ClientType::ClientType_GameServer;
 use crate::log;

@@ -1,6 +1,6 @@
 use crate::game::{ClientId, ClientOperationId, Game};
 use crate::protos;
-use crate::net_pack::PackIds;
+use crate::net::net_pack::PackIds;
 
 pub enum OperationResult{
     Succ=0,

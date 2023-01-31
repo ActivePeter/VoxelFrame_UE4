@@ -1,7 +1,9 @@
 use crate::game::{ClientId, Game};
 use crate::protos::common;
-use crate::{conv, net_pack};
-use crate::net_pack::PackIds;
+use crate::{conv};
+use crate::net::net_pack;
+use net_pack::PackIds;
+use crate::net::net_send_packer::pack_to_bytes;
 
 pub(crate) async fn call(cid:ClientId, game:&mut Game, pmcmd:common::MainPlayerJumpCmd){
     //TODO 这里1。2是假的，目前是one server 模式
@@ -20,7 +22,7 @@ pub(crate) async fn call(cid:ClientId, game:&mut Game, pmcmd:common::MainPlayerJ
         None => {}
         Some(cid) => {
             game.client_man_ref().get_sender(cid).send(
-                net_pack::pack_to_bytes(pmcmd, PackIds::EMainPlayerJumpCmd),PackIds::EMainPlayerJumpCmd.default_priority()
+                pack_to_bytes(pmcmd, PackIds::EMainPlayerJumpCmd),PackIds::EMainPlayerJumpCmd.default_priority()
             ).await;
         }
     }

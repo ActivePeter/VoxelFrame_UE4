@@ -1,5 +1,2 @@
-trait NetEvent{
-    fn on_client_disconnected();
-    fn on_client_connected();
-}
-// impl NetEvent for
+mod client_in;
+mod client_out;

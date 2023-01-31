@@ -1,12 +1,13 @@
 use crate::protos::common::{ClientType, PutBlock};
 use crate::protos::common::ClientType::{ClientType_Player, ClientType_GameServer};
 use crate::game::{ClientId, Game};
-use crate::{game, net_send};
+use crate::{game};
+use crate::net::net_send;
 use crate::log;
 // use crate::send;
 use crate::async_task;
 use crate::net::ClientMsg;
-use crate::net_pack::MsgEnum;
+use crate::net::net_pack::MsgEnum;
 use game::operation::OperationResult;
 // use crate::game::game_entity::update_entity_pos;
 
@@ -55,16 +56,18 @@ pub(crate) mod block_type {
 
 pub(crate) mod put_block{
     use crate::*;
-    use crate::{game, log, conv, protos, net_pack};
+    use crate::{game, log, conv, protos};
+    use crate::net::{net_pack, part_server_sync};
     use crate::protos::common::{ClientType, PutBlock, Rpl_PutBlockInPs};
-    use crate::game::{ClientId, part_server_sync, Game};
+    use crate::game::{ClientId, Game};
     use crate::protos::common::ClientType::ClientType_Player;
     use crate::async_task::AsyncTask;
     use protobuf::SingularPtrField;
-    use crate::net_pack::PackIds;
+    use crate::net::net_pack::PackIds;
     use crate::game::operation::OperationResult;
     use crate::game::chunk::Chunk;
     use crate::base_type:: point3f_new2;
+    use crate::net::net_send_packer::packbox_to_bytes;
 
 
     // pub mod chunksync{
@@ -75,8 +78,7 @@ pub(crate) mod put_block{
     pub async fn notifyinterest_putblock(ctx:&mut Game,putter_cid:ClientId,pb:Box<PutBlock>){
         let ck =conv::point3i_2_chunkkey2(pb.x,pb.y,pb.z);
         let chunk=ctx.chunk_get(&ck).unwrap();
-        let v=
-            net_pack::packbox_to_bytes(pb, PackIds::EPutBlock);
+        let v=packbox_to_bytes(pb, PackIds::EPutBlock);
         for pid in &chunk.be_interested_by{
             let cid=ctx.player_man_ref().playerid_2_player.get(pid).unwrap()
                 .client_id;

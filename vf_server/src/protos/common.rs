@@ -672,7 +672,7 @@ impl ::protobuf::reflect::ProtobufValue for EntityPos {
 #[derive(PartialEq,Clone,Default)]
 pub struct PlayerBasic {
     // message fields
-    pub entity_id: u32,
+    pub pos: ::protobuf::SingularPtrField<EntityPos>,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -689,24 +689,47 @@ impl PlayerBasic {
         ::std::default::Default::default()
     }
 
-    // uint32 entity_id = 1;
+    // .EntityPos pos = 1;
 
 
-    pub fn get_entity_id(&self) -> u32 {
-        self.entity_id
+    pub fn get_pos(&self) -> &EntityPos {
+        self.pos.as_ref().unwrap_or_else(|| <EntityPos as ::protobuf::Message>::default_instance())
     }
-    pub fn clear_entity_id(&mut self) {
-        self.entity_id = 0;
+    pub fn clear_pos(&mut self) {
+        self.pos.clear();
+    }
+
+    pub fn has_pos(&self) -> bool {
+        self.pos.is_some()
     }
 
     // Param is passed by value, moved
-    pub fn set_entity_id(&mut self, v: u32) {
-        self.entity_id = v;
+    pub fn set_pos(&mut self, v: EntityPos) {
+        self.pos = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_pos(&mut self) -> &mut EntityPos {
+        if self.pos.is_none() {
+            self.pos.set_default();
+        }
+        self.pos.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_pos(&mut self) -> EntityPos {
+        self.pos.take().unwrap_or_else(|| EntityPos::new())
     }
 }
 
 impl ::protobuf::Message for PlayerBasic {
     fn is_initialized(&self) -> bool {
+        for v in &self.pos {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
         true
     }
 
@@ -715,11 +738,7 @@ impl ::protobuf::Message for PlayerBasic {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
                 1 => {
-                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
-                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
-                    }
-                    let tmp = is.read_uint32()?;
-                    self.entity_id = tmp;
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.pos)?;
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -733,8 +752,9 @@ impl ::protobuf::Message for PlayerBasic {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u32 {
         let mut my_size = 0;
-        if self.entity_id != 0 {
-            my_size += ::protobuf::rt::value_size(1, self.entity_id, ::protobuf::wire_format::WireTypeVarint);
+        if let Some(ref v) = self.pos.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
@@ -742,8 +762,10 @@ impl ::protobuf::Message for PlayerBasic {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
-        if self.entity_id != 0 {
-            os.write_uint32(1, self.entity_id)?;
+        if let Some(ref v) = self.pos.as_ref() {
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -783,10 +805,10 @@ impl ::protobuf::Message for PlayerBasic {
         static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
         descriptor.get(|| {
             let mut fields = ::std::vec::Vec::new();
-            fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
-                "entity_id",
-                |m: &PlayerBasic| { &m.entity_id },
-                |m: &mut PlayerBasic| { &mut m.entity_id },
+            fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<EntityPos>>(
+                "pos",
+                |m: &PlayerBasic| { &m.pos },
+                |m: &mut PlayerBasic| { &mut m.pos },
             ));
             ::protobuf::reflect::MessageDescriptor::new_pb_name::<PlayerBasic>(
                 "PlayerBasic",
@@ -804,7 +826,7 @@ impl ::protobuf::Message for PlayerBasic {
 
 impl ::protobuf::Clear for PlayerBasic {
     fn clear(&mut self) {
-        self.entity_id = 0;
+        self.pos.clear();
         self.unknown_fields.clear();
     }
 }
@@ -1351,6 +1373,180 @@ impl ::std::fmt::Debug for ChunkEntityPack {
 }
 
 impl ::protobuf::reflect::ProtobufValue for ChunkEntityPack {
+    fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
+        ::protobuf::reflect::ReflectValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct PlayerPosUpdate {
+    // message fields
+    pub entity_pos: ::protobuf::SingularPtrField<EntityPos>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a PlayerPosUpdate {
+    fn default() -> &'a PlayerPosUpdate {
+        <PlayerPosUpdate as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl PlayerPosUpdate {
+    pub fn new() -> PlayerPosUpdate {
+        ::std::default::Default::default()
+    }
+
+    // .EntityPos entity_pos = 1;
+
+
+    pub fn get_entity_pos(&self) -> &EntityPos {
+        self.entity_pos.as_ref().unwrap_or_else(|| <EntityPos as ::protobuf::Message>::default_instance())
+    }
+    pub fn clear_entity_pos(&mut self) {
+        self.entity_pos.clear();
+    }
+
+    pub fn has_entity_pos(&self) -> bool {
+        self.entity_pos.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_entity_pos(&mut self, v: EntityPos) {
+        self.entity_pos = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_entity_pos(&mut self) -> &mut EntityPos {
+        if self.entity_pos.is_none() {
+            self.entity_pos.set_default();
+        }
+        self.entity_pos.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_entity_pos(&mut self) -> EntityPos {
+        self.entity_pos.take().unwrap_or_else(|| EntityPos::new())
+    }
+}
+
+impl ::protobuf::Message for PlayerPosUpdate {
+    fn is_initialized(&self) -> bool {
+        for v in &self.entity_pos {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.entity_pos)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if let Some(ref v) = self.entity_pos.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
+        if let Some(ref v) = self.entity_pos.as_ref() {
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: ::std::boxed::Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> PlayerPosUpdate {
+        PlayerPosUpdate::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::LazyV2<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::LazyV2::INIT;
+        descriptor.get(|| {
+            let mut fields = ::std::vec::Vec::new();
+            fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<EntityPos>>(
+                "entity_pos",
+                |m: &PlayerPosUpdate| { &m.entity_pos },
+                |m: &mut PlayerPosUpdate| { &mut m.entity_pos },
+            ));
+            ::protobuf::reflect::MessageDescriptor::new_pb_name::<PlayerPosUpdate>(
+                "PlayerPosUpdate",
+                fields,
+                file_descriptor_proto()
+            )
+        })
+    }
+
+    fn default_instance() -> &'static PlayerPosUpdate {
+        static instance: ::protobuf::rt::LazyV2<PlayerPosUpdate> = ::protobuf::rt::LazyV2::INIT;
+        instance.get(PlayerPosUpdate::new)
+    }
+}
+
+impl ::protobuf::Clear for PlayerPosUpdate {
+    fn clear(&mut self) {
+        self.entity_pos.clear();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for PlayerPosUpdate {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for PlayerPosUpdate {
     fn as_ref(&self) -> ::protobuf::reflect::ReflectValueRef {
         ::protobuf::reflect::ReflectValueRef::Message(self)
     }
@@ -4110,46 +4306,48 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x20\x01(\x02R\x05rRollB\0\x12\x15\n\x05r_yaw\x18\x07\x20\x01(\x02R\x04r\
     YawB\0\x12\x19\n\x07r_pitch\x18\x08\x20\x01(\x02R\x06rPitchB\0\x12\x10\n\
     \x02vx\x18\t\x20\x01(\x02R\x02vxB\0\x12\x10\n\x02vy\x18\n\x20\x01(\x02R\
-    \x02vyB\0\x12\x10\n\x02vz\x18\x0b\x20\x01(\x02R\x02vzB\0:\0\".\n\x0bPlay\
-    erBasic\x12\x1d\n\tentity_id\x18\x01\x20\x01(\rR\x08entityIdB\0:\0\"S\n\
-    \tChunkPack\x12\x14\n\x04data\x18\x01\x20\x01(\x0cR\x04dataB\0\x12\x0e\n\
-    \x01x\x18\x02\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\x18\x03\x20\x01(\x05R\
-    \x01yB\0\x12\x0e\n\x01z\x18\x04\x20\x01(\x05R\x01zB\0:\0\"p\n\x0fChunkEn\
-    tityPack\x12+\n\nentity_pos\x18\x01\x20\x03(\x0b2\n.EntityPosR\tentityPo\
-    sB\0\x12\x0e\n\x01x\x18\x02\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\x18\x03\
-    \x20\x01(\x05R\x01yB\0\x12\x0e\n\x01z\x18\x04\x20\x01(\x05R\x01zB\0:\0\"\
-    \x9b\x01\n\x11MainPlayerMoveCmd\x12\x1d\n\tentity_id\x18\x01\x20\x01(\rR\
-    \x08entityIdB\0\x12#\n\x0cmove_forward\x18\x02\x20\x01(\x02R\x0bmoveForw\
-    ardB\0\x12\x1f\n\nmove_right\x18\x03\x20\x01(\x02R\tmoveRightB\0\x12\x1f\
-    \n\nrotate_yaw\x18\x04\x20\x01(\x02R\trotateYawB\0:\0\"X\n\x11MainPlayer\
-    JumpCmd\x12\"\n\x0cstart_or_end\x18\x01\x20\x01(\rR\nstartOrEndB\0\x12\
-    \x1d\n\tentity_id\x18\x02\x20\x01(\rR\x08entityIdB\0:\0\"_\n\x13Cmd_Spaw\
-    nEntityInPs\x12\x19\n\x07task_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12+\n\
-    \nentity_pos\x18\x02\x20\x01(\x0b2\n.EntityPosR\tentityPosB\0:\0\"_\n\
-    \x13Rpl_SpawnEntityInPs\x12\x19\n\x07task_id\x18\x01\x20\x01(\rR\x06task\
-    IdB\0\x12+\n\nentity_pos\x18\x02\x20\x01(\x0b2\n.EntityPosR\tentityPosB\
-    \0:\0\"@\n\x0fEntityPosUpdate\x12+\n\nentity_pos\x18\x01\x20\x03(\x0b2\n\
-    .EntityPosR\tentityPosB\0:\0\"~\n\x08PutBlock\x12\x0e\n\x01x\x18\x01\x20\
-    \x01(\x05R\x01xB\0\x12\x0e\n\x01y\x18\x02\x20\x01(\x05R\x01yB\0\x12\x0e\
-    \n\x01z\x18\x03\x20\x01(\x05R\x01zB\0\x12\x1b\n\x08block_id\x18\x04\x20\
-    \x01(\x05R\x07blockIdB\0\x12#\n\x0coperation_id\x18\x05\x20\x01(\rR\x0bo\
-    perationIdB\0:\0\"Y\n\x10Cmd_PutBlockInPs\x12\x19\n\x07task_id\x18\x01\
-    \x20\x01(\rR\x06taskIdB\0\x12(\n\tput_block\x18\x02\x20\x01(\x0b2\t.PutB\
-    lockR\x08putBlockB\0:\0\"L\n\x10Rpl_PutBlockInPs\x12\x19\n\x07task_id\
-    \x18\x01\x20\x01(\rR\x06taskIdB\0\x12\x1b\n\x08put_succ\x18\x02\x20\x01(\
-    \rR\x07putSuccB\0:\0\">\n\x15ClientOperationFailed\x12#\n\x0coperation_i\
-    d\x18\x01\x20\x01(\rR\x0boperationIdB\0:\0\"<\n\x13ClientOperationSucc\
-    \x12#\n\x0coperation_id\x18\x01\x20\x01(\rR\x0boperationIdB\0:\0\"e\n\
-    \x0cRemoveEntity\x124\n\x0bremove_type\x18\x01\x20\x01(\x0e2\x11.RemoveE\
-    ntityTypeR\nremoveTypeB\0\x12\x1d\n\tentity_id\x18\x02\x20\x01(\rR\x08en\
-    tityIdB\0:\0\"A\n\rProtoChunkKey\x12\x0e\n\x01x\x18\x01\x20\x01(\x05R\
-    \x01xB\0\x12\x0e\n\x01y\x18\x02\x20\x01(\x05R\x01yB\0\x12\x0e\n\x01z\x18\
-    \x03\x20\x01(\x05R\x01zB\0:\0\"H\n\x13PlayerRequestChunks\x12/\n\nchunk_\
-    keys\x18\x01\x20\x03(\x0b2\x0e.ProtoChunkKeyR\tchunkKeysB\0:\0*@\n\nClie\
-    ntType\x12\x19\n\x15ClientType_GameServer\x10\0\x12\x15\n\x11ClientType_\
-    Player\x10\x01\x1a\0*(\n\nEntityType\x12\n\n\x06T_Null\x10\0\x12\x0c\n\
-    \x08T_Player\x10\x01\x1a\0*6\n\x10RemoveEntityType\x12\n\n\x06killed\x10\
-    \0\x12\t\n\x05disco\x10\x01\x12\t\n\x05clear\x10\x02\x1a\0B\0b\x06proto3\
+    \x02vyB\0\x12\x10\n\x02vz\x18\x0b\x20\x01(\x02R\x02vzB\0:\0\"/\n\x0bPlay\
+    erBasic\x12\x1e\n\x03pos\x18\x01\x20\x01(\x0b2\n.EntityPosR\x03posB\0:\0\
+    \"S\n\tChunkPack\x12\x14\n\x04data\x18\x01\x20\x01(\x0cR\x04dataB\0\x12\
+    \x0e\n\x01x\x18\x02\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\x18\x03\x20\x01\
+    (\x05R\x01yB\0\x12\x0e\n\x01z\x18\x04\x20\x01(\x05R\x01zB\0:\0\"p\n\x0fC\
+    hunkEntityPack\x12+\n\nentity_pos\x18\x01\x20\x03(\x0b2\n.EntityPosR\ten\
+    tityPosB\0\x12\x0e\n\x01x\x18\x02\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\
+    \x18\x03\x20\x01(\x05R\x01yB\0\x12\x0e\n\x01z\x18\x04\x20\x01(\x05R\x01z\
+    B\0:\0\"@\n\x0fPlayerPosUpdate\x12+\n\nentity_pos\x18\x01\x20\x01(\x0b2\
+    \n.EntityPosR\tentityPosB\0:\0\"\x9b\x01\n\x11MainPlayerMoveCmd\x12\x1d\
+    \n\tentity_id\x18\x01\x20\x01(\rR\x08entityIdB\0\x12#\n\x0cmove_forward\
+    \x18\x02\x20\x01(\x02R\x0bmoveForwardB\0\x12\x1f\n\nmove_right\x18\x03\
+    \x20\x01(\x02R\tmoveRightB\0\x12\x1f\n\nrotate_yaw\x18\x04\x20\x01(\x02R\
+    \trotateYawB\0:\0\"X\n\x11MainPlayerJumpCmd\x12\"\n\x0cstart_or_end\x18\
+    \x01\x20\x01(\rR\nstartOrEndB\0\x12\x1d\n\tentity_id\x18\x02\x20\x01(\rR\
+    \x08entityIdB\0:\0\"_\n\x13Cmd_SpawnEntityInPs\x12\x19\n\x07task_id\x18\
+    \x01\x20\x01(\rR\x06taskIdB\0\x12+\n\nentity_pos\x18\x02\x20\x01(\x0b2\n\
+    .EntityPosR\tentityPosB\0:\0\"_\n\x13Rpl_SpawnEntityInPs\x12\x19\n\x07ta\
+    sk_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12+\n\nentity_pos\x18\x02\x20\
+    \x01(\x0b2\n.EntityPosR\tentityPosB\0:\0\"@\n\x0fEntityPosUpdate\x12+\n\
+    \nentity_pos\x18\x01\x20\x03(\x0b2\n.EntityPosR\tentityPosB\0:\0\"~\n\
+    \x08PutBlock\x12\x0e\n\x01x\x18\x01\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\
+    \x18\x02\x20\x01(\x05R\x01yB\0\x12\x0e\n\x01z\x18\x03\x20\x01(\x05R\x01z\
+    B\0\x12\x1b\n\x08block_id\x18\x04\x20\x01(\x05R\x07blockIdB\0\x12#\n\x0c\
+    operation_id\x18\x05\x20\x01(\rR\x0boperationIdB\0:\0\"Y\n\x10Cmd_PutBlo\
+    ckInPs\x12\x19\n\x07task_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12(\n\tput\
+    _block\x18\x02\x20\x01(\x0b2\t.PutBlockR\x08putBlockB\0:\0\"L\n\x10Rpl_P\
+    utBlockInPs\x12\x19\n\x07task_id\x18\x01\x20\x01(\rR\x06taskIdB\0\x12\
+    \x1b\n\x08put_succ\x18\x02\x20\x01(\rR\x07putSuccB\0:\0\">\n\x15ClientOp\
+    erationFailed\x12#\n\x0coperation_id\x18\x01\x20\x01(\rR\x0boperationIdB\
+    \0:\0\"<\n\x13ClientOperationSucc\x12#\n\x0coperation_id\x18\x01\x20\x01\
+    (\rR\x0boperationIdB\0:\0\"e\n\x0cRemoveEntity\x124\n\x0bremove_type\x18\
+    \x01\x20\x01(\x0e2\x11.RemoveEntityTypeR\nremoveTypeB\0\x12\x1d\n\tentit\
+    y_id\x18\x02\x20\x01(\rR\x08entityIdB\0:\0\"A\n\rProtoChunkKey\x12\x0e\n\
+    \x01x\x18\x01\x20\x01(\x05R\x01xB\0\x12\x0e\n\x01y\x18\x02\x20\x01(\x05R\
+    \x01yB\0\x12\x0e\n\x01z\x18\x03\x20\x01(\x05R\x01zB\0:\0\"H\n\x13PlayerR\
+    equestChunks\x12/\n\nchunk_keys\x18\x01\x20\x03(\x0b2\x0e.ProtoChunkKeyR\
+    \tchunkKeysB\0:\0*@\n\nClientType\x12\x19\n\x15ClientType_GameServer\x10\
+    \0\x12\x15\n\x11ClientType_Player\x10\x01\x1a\0*(\n\nEntityType\x12\n\n\
+    \x06T_Null\x10\0\x12\x0c\n\x08T_Player\x10\x01\x1a\0*6\n\x10RemoveEntity\
+    Type\x12\n\n\x06killed\x10\0\x12\t\n\x05disco\x10\x01\x12\t\n\x05clear\
+    \x10\x02\x1a\0B\0b\x06proto3\
 ";
 
 static file_descriptor_proto_lazy: ::protobuf::rt::LazyV2<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::rt::LazyV2::INIT;

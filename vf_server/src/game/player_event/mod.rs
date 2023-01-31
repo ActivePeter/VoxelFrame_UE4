@@ -4,3 +4,4 @@ pub(crate) mod cmd_move;
 pub(crate) mod player_chunk_change;
 pub(crate) mod request_chunks;
 pub(crate) mod player_pos_update;
+pub(crate) mod connected;

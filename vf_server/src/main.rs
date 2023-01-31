@@ -1,6 +1,7 @@
 #![feature(linked_list_remove)]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
+#![feature(sync_unsafe_cell)]
 
 
 // mod game;
@@ -9,19 +10,12 @@
 mod base_type;
 mod net;
 mod conv;
-mod net_send;
-mod send_packer;
 mod protos;
-pub mod net_pack;
-mod part_server_sync;
 
 mod async_task;
 
 mod log;
 mod game;
-pub mod netclient;
-mod net_event;
-mod event;
 // mod base_func;
 
 // use std::net::TcpListener;

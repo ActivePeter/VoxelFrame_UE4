@@ -1,3 +1,10 @@
+pub(crate) mod net_client;
+pub(crate) mod net_event;
+pub(crate) mod net_pack;
+pub(crate) mod part_server_sync;
+pub(crate) mod net_send_packer;
+pub(crate) mod net_send;
+
 use crate::*;
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::net::TcpStream;
@@ -5,7 +12,7 @@ use std::net::SocketAddr;
 use game::player::Player;
 use tokio::sync::{mpsc, oneshot};
 use crate::protos::common::{ClientFirstConfirm, EntityPos, PlayerBasic, ChunkPack, ChunkEntityPack, ClientType};
-use crate::net_pack::{MsgEnum, PackIds};
+use crate::net::net_pack::{MsgEnum, PackIds};
 use crate::net::msg_pack_make::MsgPackMaker;
 use crate::protos::common::ClientType::{ClientType_Player, ClientType_GameServer};
 use crate::game::{ClientId, GameMainLoopChannels};
@@ -13,6 +20,7 @@ use crate::game::{ClientId, GameMainLoopChannels};
 use tokio::io::AsyncWriteExt;
 use pa_queue_and_chan::priotity_async_mpsc_chan::Sender as PrioritySender;
 use pa_queue_and_chan::priotity_async_mpsc_chan::Receiver as PriorityReceiver;
+use crate::net::net_send_packer::pack_to_bytes;
 
 //当前文件，表示读写循环
 
@@ -64,7 +72,7 @@ pub struct ClientSender{
 impl ClientSender{
     pub async fn serialize_and_send<T: ::protobuf::Message>(
         &self,proto_pack: T, pack_id: PackIds){
-        let bytes= net_pack::pack_to_bytes(proto_pack, pack_id.clone());
+        let bytes= pack_to_bytes(proto_pack, pack_id.clone());
         // self.sender.send(bytes).await;
         self.sender.send_sync(bytes,pack_id.default_priority());
     }
@@ -271,7 +279,7 @@ impl ReceiveHandlerKernel {
 
 mod msg_pack_make {
     use byteorder::{LittleEndian, BigEndian, ByteOrder};
-    use crate::net_pack::{MsgEnum, bytes_to_pack};
+    use crate::net::net_pack::{MsgEnum, bytes_to_pack};
     use crate::net::{ReceiveHandlerKernel};
     use tokio::macros::support::Future;
 

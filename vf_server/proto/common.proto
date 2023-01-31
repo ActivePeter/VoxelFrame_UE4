@@ -35,7 +35,7 @@ message EntityPos{
 
 //首次进入游戏
 message PlayerBasic{
-  uint32 entity_id = 1;
+  EntityPos pos=1;
 }
 
 message ChunkPack{
@@ -52,12 +52,18 @@ message ChunkEntityPack{
   int32 z = 4;
 }
 
+// from player send
+message PlayerPosUpdate{
+  EntityPos entity_pos=1;
+}
+
 message MainPlayerMoveCmd{
   uint32 entity_id=   1;//作用是转发到partserver的时候可以找到对应的实体
   float move_forward= 2;
   float move_right=   3;
   float rotate_yaw=   4;//左右转
 }
+
 message MainPlayerJumpCmd{
   uint32 start_or_end=1;
   uint32 entity_id=   2;//作用是转发到partserver的时候可以找到对应的实体
@@ -124,3 +130,5 @@ message ProtoChunkKey{
 message PlayerRequestChunks{
   repeated ProtoChunkKey chunk_keys=1;
 }
+
+

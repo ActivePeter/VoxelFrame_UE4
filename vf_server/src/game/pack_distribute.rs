@@ -1,13 +1,13 @@
 use crate::net::{ClientMsgEnum, ClientMsg};
-use crate::net_pack::MsgEnum;
+use crate::net::net_pack::MsgEnum;
 use crate::protos::common::ClientType;
-use crate::{async_task, part_server_sync, log};
+use crate::{async_task, log};
+use crate::net::part_server_sync;
 use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
 use crate::game::{Game, player, entity, block};
-use crate::netclient;
+use crate::net::net_client;
 use crate::game::player::PlayerConnectionHandler;
-use crate::event::player_event;
-use crate::event::chunk_event;
+use crate::game::{player_event,chunk_event};
 // use std::alloc::Global;
 
 // pub struct PackHandler{
@@ -42,8 +42,7 @@ pub async fn distribute_client_common_msg(context:&mut Game,msg:ClientMsgEnum){
 
                     // println!("EntityPosUpdate From PartServer");
                     if msg.client_type==ClientType_GameServer{
-                        chunk_event::entity_pos_update::call(context, epu,
-                                                                false, 0).await;
+                        chunk_event::entity_pos_update::on_ps_update(context, epu).await;
                     }
 
                     // false
@@ -76,6 +75,9 @@ pub async fn distribute_client_common_msg(context:&mut Game,msg:ClientMsgEnum){
                     }
                     // false
                 }
+                MsgEnum::PlayerPosUpdate(player_pos_update)=>{
+                    player_event::player_pos_update::on_player_msg(context, player_pos_update).await;
+                }
                 _ => {
                     // true
                 }
@@ -98,16 +100,14 @@ pub async fn distribute_client_common_msg(context:&mut Game,msg:ClientMsgEnum){
                 // _after_client_connect::after_client_connect_part_server(game,cid).await;
             }else if m.client_type==ClientType_Player{
                 //获取玩家位置
-                PlayerConnectionHandler::new(context).on_player_connect_getcid(id).await;
-                // println!("ClientType_Player");
-                // _after_client_connect::after_client_connect_player(game, cid).await;
+                player_event::connected::on_player_connect_getcid(context,id).await;
             }else{
                 println!("ClientConnect unknown type");
             }
             // game_flow::after_client_connect(context, id).await;
         }
         ClientMsgEnum::ClientDisconnect(m) => {
-            netclient::NetClientOperator::new(context)
+            net_client::NetClientOperator::new(context)
                 .on_client_disconnect(m.client_id).await
             // context.client_manager.remove_client(m.client_id);
         }

@@ -6,6 +6,9 @@ pub(crate) mod pack_distribute;
 pub(crate) mod operation;
 mod chunk_terrain;
 mod terrain_gen;
+pub(crate) mod chunk_send;
+pub(crate) mod player_event;
+pub(crate) mod chunk_event;
 
 pub use crate::*;
 use std::collections::{HashMap, HashSet};
@@ -20,24 +23,26 @@ use tokio::net::windows::named_pipe::PipeEnd::Client;
 use std::thread::{spawn, LocalKey, sleep};
 use tokio::sync::{mpsc, oneshot, Mutex};
 use tokio::task;
-use crate::net::{ClientMsg, ClientMsgEnum, ClientDescription, ClientSender};
+use crate::net::{ClientMsg, ClientMsgEnum, ClientDescription, ClientSender, part_server_sync};
 // use std::borrow::Borrow;
 use crate::protos::common::ClientType;
 use crate::protos::common::ClientType::{ClientType_GameServer, ClientType_Player};
-use crate::part_server_sync::PartServerSync;
+use net::part_server_sync::PartServerSync;
 use game::entity::{EntityId, EntityData};
-use crate::net_pack::MsgEnum;
-use crate::net_pack::MsgEnum::MainPlayerMoveCmd;
+use net::net_pack::MsgEnum;
+use net::net_pack::MsgEnum::MainPlayerMoveCmd;
 use crate::async_task::AsyncTaskManager;
 use crate::game::player::PlayerManager;
 use tokio::time::Duration;
 use std::sync::atomic::AtomicI32;
 use std::sync::atomic::Ordering::{Relaxed, Release, Acquire};
-use crate::event::chunk_event;
 use crate::game::chunk::{VF_CHUNK_WIDTH, ChunkLoadStage};
 use crate::game::terrain_gen::tree::TerrainGenTree;
 use std::cell::Cell;
 use std::collections::hash_map::RandomState;
+use tokio::sync::mpsc::Sender;
+use crate::game::chunk_send::SendChunkTask;
+use net::net_client::ClientManager;
 
 pub type ClientId = usize;
 pub type ClientOperationId=u32;
@@ -69,55 +74,7 @@ pub type ClientOperationId=u32;
 
 // }
 // #[derive(Default, Debug)]
-pub struct ClientManager{
-    next_client_id:ClientId,
-    pub(crate) id2client :HashMap<ClientId,ClientDescription>,
-    partserver_clients:HashSet<ClientId>,
-    player_clients:HashSet<ClientId>,
-}
-impl ClientManager{
-    pub fn get_player_sender(&self, player: &Player) -> ClientSender {
-        return self.id2client.get(&(player.client_id)).unwrap().sender.clone();
-    }
 
-    //make sure the cid is valid before call
-    pub fn get_sender(&self,cid:ClientId)->ClientSender{
-        return self.id2client.get(&(cid)).unwrap().sender.clone();
-    }
-    pub fn add_new_client(&mut self, mut sender:ClientSender, client_type:ClientType) ->ClientId{
-        // sender.id=self.next_client_id;
-        self.id2client.insert(self.next_client_id,ClientDescription{
-            client_type,
-            sender,
-            client_id: self.next_client_id
-        });
-        if(client_type==ClientType_GameServer){
-            self.partserver_clients.insert(self.next_client_id);
-        }else{
-            self.player_clients.insert(self.next_client_id);
-        }
-        self.next_client_id+=1;
-
-        return self.next_client_id-1;
-    }
-    pub fn remove_client(&mut self,cid:ClientId){
-        let ctype=self.id2client.get(&cid).unwrap().client_type;
-        if ctype==ClientType_GameServer{
-            self.partserver_clients.remove(&cid);
-        }else{
-            self.player_clients.remove(&cid);
-        }
-        self.id2client.remove(&cid);
-    }
-    pub fn get_clienttype(&self,cid:ClientId)->Option<ClientType>{
-        match self.id2client.get(&cid){
-            None => {None}
-            Some(c) => {
-                Some(c.client_type)
-            }
-        }
-    }
-}
 pub struct Game {
     //enityid_entity_map:
 
@@ -132,28 +89,25 @@ pub struct Game {
     _client_manager:RefCell<ClientManager>,
     _part_server_sync:RefCell<PartServerSync>,
     _async_task_manager:RefCell<AsyncTaskManager>,
+    pub(crate) _chunk_sender:Sender<SendChunkTask>
 }
 unsafe impl Send for Game{}
 unsafe impl Sync for Game{}
 
 impl Game {
-    pub fn new() -> Game {
+    pub(crate) fn new(chunk_sender:Sender<SendChunkTask>) -> Game {
         Game {
             _next_entity_id: RefCell::new(0),
             _chunks: Default::default(),
             _entities: Default::default(),
             _player_manager: RefCell::new(PlayerManager::create_once()),
 
-            _client_manager:RefCell::new(ClientManager{
-                next_client_id: 0,
-                id2client: Default::default(),
-                partserver_clients: Default::default(),
-                player_clients: Default::default()
-            }),
+            _client_manager:RefCell::new(ClientManager::new()),
             _part_server_sync:RefCell::new(PartServerSync::new()),
             _async_task_manager: RefCell::new(
                 AsyncTaskManager::new()
             ),
+            _chunk_sender:chunk_sender
         }
     }
     pub(crate) fn tick(&mut self){
@@ -211,8 +165,8 @@ impl Game {
     }
     pub fn chunks_mut(&self) -> &mut HashMap<ChunkKey, Chunk> { unsafe{&mut *self._chunks.as_ptr() } }
 
-    pub fn client_man_ref(&self) -> &ClientManager { unsafe{& *self._client_manager.as_ptr() } }
-    pub fn client_man_mut(&self) -> &ClientManager { unsafe{&mut *self._client_manager.as_ptr() } }
+    pub(crate) fn client_man_ref(&self) -> &ClientManager { unsafe{& *self._client_manager.as_ptr() } }
+    pub(crate) fn client_man_mut(&self) -> &ClientManager { unsafe{&mut *self._client_manager.as_ptr() } }
 
     pub fn player_man_ref(&self) -> &PlayerManager {
         unsafe{& *self._player_manager.as_ptr()}
@@ -324,11 +278,14 @@ pub async fn main_loop()
             sleep(Duration::from_millis(20));
         });
     }
+
+
     //
     // let mut game = game::Game::create();
     // local.spawn_local(async move {
     tokio::spawn(async move {
-        let mut context = game::Game::new();
+        let chunksender=chunk_send::ChunkSendWorker::spawn().await;
+        let mut context = game::Game::new(chunksender);
         // let mut packhandlers=game_pack_distribute::create_packhandlers();
         // task::spawn_local(async move{
         println!("game main loop task spawned");

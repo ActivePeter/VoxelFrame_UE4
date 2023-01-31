@@ -1,6 +1,6 @@
 use crate::game::{Game, ClientId};
 use crate::protos::common::ClientType::{ClientType_Player, ClientType_GameServer};
-use crate::part_server_sync;
+use crate::net::part_server_sync;
 use crate::game::player::{PlayerConnectionHandler, Player, PlayerId};
 use std::collections::{HashMap, HashSet, LinkedList};
 use crate::net::{ClientSender, ClientDescription};
