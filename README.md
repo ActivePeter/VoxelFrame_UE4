@@ -7,7 +7,7 @@
 
 
 
-![](https://s3.bmp.ovh/imgs/2023/01/31/d94e9ddb0c27a298.png)
+![](https://s3.bmp.ovh/imgs/2023/01/31/a59bdd4316c5df7e.png)
 
 ## Organization（组织
 
